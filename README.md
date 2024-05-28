@@ -8,7 +8,7 @@ source /cvmfs/sft.cern.ch/lcg/views/LCG_105/x86_64-el9-gcc13-opt/setup.sh
 
 which delivers ROOT version 6.30, built with C++20. The header-only dependencies also depend on C++20
 with a modern compiler, i.e. GCC13 is a minimum. Some parts compile on Apple-clang version 15 and GCC12 but
-all togther fail eventually. Only GCC13 covers all dependencies.
+all together fail eventually. Only GCC13 covers all dependencies.
 
 There are two small libraries to be built, the tools and the modules. Each is required to build an app,
 i.e. a reconstruction pipeline code. There are currently 2 apps in the apps folder as examples on how
