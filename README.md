@@ -16,3 +16,31 @@ to use the pipeline. The tools are considered fairly complete, and they would be
 are meant to run in the pipeline. The modules folder holds examples for a few of the tools as well as
 examples for reader modules (sources) and pipeline sinks like a writer or a print to screen.
 
+The cmake file builds all the individual little test codes from the examples folder. These should demonstrate
+the proper functioning of individual tools, at least for the case considered in the example code. They
+would typically produce a little output file (csv type) which can be read and plotted with a Python script from
+the examples folder for that particular case. Can all be done neater but is one-by-one for now.
+
+One main external dependency to get used to (also for reading code) is the unit system from here
+
+https://github.com/mpusz/mp-units
+
+which is being included in this pipeline reconstruction since our tools mostly represent
+physics objects and good unit handling is beneficial. It just needs getting used to when reading and using code.
+Note also that the fmt and gsl external dependencies originate entirely from mp-units and should disappear as
+compilers cover more and more of C++20 concepts.
+
+The pipeline 'yapp' also builds heavily on C++20, from here:
+
+https://github.com/picanumber/yapp
+
+Examples and features can be found on that page. Two more external header-only libraries are in the utils
+folder for now and may change in the future. A convenient CSV file reader (https://github.com/d99kris/rapidcsv)
+and a spline algorithm for interpolation (https://github.com/ttk592/spline/tree/master). The FFT library from
+(https://github.com/jdupuy/dj_fft) has been used and heavily simplified (feature-reduced) since we only
+require 1-D FFT with real values, nothing else. The Butterworth filter algorithm comes from here
+(https://github.com/adis300/filter-c), and again was simplified to using the low-pass only. Finally, the apps
+use the command line tool CLI11 (https://github.com/CLIUtils/CLI11).
+
+
+
