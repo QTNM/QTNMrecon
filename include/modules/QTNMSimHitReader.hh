@@ -29,6 +29,17 @@ class QTNMSimHitReader
 
     // ROOT file access for member functions
     TTreeReader& reader;
+    TTreeReaderValue<int> eventID;
+    TTreeReaderValue<int> trackID;
+    TTreeReaderValue<double> edep; // interaction data
+    TTreeReaderValue<double> tstamp;
+    TTreeReaderValue<double> prek;
+    TTreeReaderValue<double> postk;
+    TTreeReaderValue<double> preth;
+    TTreeReaderValue<double> postth;
+    TTreeReaderValue<double> posx; // interaction location
+    TTreeReaderValue<double> posy;
+    TTreeReaderValue<double> posz;
 
     // these below serve as string keys to access (read/write) the Event map
     std::string outkey;

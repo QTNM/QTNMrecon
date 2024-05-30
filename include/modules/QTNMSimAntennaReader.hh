@@ -29,6 +29,17 @@ class QTNMSimAntennaReader
 
     // ROOT file access for member functions
     TTreeReader& reader;
+    TTreeReaderValue<int> eventID;
+    TTreeReaderValue<int> trackID;
+    TTreeReaderValue<double> posx; // vertex data
+    TTreeReaderValue<double> posy;
+    TTreeReaderValue<double> posz;
+    TTreeReaderValue<double> kine;
+    TTreeReaderValue<double> pangle;
+    TTreeReaderValue<std::vector<int>> aID;
+    TTreeReaderValue<std::vector<double>> kvec;
+    TTreeReaderValue<std::vector<double>> tvec;
+    TTreeReaderValue<std::vector<double>> vvec;
 
     // these below serve as string keys to access (read/write) the Event map
     std::string outkey;

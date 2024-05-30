@@ -17,7 +17,18 @@ QTNMSimAntennaReader::QTNMSimAntennaReader(TTreeReader& re, std::string out) :
     outkey(std::move(out)),
     maxEventNumber(-1), // default -1 for a all events
     evcounter(0),
-    reader(re)
+    reader(re),
+    eventID(reader, "EventID"), // needs reader by reference
+    trackID(reader, "TrackID"),
+    posx(reader, "Posx"), // vertex data
+    posy(reader, "Posy"),
+    posz(reader, "Posz"),
+    kine(reader, "KinEnergy"),
+    pangle(reader, "PitchAngle"),
+    aID(reader, "AntennaID"),
+    kvec(reader, "KEVec"),
+    tvec(reader, "TimeVec"),
+    vvec(reader, "VoltageVec")
 {
     std::cout << "in reader n entries: " << reader.GetEntries() << std::endl;
 }
@@ -36,17 +47,6 @@ Event_map<std::any> QTNMSimAntennaReader::operator()()
     Event<std::any> outdata; // to hold all the data items from file
 
     // collect all Signal info from file, reader holds event iterator
-    TTreeReaderValue<int> eventID(reader, "EventID"); // needs reader by reference
-    TTreeReaderValue<int> trackID(reader, "TrackID");
-    TTreeReaderValue<double> posx(reader, "Posx"); // vertex data
-    TTreeReaderValue<double> posy(reader, "Posy");
-    TTreeReaderValue<double> posz(reader, "Posz");
-    TTreeReaderValue<double> kine(reader, "KinEnergy");
-    TTreeReaderValue<double> pangle(reader, "PitchAngle");
-    TTreeReaderValue<std::vector<int>> aID(reader, "AntennaID");
-    TTreeReaderValue<std::vector<double>> kvec(reader, "KEVec");
-    TTreeReaderValue<std::vector<double>> tvec(reader, "TimeVec");
-    TTreeReaderValue<std::vector<double>> vvec(reader, "VoltageVec");
     
     if (reader.Next()) {; // variables filled from file
         outdata["eventID"] = std::any(*eventID); // de-reference an int to std::any
