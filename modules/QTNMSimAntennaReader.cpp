@@ -47,7 +47,7 @@ Event_map<std::any> QTNMSimAntennaReader::operator()()
     Event<std::any> outdata; // to hold all the data items from file
 
     // collect all Signal info from file, reader holds event iterator
-    
+    std::cout << "reader called" << std::endl;
     if (reader.Next()) {; // variables filled from file
         outdata["eventID"] = std::any(*eventID); // de-reference an int to std::any
         outdata["trackID"] = std::any(*trackID);
@@ -64,6 +64,7 @@ Event_map<std::any> QTNMSimAntennaReader::operator()()
     else // no more entries in TTreeReader
         throw yap::GeneratorExit{};
 
+    std::cout << "reader Next() done, evt:  " << evcounter << std::endl;
     // at the end, store new data product in dictionary event map.
     eventmap[outkey] = outdata; // with outdata an Event<std::any>
     return eventmap;

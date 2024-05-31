@@ -25,7 +25,9 @@ Event_map<std::any> WaveformInterpolator::operator()(Event_map<std::any> emap)
     if (! emap.count(inkey)) { 
         throw std::logic_error("input key not in dictionary!");
     }
-    Event<std::any> indata = emap[inkey];
+    std::cout << "interpolator called" << std::endl;
+    Event_map<std::any> mymap = std::move(emap); // move copy from buffer
+    Event<std::any> indata = mymap[inkey];
     Event<std::any> outdata; // to hold all the data items
     // get hold of relevant data, transform and store in outdata
     try
@@ -37,6 +39,7 @@ Event_map<std::any> WaveformInterpolator::operator()(Event_map<std::any> emap)
         ROOT::VecOps::RVec<int> tempant(aID); // temporary
         ROOT::VecOps::RVec<double> tempt(tiv); // temporary
         ROOT::VecOps::RVec<double> tempv(vvv); // temporary
+	std::cout << "interpolator RVecs done" << std::endl;
         for (int i=0;i<nantenna;++i) {
             auto selecttvec = tempt[tempant==i]; // like NumPy sepection
             auto selectvvec = tempv[tempant==i];
@@ -44,6 +47,7 @@ Event_map<std::any> WaveformInterpolator::operator()(Event_map<std::any> emap)
             const vec_t tv(selectvvec.begin(),selectvvec.end());
 
             vec_t resampled = interpolate(tt, tv);
+	    std::cout << "interpolator signal done, antenna " << i << std::endl;
             std::string tkey = "sampled_" + std::to_string(i) + "_[V]";
             outdata[tkey] = std::make_any<vec_t>(resampled);
         }
@@ -53,14 +57,15 @@ Event_map<std::any> WaveformInterpolator::operator()(Event_map<std::any> emap)
         std::cerr << e.what() << '\n';
     }
     outdata["sample_time[ns]"] = std::make_any<quantity<ns>>(sampletime);
-    emap[outkey] = outdata;
+    mymap[outkey] = outdata;
 
     // clear obsolete data in Event_map
-    emap[inkey]["AntennaID"]  = std::any(0); // replaces vector<int>
-    emap[inkey]["TimeVec"]    = std::any(0); // replaces vector<double>
-    emap[inkey]["VoltageVec"] = std::any(0); // replaces vector<double>
+    mymap[inkey]["AntennaID"]  = std::any(0); // replaces vector<int>
+    mymap[inkey]["TimeVec"]    = std::any(0); // replaces vector<double>
+    mymap[inkey]["VoltageVec"] = std::any(0); // replaces vector<double>
+    std::cout << "interpolator finish." << std::endl;
 
-    return emap;
+    return mymap;
 }
 
 vec_t WaveformInterpolator::interpolate(const vec_t& tvals, const vec_t& vvals)
