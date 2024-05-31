@@ -53,6 +53,8 @@ add_executable(exrp.exe apps/example_read_print.cpp)
 target_link_libraries(exrp.exe PUBLIC ReconModules QTNMTools)
 add_executable(exsc.exe apps/example_sine_csv.cpp)
 target_link_libraries(exsc.exe PUBLIC ReconModules QTNMTools)
+add_executable(exrip.exe apps/example_interpolate_print.cpp)
+target_link_libraries(exrip.exe PUBLIC ReconModules QTNMTools)
 
 # Build testing executables separately for file output
 add_executable(testbw examples/bwfiltertest.cpp)
