@@ -26,14 +26,14 @@ QTNMSimAntennaReader::QTNMSimAntennaReader(TTreeReader& re, std::string out) :
     kine(reader, "KinEnergy"),
     pangle(reader, "PitchAngle"),
     aID(reader, "AntennaID"),
-    kvec(reader, "KEVec"),
     tvec(reader, "TimeVec"),
     vvec(reader, "VoltageVec")
 {
     std::cout << "in reader n entries: " << reader.GetEntries() << std::endl;
 }
 
-Event_map<std::any> QTNMSimAntennaReader::operator()()
+
+DataPack QTNMSimAntennaReader::operator()()
 {
     // catch event number limit in pipeline, -1 = all, default
   if ((evcounter > maxEventNumber &&   // reached maximum event number
@@ -43,7 +43,7 @@ Event_map<std::any> QTNMSimAntennaReader::operator()()
     throw yap::GeneratorExit{};
   evcounter++;
 
-    Event_map<std::any> eventmap; // data item for delivery
+  Event_map<std::any> eventmap; // data item for delivery
     Event<std::any> outdata; // to hold all the data items from file
 
     // collect all Signal info from file, reader holds event iterator
@@ -57,7 +57,6 @@ Event_map<std::any> QTNMSimAntennaReader::operator()()
         outdata["VKinEnergy"] = std::any(*kine); // vertex energy
         outdata["VPitchAngle"] = std::any(*pangle); // vertex pitch angle to z-axis
         outdata["AntennaID"] = std::make_any<std::vector<int>>(aID->begin(),aID->end());
-        outdata["KEVec"] = std::make_any<std::vector<double>>(kvec->begin(),kvec->end());
         outdata["TimeVec"] = std::make_any<std::vector<double>>(tvec->begin(),tvec->end());
         outdata["VoltageVec"] = std::make_any<std::vector<double>>(vvec->begin(),vvec->end());
     }
@@ -67,5 +66,6 @@ Event_map<std::any> QTNMSimAntennaReader::operator()()
     std::cout << "reader Next() done, evt:  " << evcounter << std::endl;
     // at the end, store new data product in dictionary event map.
     eventmap[outkey] = outdata; // with outdata an Event<std::any>
-    return eventmap;
+    DataPack dp(eventmap);
+    return dp;
 }

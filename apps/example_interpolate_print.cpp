@@ -8,13 +8,6 @@
 //
 // Current data model assumes the exchange of an Event_map from module to module
 // with the definition in Event.hh
-//
-// This example includes a printing sink on purpose since printing
-// is for debugging and requires a lot of flexibility. Better to include
-// that directly in the app, like here, instead as a separate module in
-// the module library.
-// Here we print from two L1 level keys, showing how to access previous
-// processing outcomes with their keys.
 
 // std
 #include<iostream>
@@ -42,7 +35,7 @@ public:
     inkey1(std::move(inbox)),
     inkey2(std::move(inbox2)) {}; // constructor; required
   
-  void operator()(Event_map<std::any> emap); // this is called by the pipeline
+  void operator()(DataPack dp); // this is called by the pipeline
   
 private:
     // these below serve as string keys to access (read/write) the Event map
@@ -51,16 +44,16 @@ private:
 
 };
 
-void printInterpolator::operator()(Event_map<std::any> emap)
+//void printInterpolator::operator()(Event_map<std::any> emap)
+void printInterpolator::operator()(DataPack dp)
 {
     // example getting hold of requested input data for processing
-    if (! emap.count(inkey1)) { 
+  if (! dp.getRef().count(inkey1)) { 
         std::cout << "input key not in dictionary!" << std::endl;
         return; // not found, return unchanged map, no processing
     }
-    Event_map<std::any> mymap = std::move(emap); // move from buffer copy
-    Event<std::any> indata1 = mymap[inkey1]; // access L1 dictionary
-    Event<std::any> indata2 = mymap[inkey2]; // access L1 dictionary
+    Event<std::any> indata1 = dp.getRef()[inkey1]; // access L1 dictionary
+    Event<std::any> indata2 = dp.getRef()[inkey2]; // access L1 dictionary
     // yields a L2 unordered map called Event<std::any> with the 
     // help of the inkey1 label.
 
@@ -70,7 +63,6 @@ void printInterpolator::operator()(Event_map<std::any> emap)
     {
       // from raw
       std::cout << "evID " << std::any_cast<int>(indata2["eventID"]) << std::endl;
-
       // from interpolator
       std::cout << "Sampling " << std::any_cast<quantity<ns>>(indata1["sample_time[ns]"]) << std::endl;
         // can also cast the container
@@ -110,12 +102,12 @@ int main(int argc, char** argv)
 
   // transformer, here interpolation
   auto interpolator = WaveformInterpolator("raw","sampled");
-  quantity<ns> stime = 0.004 * ns;
+  quantity<ns> stime = 0.008 * ns;
   int nant = 2;
   interpolator.setSampleTime(stime);
   interpolator.setAntennaNumber(nant);
   
-  // data sink: simply print to screen, take from keys, see above
+  // data sink: simply print to screen, take from key
   auto sink   = printInterpolator("sampled","raw");
   
   auto pl = yap::Pipeline{} | source | interpolator | sink;

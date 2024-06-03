@@ -19,8 +19,8 @@ class WaveformInterpolator
         // Configures the module. Could have more config parameters
         // String Key outbox label as input.
 
-        Event_map<std::any> operator()(Event_map<std::any>); // this is called by the pipeline
-        // Transforming module event map in and out.
+        DataPack operator()(DataPack); // this is called by the pipeline
+        // Transforming module DataPack in and out.
 
         // getter/setter methods for configuration could live here.
         inline void setSampleTime(quantity<ns> st) {sampletime = st;}

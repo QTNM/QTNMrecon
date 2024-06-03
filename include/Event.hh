@@ -21,4 +21,20 @@
 template <typename T> using Event = std::unordered_map<std::string, T>;
 template <typename T> using Event_map = std::unordered_map<std::string, Event<T>>;
 
+class DataPack
+{
+    Event_map<std::any> mymap;
+
+public:
+    DataPack(Event_map<std::any> emap) noexcept : mymap(std::move(emap))
+    {}
+
+    DataPack(const DataPack&) = delete;
+    DataPack& operator=(const DataPack&) = delete;
+
+    DataPack(DataPack &&) = default;
+
+  inline Event_map<std::any>& getRef() {return mymap;}
+};
+
 #endif
