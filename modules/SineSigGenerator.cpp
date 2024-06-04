@@ -33,7 +33,7 @@ SineSigGenerator::SineSigGenerator(std::string out, quantity<V> amp, quantity<Hz
   sig.setphase_rad(phase);
 }
 
-Event_map<std::any> SineSigGenerator::operator()()
+DataPack SineSigGenerator::operator()()
 {
     if (counter > maxEventNumber)
         throw yap::GeneratorExit{};
@@ -50,5 +50,6 @@ Event_map<std::any> SineSigGenerator::operator()()
     outdata["phase[rad]"] = std::make_any<quantity<rad>>(phase);
     std::cout << "sine gen: counter " << counter << ", in key " << outkey << std::endl;
     eventmap[outkey] = outdata;
-    return eventmap;
+    DataPack dp(eventmap);
+    return dp;
 }

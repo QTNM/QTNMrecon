@@ -17,7 +17,7 @@ class QTNMSimHitReader
         QTNMSimHitReader(TTreeReader& re, std::string outbox); // constructor; required
         // input file name and new Key outbox label.
 
-        Event_map<std::any> operator()(); // this is called by the pipeline
+        DataPack operator()(); // this is called by the pipeline
 
         // default = -1 for all events
         inline void setMaxEventNumber(int nend) {maxEventNumber = nend;}

@@ -20,8 +20,8 @@ class xCsvWriter
         // Minimum required are the key labels for input and output 
         // of Event Map data item. String Key inbox label and new Key outbox label.
 
-        void operator()(Event_map<std::any> emap); // this is called by the pipeline
-        // Writers/Sinks only receive an event map and return void as signature.
+        void operator()(DataPack dp); // this is called by the pipeline
+        // Writers/Sinks only receive a DataPack and return void as signature.
 
         // getter/setter methods for configuration could live here.
 

@@ -29,7 +29,7 @@ QTNMSimHitReader::QTNMSimHitReader(TTreeReader& re, std::string out) :
 {
 }
 
-Event_map<std::any> QTNMSimHitReader::operator()()
+DataPack QTNMSimHitReader::operator()()
 {
     // catch event number limit in pipeline, -1 = all, default
   if ((evcounter > maxEventNumber &&   // reached maximum event number
@@ -62,5 +62,6 @@ Event_map<std::any> QTNMSimHitReader::operator()()
 
     // at the end, store new data product in dictionary event map.
     eventmap[outkey] = outdata; // with outdata an Event<std::any>
-    return eventmap;
+    DataPack dp(eventmap);
+    return dp;
 }

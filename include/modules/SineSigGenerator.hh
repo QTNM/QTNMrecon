@@ -21,7 +21,7 @@ class SineSigGenerator
         SineSigGenerator(std::string outbox, quantity<V> amp, quantity<Hz> freq, quantity<Hz> srate, 
                         quantity<s> dur, quantity<rad> phrad); // full constructor
 
-        Event_map<std::any> operator()(); // this is called by the pipeline
+        DataPack operator()(); // this is called by the pipeline
         // Generators deliver an event map and receive nothing as signature.
 
         // getter/setter methods for configuration could live here.
