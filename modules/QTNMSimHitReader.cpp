@@ -1,4 +1,4 @@
-// reader module implementation
+// QTNMSim Hit reader module implementation
 
 // std
 #include <iostream>
@@ -7,8 +7,6 @@
 #include "QTNMSimHitReader.hh"
 #include "yap/pipeline.h"
 
-// ROOT
-#include "TTreeReaderValue.h"
 
 QTNMSimHitReader::QTNMSimHitReader(TTreeReader& re, std::string out) : 
     outkey(std::move(out)),
@@ -44,7 +42,7 @@ DataPack QTNMSimHitReader::operator()()
 
     // collect all Signal info from file, reader holds event iterator
     
-    if (reader.Next()) {; // variables filled from file
+    if (reader.Next()) { // variables filled from file
         outdata["eventID"] = std::any(*eventID); // de-reference an int to std::any
         outdata["trackID"] = std::any(*trackID);
         outdata["Edep"] = std::any(*edep);

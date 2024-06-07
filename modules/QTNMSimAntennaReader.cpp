@@ -1,7 +1,4 @@
-// template module implementation
-// necessarily empty since nothing is supposed to happen
-// for this example, showing boiler-plate code for any 
-// processing module.
+// QTNMSim Antenna signal reader module implementation
 
 // std
 #include <iostream>
@@ -10,8 +7,6 @@
 #include "QTNMSimAntennaReader.hh"
 #include "yap/pipeline.h"
 
-// ROOT
-#include "TTreeReaderValue.h"
 
 QTNMSimAntennaReader::QTNMSimAntennaReader(TTreeReader& re, std::string out) : 
     outkey(std::move(out)),
@@ -48,7 +43,7 @@ DataPack QTNMSimAntennaReader::operator()()
 
     // collect all Signal info from file, reader holds event iterator
     std::cout << "reader called" << std::endl;
-    if (reader.Next()) {; // variables filled from file
+    if (reader.Next()) { // variables filled from file
         outdata["eventID"] = std::any(*eventID); // de-reference an int to std::any
         outdata["trackID"] = std::any(*trackID);
         outdata["VPosx"] = std::any(*posx); // vertex position
