@@ -42,6 +42,7 @@ src/WhiteNoiseGen.cpp)
 # module library
 add_library(ReconModules SHARED modules/QTNMSimAntennaReader.cpp 
 modules/QTNMSimHitReader.cpp 
+modules/QTNMSimKinematicsReader.cpp 
 modules/xCsvWriter.cpp 
 modules/SineSigGenerator.cpp 
 modules/WaveformInterpolator.cpp 
