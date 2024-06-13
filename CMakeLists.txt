@@ -24,6 +24,7 @@ include_directories(include
  include/signalgen 
  include/utils
  include/yap
+ include/receiver
  include/modules
  external/gsl/include
  external/mp-units/src/core/include
@@ -35,7 +36,10 @@ add_library(QTNMTools SHARED src/digitizer.cpp
 src/dsp.cpp 
 src/filter.cpp
 src/LIA.cpp 
-src/SineGenerator.cpp 
+src/SineGenerator.cpp
+src/halfwavedipole.cpp
+src/patchantenna.cpp
+src/VReceiver.cpp
 src/ChirpGenerator.cpp
 src/WhiteNoiseGen.cpp)
 
@@ -45,7 +49,8 @@ modules/QTNMSimHitReader.cpp
 modules/QTNMSimKinematicsReader.cpp 
 modules/xCsvWriter.cpp 
 modules/SineSigGenerator.cpp 
-modules/WaveformInterpolator.cpp 
+modules/AntennaResponse.cpp
+modules/WaveformSampling.cpp 
 modules/printSimReader.cpp)
 target_link_libraries(ReconModules QTNMTools ${ROOT_LIBRARIES})
 

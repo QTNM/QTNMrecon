@@ -21,7 +21,7 @@
 // us
 #include "yap/pipeline.h"
 #include "modules/QTNMSimAntennaReader.hh"
-#include "modules/WaveformInterpolator.hh"
+#include "modules/WaveformSampling.hh"
 #include "CLI11.hpp"
 #include <Event.hh>
 #include "types.hh"
@@ -35,6 +35,7 @@ public:
     inkey1(std::move(inbox)),
     inkey2(std::move(inbox2)) {}; // constructor; required
   
+  //  void operator()(Event_map<std::any> emap); // this is called by the pipeline
   void operator()(DataPack dp); // this is called by the pipeline
   
 private:
@@ -52,6 +53,7 @@ void printInterpolator::operator()(DataPack dp)
         std::cout << "input key not in dictionary!" << std::endl;
         return; // not found, return unchanged map, no processing
     }
+    //    Event_map<std::any> mymap = std::move(emap); // move from buffer copy
     Event<std::any> indata1 = dp.getRef()[inkey1]; // access L1 dictionary
     Event<std::any> indata2 = dp.getRef()[inkey2]; // access L1 dictionary
     // yields a L2 unordered map called Event<std::any> with the 
@@ -101,7 +103,7 @@ int main(int argc, char** argv)
   source.setMaxEventNumber(nevents); // default = all events in file
 
   // transformer, here interpolation
-  auto interpolator = WaveformInterpolator("raw","sampled");
+  auto interpolator = WaveformSampling("raw","sampled");
   quantity<ns> stime = 0.008 * ns;
   int nant = 2;
   interpolator.setSampleTime(stime);
