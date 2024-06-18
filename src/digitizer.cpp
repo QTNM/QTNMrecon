@@ -5,6 +5,7 @@
 #include <algorithm>
 
 // us
+#include <mp-units/ostream.h> // for cout stream
 #include "digitizer.hh"
 
 Digitizer::Digitizer() : 
@@ -12,7 +13,6 @@ vrange(0.0 * V),
 sampling(0.0 * Hz),
 bitrange(12) // default 12-bits
 {
-    if (bitrange>16) bitrange = 16;
     bmax = (int)pow(2,bitrange-1); // for signed range
     calarray.clear();
     darray.clear();

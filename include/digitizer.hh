@@ -16,7 +16,6 @@
 #include <cstdint>
 
 // us
-#include <mp-units/ostream.h> // for cout stream
 #include "types.hh"
 
 class Digitizer
@@ -27,7 +26,6 @@ class Digitizer
         virtual ~Digitizer() = default;
 
         // operations, avoid data copy
-        void digitize_raw(const waveform_t&);
         waveform_t  digitize(const waveform_t&);
 
         // config parameter
@@ -42,6 +40,7 @@ class Digitizer
 
     private:
         // internal operation
+        void digitize_raw(const waveform_t&);
         std::int16_t _adc(waveform_value);
 
         int bitrange; // 16 bit max
@@ -49,8 +48,8 @@ class Digitizer
         quantity<isq::frequency[Hz]> sampling;
         quantity<V> vrange;
 
-        std::vector<std::int16_t> darray; // digitizer array
-        std::vector<waveform_value> calarray; // scaled array
+        digi_t darray; // digitizer array
+        waveform_t calarray; // scaled array
         digi_t dwave; // digitized waveform vector<std::int16_t>
 };
 
