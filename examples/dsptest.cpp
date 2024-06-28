@@ -1,8 +1,10 @@
 // DSP test
 #include "dsp.hh"
+#include <mp-units/math.h>
 
 #include <iostream>
 #include <vector>
+#include <cmath>
 #include <fstream>
 
 
@@ -34,5 +36,17 @@ int main()
     for (unsigned int i=0;i<dftdata.size();++i)
         ofs2 << freq[i].numerical_value_in(Hz) << "," << dftdata[i].numerical_value_in(V) << std::endl;
     ofs2.close();
+
+        // try inverse fft from complex to real
+    fft_arg xo2 = dsp.rfft1d(xo, fft_dir::DIR_BWD);
+    waveform_t rout(entries/2);
+    for (int i=0;i<entries/2;++i) {
+        rout[i] = abs(xo2[i].real()+xo2[entries-i].imag()); // response output
+    }
+    std::ofstream ofs3("t3.csv", std::ofstream::out);
+    for (unsigned int i=0;i<rout.size();++i)
+        ofs3 << rout[i].numerical_value_in(V) << std::endl;
+    ofs3.close();
+
     return 0;
 }

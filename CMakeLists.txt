@@ -36,6 +36,7 @@ add_library(QTNMTools SHARED src/digitizer.cpp
 src/dsp.cpp 
 src/filter.cpp
 src/LIA.cpp 
+src/CustomNoiseGen.cpp
 src/SineGenerator.cpp
 src/halfwavedipole.cpp
 src/patchantenna.cpp
@@ -51,6 +52,8 @@ modules/xCsvWriter.cpp
 modules/SineSigGenerator.cpp 
 modules/AntennaResponse.cpp
 modules/WaveformSampling.cpp 
+modules/AddNoise.cpp
+modules/Digitize.cpp
 modules/printSimReader.cpp)
 target_link_libraries(ReconModules QTNMTools ${ROOT_LIBRARIES})
 

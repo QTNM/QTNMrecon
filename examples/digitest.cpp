@@ -11,7 +11,7 @@ int main()
     quantity<s>  dur = 4.0 * s; // [s]
     quantity<Hz> freq = 1.0 * Hz;
 
-    Digitizer digi(1.0 * V, srate, 8); // range +- 1V
+    Digitizer digi(1.0 * V, 8); // range +- 1V
     SineGenerator sinsig(2.0 * V, freq, srate, dur, 0.0*deg); // 2V amplitude
 
     digi.dumpInfo();

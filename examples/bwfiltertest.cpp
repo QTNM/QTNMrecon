@@ -18,7 +18,10 @@ int main()
     quantity<Hz> ff2 = 20.0 * Hz;
     quantity<Hz> fcut = 15.0 * Hz;
 
-    Butterworth lp(srate, fcut, 10);
+    Butterworth lp;
+    lp.SetFilterOrder(10);
+    lp.SetSamplingRate(srate);
+    lp.SetLowFilterFreq(fcut);
 
     // filter test
     // make data
@@ -31,7 +34,7 @@ int main()
     // filter
     int entries = (int)(srate.numerical_value_in(Hz) * duration.numerical_value_in(s));
     waveform_t out(entries);
-    lp.Filter(sig, out); // filter action
+    lp.LPassFilter(sig, out); // filter action
 
     std::ofstream ofs2("f.csv", std::ofstream::out);
     for (unsigned int i=0;i<out.size();++i)

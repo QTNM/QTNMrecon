@@ -10,7 +10,6 @@
 
 Digitizer::Digitizer() : 
 vrange(0.0 * V),
-sampling(0.0 * Hz),
 bitrange(12) // default 12-bits
 {
     bmax = (int)pow(2,bitrange-1); // for signed range
@@ -24,26 +23,17 @@ bitrange(12) // default 12-bits
     }
 }
 
-Digitizer::Digitizer(quantity<V> voltrange, quantity<isq::frequency[Hz]> samp, int b) : 
+Digitizer::Digitizer(quantity<V> voltrange, int b) : 
 vrange(voltrange),
-sampling(samp),
 bitrange(b)
 {
     setADCBits(b);
 }
 
-quantity<isq::time[s]> Digitizer::getSamplingTimeInterval()
-{
-    if (sampling>0 * Hz)
-        return 1./sampling; // turn into a double of unit [s]
-    else
-        return -1.0 * s; // no sampling set
-}
-
 void Digitizer::dumpInfo()
 {
     std::cout << "Digitizer Info: " << std::endl;
-    std::cout << "voltage range [V]: " << vrange.in(V) << "; sampling rate [Hz]: " << sampling.in(Hz)
+    std::cout << "voltage range [V]: " << vrange.in(V)
             << " ADC bits: " << bitrange << std::endl;
 }
 

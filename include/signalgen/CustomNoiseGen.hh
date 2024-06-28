@@ -1,4 +1,4 @@
-// QTNM noise generator white noise generator
+// QTNM noise generator custom noise generator
 
 // std
 
@@ -12,14 +12,14 @@ class CustomNoiseGenerator : VSignal
 {
     public:
         CustomNoiseGenerator(); // constructor
-        CustomNoiseGenerator(const char* fname, quantity<V> scale, quantity<Hz> srate, quantity<s> dur, int seed); // full constructor
+        CustomNoiseGenerator(const char* fname, quantity<V> rms, quantity<Hz> srate, quantity<s> dur, int seed);
         virtual ~CustomNoiseGenerator() = default; // default destructor
 
         waveform_t generate() override; // must have from VSignal
         vec_t generate_pattern() override; // must have from VSignal
         waveform_t add(waveform_t& sig, size_t pos) override; // also required
 
-        inline void setscale(quantity<V> s) {scalefactor = s;}
+        inline void setTargetRMS(quantity<V> s) {noiseRMS = s;}
         inline void setsampling_rate(quantity<Hz> sr) {sampling_rate = sr;}
         inline void setduration(quantity<s> d) {duration = d;}
         inline void setseed(int sd) {seed = sd;}
@@ -30,7 +30,7 @@ class CustomNoiseGenerator : VSignal
         vec_t frequencies; // from file
 
         int    seed;
-        quantity<V>  scalefactor;
+        quantity<V>  noiseRMS;
         quantity<Hz> sampling_rate;
         quantity<s>  duration;
 

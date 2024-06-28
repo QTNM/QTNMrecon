@@ -67,12 +67,6 @@ waveform_t MatchedFilter::Filter(waveform_t &record)
 // ------------------
 // Butterworth filter
 // Buttterworth: methods implementation
-Butterworth::Butterworth(quantity<isq::frequency[Hz]> sr, quantity<Hz> low, int n)
-{
-    SetSamplingRate(sr);
-    SetLowFilterFreq(low);
-    SetFilterOrder(n); // has the consistency checks
-}
 
 void Butterworth::SetSamplingRate(quantity<isq::frequency[Hz]> ff)
 {
@@ -90,6 +84,16 @@ void Butterworth::SetLowFilterFreq(quantity<Hz> low)
 }
 
 
+void Butterworth::SetBPassFilterFreqs(quantity<Hz> low, quantity<Hz> high)
+{
+    if (low >= 0.0 * Hz) flowfreq = low; // take only positive frequencies
+    else flowfreq = 0.0 * Hz;
+    if (high > 0.0 * Hz && high > low) fhighfreq = high; // take only positive frequencies
+    else fhighfreq = flowfreq + 1.0 * Hz; // shouldn't happen but right order at least
+    recalc = true; // recalculate coefficients
+}
+
+
 void Butterworth::SetFilterOrder(int o)
 {
     if (o%2) fOrder = (o>2) ? (o + 1) : 2 ;    // Minimum order here is 2
@@ -97,11 +101,13 @@ void Butterworth::SetFilterOrder(int o)
     // prepare filter coefficients
     const int n = fOrder/2;
     A.resize(n), d1.resize(n), d2.resize(n); // zero initialize, plain numbers
+    d3.resize(n), d4.resize(n); // zero initialize, plain numbers
     w0.resize(n), w1.resize(n), w2.resize(n); // carry unit [V]
+    w3.resize(n), w4.resize(n); // carry unit [V]
     recalc = true; // recalculate coefficients
 }
 
-void Butterworth::Filter(const waveform_t &record, waveform_t &result)
+void Butterworth::LPassFilter(const waveform_t &record, waveform_t &result)
 {
     quantity<Hz> nyfreq;
     double a, a2, r, s;  // naming as in source code, see header.
@@ -143,4 +149,60 @@ void Butterworth::Filter(const waveform_t &record, waveform_t &result)
     w2.clear();
     w1.resize(n); 
     w2.resize(n);
+}
+
+
+void Butterworth::BPassFilter(const waveform_t &record, waveform_t &result)
+{
+    quantity<Hz> nyfreq;
+    double a, a2, b, b2, r, s;  // naming as in source code, see header.
+    const int n = (int)std::rint(fOrder/4);
+
+    if (recalc) { // coefficients calculated previously
+        nyfreq = 1.0 / (2.0 * ftimebase);  // Nyquist frequency
+        if (flowfreq < nyfreq) {  // must be smaller than Nyquist frequency
+	  a  = cos(Pi * ((fhighfreq+flowfreq) * ftimebase).numerical_value_in(one)) /
+	       cos(Pi * ((fhighfreq-flowfreq) * ftimebase).numerical_value_in(one));
+	  a2 = a*a;
+	  b  = tan(Pi * ((fhighfreq-flowfreq) * ftimebase).numerical_value_in(one));
+	  b2 = b*b;
+            for (int i=0;i<n; ++i) {
+	        r = std::sin(Pi*(2.0*i+1)/(4.0*n));
+                s = b2 + 2.0*r*b + 1.0;
+                A[i]  = b2/s;
+                d1[i] = 4.0*a*(1.0 + b*r)/s;
+                d2[i] = 2.0*(b2 - 2.0*a2 - 1.0)/s;
+                d3[i] = 4.0*a*(1.0 - b*r)/s;
+                d4[i] = -(b2 - 2.0*b*r + 1.0)/s;
+            }
+            recalc = false; // coefficients calculated
+        }
+        else 
+            return;       // empty; no filtering
+    }
+
+    if (!record.empty()) {
+        result.clear();
+        for (waveform_value xdata : record) {
+            for (int j=0;j<n;++j) { // for every data item, filter order loop
+                w0[j]     = d1[j]*w1[j] + d2[j]*w2[j] + d3[j]*w3[j] + d4[j]*w4[j] + xdata;
+                xdata     = A[j] * (w0[j]-2.0*w2[j]+w4[j]);
+                w4[j]     = w3[j];
+                w3[j]     = w2[j];
+                w2[j]     = w1[j];
+                w1[j]     = w0[j];
+            }
+            result.push_back(xdata);
+        }
+    }
+    else
+        std::cout << "Error data not valid in apply filter" << std::endl;
+    w1.clear(); // reset w1-4 for next call
+    w2.clear();
+    w3.clear();
+    w4.clear();
+    w1.resize(n); 
+    w2.resize(n);
+    w3.resize(n); 
+    w4.resize(n);
 }

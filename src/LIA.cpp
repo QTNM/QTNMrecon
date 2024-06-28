@@ -20,9 +20,9 @@ LIA::LIA()
 LIA::LIA(quantity<Hz> fc, quantity<isq::frequency[Hz]> sr)
 {
     // fully set up filter
+    bw.SetFilterOrder(10); // fixed
     bw.SetLowFilterFreq(fc);
     bw.SetSamplingRate(sr);
-    bw.SetFilterOrder(10); // fixed
 }
 
 LIA::~LIA() {} // default
@@ -45,8 +45,8 @@ waveform_t LIA::quadrature(waveform_t& signal)
     std::cout << std::endl;
     waveform_t f1, f2; // temp
     // filter
-    bw.Filter(part1, f1);
-    bw.Filter(part2, f2);
+    bw.LPassFilter(part1, f1);
+    bw.LPassFilter(part2, f2);
 
     // to quadrature of arrays
     for (size_t i=0;i<f1.size();++i)

@@ -22,7 +22,7 @@ class Digitizer
 {
     public:
         Digitizer(); // set default values for oscilloscope
-        Digitizer(quantity<V> voltrange, quantity<isq::frequency[Hz]> sampling, int bitrange);
+        Digitizer(quantity<V> voltrange, int bitrange);
         virtual ~Digitizer() = default;
 
         // operations, avoid data copy
@@ -31,10 +31,6 @@ class Digitizer
         // config parameter
         inline void setVRange(quantity<V> v) {vrange = v;}
         inline void setADCBits(int b);
-
-        // no active role but keep bound to waveform
-        inline void setSamplingRate(quantity<isq::frequency[Hz]> v) {sampling = v;}
-        quantity<isq::time[s]> getSamplingTimeInterval();
 
         void dumpInfo(); // report by print
 
@@ -45,7 +41,6 @@ class Digitizer
 
         int bitrange; // 16 bit max
         int bmax;     // max number from bitrange
-        quantity<isq::frequency[Hz]> sampling;
         quantity<V> vrange;
 
         digi_t darray; // digitizer array
