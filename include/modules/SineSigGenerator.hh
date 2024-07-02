@@ -25,11 +25,11 @@ class SineSigGenerator
         // Generators deliver an event map and receive nothing as signature.
 
         // getter/setter methods for configuration could live here.
-        inline void setamplitude(quantity<V>  a) {amplitude = a;}
-        inline void setfrequency(quantity<Hz> ff) {frequency = ff;}
-        inline void setsampling_rate(quantity<Hz> sr) {sampling_rate = sr;}
-        inline void setduration(quantity<s> d) {duration = d;}
-        inline void setphase_rad(quantity<rad> phr) {phase = phr;}
+        inline void setAmplitude(quantity<V>  a) {amplitude = a;}
+        inline void setFrequency(quantity<Hz> ff) {frequency = ff;}
+        inline void setSampling_rate(quantity<Hz> sr) {sampling_rate = sr;}
+        inline void setDuration(quantity<s> d) {duration = d;}
+        inline void setPhase_rad(quantity<rad> phr) {phase = phr;}
 
         // default = 0 = exactly one event
         inline void setMaxEventNumber(int nend) {maxEventNumber = nend;}

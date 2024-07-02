@@ -13,7 +13,7 @@
 
 
 // MatchedFilter: inline methods implementation
-void MatchedFilter::SetTemplate(vec_t t)
+void MatchedFilter::setTemplate(vec_t t)
 {
     pattern = t;
     std::reverse(pattern.begin(), pattern.end()); // preparation for cross-correlation
@@ -68,7 +68,7 @@ waveform_t MatchedFilter::Filter(waveform_t &record)
 // Butterworth filter
 // Buttterworth: methods implementation
 
-void Butterworth::SetSamplingRate(quantity<isq::frequency[Hz]> ff)
+void Butterworth::setSamplingRate(quantity<Hz> ff)
 {
     if (ff > 0.0 * Hz) ftimebase = 1.0/ff; // take only positive time base
     else ftimebase = 1. * ns; // unit nano seconds
@@ -76,7 +76,7 @@ void Butterworth::SetSamplingRate(quantity<isq::frequency[Hz]> ff)
 }
 
 
-void Butterworth::SetLowFilterFreq(quantity<Hz> low)
+void Butterworth::setLowFilterFreq(quantity<Hz> low)
 {
     if (low >= 0.0 * Hz) flowfreq = low; // take only positive frequencies
     else flowfreq = 0.0 * Hz;
@@ -84,7 +84,7 @@ void Butterworth::SetLowFilterFreq(quantity<Hz> low)
 }
 
 
-void Butterworth::SetBPassFilterFreqs(quantity<Hz> low, quantity<Hz> high)
+void Butterworth::setBPassFilterFreqs(quantity<Hz> low, quantity<Hz> high)
 {
     if (low >= 0.0 * Hz) flowfreq = low; // take only positive frequencies
     else flowfreq = 0.0 * Hz;
@@ -94,7 +94,7 @@ void Butterworth::SetBPassFilterFreqs(quantity<Hz> low, quantity<Hz> high)
 }
 
 
-void Butterworth::SetFilterOrder(int o)
+void Butterworth::setFilterOrder(int o)
 {
     if (o%2) fOrder = (o>2) ? (o + 1) : 2 ;    // Minimum order here is 2
     else fOrder = (o>2) ? o : 2 ; // take only even orders
@@ -107,8 +107,9 @@ void Butterworth::SetFilterOrder(int o)
     recalc = true; // recalculate coefficients
 }
 
-void Butterworth::LPassFilter(const waveform_t &record, waveform_t &result)
+waveform_t Butterworth::LPassFilter(const waveform_t &record)
 {
+    waveform_t result;
     quantity<Hz> nyfreq;
     double a, a2, r, s;  // naming as in source code, see header.
     const int n = fOrder/2;
@@ -128,11 +129,9 @@ void Butterworth::LPassFilter(const waveform_t &record, waveform_t &result)
             recalc = false; // coefficients calculated
         }
         else 
-            return;       // empty; no filtering
+            return result;       // empty; no filtering
     }
-
     if (!record.empty()) {
-        result.clear();
         for (waveform_value xdata : record) {
             for (int j=0;j<n;++j) { // for every data item, filter order loop
                 w0[j]     = d1[j]*w1[j] + d2[j]*w2[j] + xdata;
@@ -149,11 +148,13 @@ void Butterworth::LPassFilter(const waveform_t &record, waveform_t &result)
     w2.clear();
     w1.resize(n); 
     w2.resize(n);
+    return result;
 }
 
 
-void Butterworth::BPassFilter(const waveform_t &record, waveform_t &result)
+waveform_t Butterworth::BPassFilter(const waveform_t &record)
 {
+    waveform_t result;
     quantity<Hz> nyfreq;
     double a, a2, b, b2, r, s;  // naming as in source code, see header.
     const int n = (int)std::rint(fOrder/4);
@@ -178,11 +179,9 @@ void Butterworth::BPassFilter(const waveform_t &record, waveform_t &result)
             recalc = false; // coefficients calculated
         }
         else 
-            return;       // empty; no filtering
+            return result;       // empty; no filtering
     }
-
     if (!record.empty()) {
-        result.clear();
         for (waveform_value xdata : record) {
             for (int j=0;j<n;++j) { // for every data item, filter order loop
                 w0[j]     = d1[j]*w1[j] + d2[j]*w2[j] + d3[j]*w3[j] + d4[j]*w4[j] + xdata;
@@ -205,4 +204,5 @@ void Butterworth::BPassFilter(const waveform_t &record, waveform_t &result)
     w2.resize(n);
     w3.resize(n); 
     w4.resize(n);
+    return result;
 }

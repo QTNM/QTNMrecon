@@ -34,14 +34,14 @@ class Butterworth
         Butterworth() = default;
         virtual   ~Butterworth() = default;
 
-        void LPassFilter(const waveform_t &record, waveform_t &result); // operation function
-        void BPassFilter(const waveform_t &record, waveform_t &result); // operation function
+        waveform_t LPassFilter(const waveform_t &record); // operation function
+        waveform_t BPassFilter(const waveform_t &record); // operation function
 
     // setter and getter
-        void   SetSamplingRate(quantity<isq::frequency[Hz]> sr);
-        void   SetLowFilterFreq(quantity<Hz> low);
-        void   SetBPassFilterFreqs(quantity<Hz> low, quantity<Hz> high);
-        void   SetFilterOrder(int o);
+        void   setSamplingRate(quantity<Hz> sr);
+        void   setLowFilterFreq(quantity<Hz> low);
+        void   setBPassFilterFreqs(quantity<Hz> low, quantity<Hz> high);
+        void   setFilterOrder(int o);
 
 };
 
@@ -52,7 +52,7 @@ class MatchedFilter
     public:
         waveform_t Filter(waveform_t &record); // operation function
 
-        void SetTemplate(vec_t templ);
+        void setTemplate(vec_t templ);
 
     private:
         DSP dsp; // FFT internal, holds no data

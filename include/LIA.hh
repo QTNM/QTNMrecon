@@ -14,19 +14,19 @@ class LIA
 
     public:
     LIA();
-    LIA(quantity<Hz> fc, quantity<isq::frequency[Hz]> sr); // init with filter constants
+    LIA(quantity<Hz> fc, quantity<Hz> sr); // init with filter constants
     virtual ~LIA();
 
     waveform_t quadrature(waveform_t&  sig); // default run on type double
     waveform_t quadrature(digi_t& sig); // overload for type short
 
     // setter/getter; move leaves origin undefined
-    inline void SetReference(vec_t ref) {reference = ref;}
-    inline void SetCrossReference(vec_t coref) {coreference = coref;} // 90 phase reference (e.g. cos)
+    inline void setReference(vec_t ref) {reference = ref;}
+    inline void setCrossReference(vec_t coref) {coreference = coref;} // 90 phase reference (e.g. cos)
 
     // filter info setting
-    inline void SetFilterCutoff(quantity<Hz> fc) {bw.SetLowFilterFreq(fc);}
-    inline void SetSamplingRate(quantity<isq::frequency[Hz]> sr) {bw.SetSamplingRate(sr);}
+    inline void setFilterCutoff(quantity<Hz> fc) {bw.setLowFilterFreq(fc);}
+    inline void setSamplingRate(quantity<Hz> sr) {bw.setSamplingRate(sr);}
 
     private:
     Butterworth bw; // low-pass filter, order is fixed at 10

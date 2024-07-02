@@ -22,13 +22,13 @@ int main()
     waveform_t s1  = sinsig.generate(); // pure signal with unit
     waveform_t temp2 = noise.generate();  // pure noise with unit
     waveform_t xin2 = sinsig.add(temp2, 0); // add noise to signal, implicit cast
-    sinsig.setfrequency(freq2);
+    sinsig.setFrequency(freq2);
     vec_t s2  = sinsig.generate_pattern(); // pure signal, no unit
 
     MatchedFilter mf;
 
-    mf.SetTemplate(s2);
-    //mf.SetTemplate(xin2); // autocorrelate
+    mf.setTemplate(s2);
+    //mf.setTemplate(xin2); // autocorrelate
     waveform_t out = mf.Filter(xin2); // filter action
 
     std::ofstream ofs2("mf.csv", std::ofstream::out);

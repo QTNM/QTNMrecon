@@ -40,9 +40,9 @@ DataPack AddNoise::operator()(DataPack dp)
             double maxel = *std::max_element(pure.begin(),pure.end()); // Amplitude A
             quantity<V> nlevel = maxel / std::numbers::sqrt2 / SNr * V; // A/sqrt(2) * noise/sig ratio
 
-            noisegen.setscale(nlevel); // is std.dev of Gaussian = RMS to reach SNR=(A/sqrt2)/RMS
-            noisegen.setsampling_rate(1.0/stime.numerical_value_in(ns) * Hz); // inverse time!=frequency
-            noisegen.setduration(pure.size()*stime);
+            noisegen.setScale(nlevel); // is std.dev of Gaussian = RMS to reach SNR=(A/sqrt2)/RMS
+            noisegen.setSampling_rate(1.0/stime.numerical_value_in(ns) * Hz); // inverse time!=frequency
+            noisegen.setDuration(pure.size()*stime);
             // seed is default
             // need values with unit from now on
             waveform_t res(pure.size());

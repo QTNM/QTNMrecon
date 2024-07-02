@@ -11,7 +11,7 @@
 
 
 // interface to main fft for real DFT
-std::vector<quantity<Hz>> DSP::dft(waveform_t &xi, quantity<isq::frequency[Hz]> srate)
+std::vector<quantity<Hz>> DSP::dft(waveform_t &xi, quantity<Hz> srate)
 {
     fft_arg tin(xi.size()); // temporary
     for (int i=0; i<xi.size();++i) tin[i] = xi[i]; // casting double->complex<double>

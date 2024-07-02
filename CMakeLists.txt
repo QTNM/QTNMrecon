@@ -41,6 +41,7 @@ src/SineGenerator.cpp
 src/halfwavedipole.cpp
 src/patchantenna.cpp
 src/VReceiver.cpp
+src/DownConverter.cpp
 src/ChirpGenerator.cpp
 src/WhiteNoiseGen.cpp)
 

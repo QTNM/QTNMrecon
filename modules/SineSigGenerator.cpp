@@ -26,11 +26,11 @@ SineSigGenerator::SineSigGenerator(std::string out, quantity<V> amp, quantity<Hz
     maxEventNumber(0)
 {
   std::cout << "SineSig constructor called." << std::endl;
-  sig.setamplitude(amplitude);
-  sig.setfrequency(frequency);
-  sig.setsampling_rate(sampling_rate);
-  sig.setduration(duration);
-  sig.setphase_rad(phase);
+  sig.setAmplitude(amplitude);
+  sig.setFrequency(frequency);
+  sig.setSampling_rate(sampling_rate);
+  sig.setDuration(duration);
+  sig.setPhase_rad(phase);
 }
 
 DataPack SineSigGenerator::operator()()

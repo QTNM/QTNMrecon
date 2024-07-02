@@ -19,22 +19,21 @@ int main()
     quantity<Hz> fcut = 15.0 * Hz;
 
     Butterworth lp;
-    lp.SetFilterOrder(10);
-    lp.SetSamplingRate(srate);
-    lp.SetLowFilterFreq(fcut);
+    lp.setFilterOrder(10);
+    lp.setSamplingRate(srate);
+    lp.setLowFilterFreq(fcut);
 
     // filter test
     // make data
     SineGenerator sinsig(1.0*V, ff1, srate, duration, 0.0*deg); // sin
     waveform_t wave1 = sinsig.generate();
 
-    sinsig.setfrequency(ff2);
+    sinsig.setFrequency(ff2);
     waveform_t sig = sinsig.add(wave1, 0);
 
     // filter
     int entries = (int)(srate.numerical_value_in(Hz) * duration.numerical_value_in(s));
-    waveform_t out(entries);
-    lp.LPassFilter(sig, out); // filter action
+    waveform_t out = lp.LPassFilter(sig); // filter action
 
     std::ofstream ofs2("f.csv", std::ofstream::out);
     for (unsigned int i=0;i<out.size();++i)

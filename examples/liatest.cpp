@@ -24,11 +24,11 @@ int main()
     SineGenerator sinsig(1.0*V, ff, srate, duration, 90.0*deg); // cos
     waveform_t data = sinsig.generate();
     vec_t ref = sinsig.generate_pattern();
-    lia.SetReference(ref);
+    lia.setReference(ref);
 
-    sinsig.setphase_rad(0.0 * rad);
+    sinsig.setPhase_rad(0.0 * rad);
     vec_t crref = sinsig.generate_pattern();
-    lia.SetCrossReference(crref);
+    lia.setCrossReference(crref);
 
     waveform_t output = lia.quadrature(data);
     std::cout << "got signal of size: " << output.size() << std::endl;

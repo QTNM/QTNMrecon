@@ -21,7 +21,7 @@ class DSP
 
         // convenience DFT interface to FFT routine
         // output limited to Nyquist max frequency
-        std::vector<quantity<Hz>> dft(waveform_t &xi, quantity<isq::frequency[Hz]> srate); 
+        std::vector<quantity<Hz>> dft(waveform_t &xi, quantity<Hz> srate); 
 
     private:
         fft_arg hidden_rfft1d(pattern_arg &xi, const fft_dir &dir);
