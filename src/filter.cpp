@@ -206,3 +206,58 @@ waveform_t Butterworth::BPassFilter(const waveform_t &record)
     w4.resize(n);
     return result;
 }
+
+
+// ---------------------
+// Moving average filter
+// Moving Average: methods implementation
+
+void MovingAverage::setMovingAverageWidth(int width)
+{
+  if (width%2) fMAwidth = (width>3) ? width : 3 ;    // Minimum width here is 3
+  else fMAwidth = (width>3) ? (width + 1) : 3 ; // take only odd integer widths
+}
+
+
+waveform_t MovingAverage::Filter(waveform_t &record)
+{
+    waveform_t result;
+  
+    if (fMAwidth>0.0)
+        fresponse = 1.0 / fMAwidth;
+    else
+        return result; // empty return
+
+    if (!record.empty()) {
+    
+        if (fMAwidth>=(0.5 * record.size())) // window too big
+            return result; // empty return
+    
+
+        // Data has been set and the response calculated; so apply it
+    
+        quantity<V> sum = 0.0 * V; // with unit from padded
+        int start = (int)(std::floor(0.5 * fMAwidth));
+        waveform_t padded = padding(record, start);
+    
+        for (unsigned int j=0; j<record.size(); ++j) { // all entries in record
+
+            for (int i=-start; i<=start; ++i)   sum += padded.at(start + i + j);
+
+            result.push_back(sum * fresponse); // unit from sum quantity
+            sum = 0.0 * V;
+        }
+    }
+    return result;
+}
+
+waveform_t MovingAverage::padding(waveform_t &record, int width)
+{
+  waveform_t padded;
+
+  for (int i=width;i>0;--i) padded.push_back(record.at(i)); // flipped data padding left of start
+  padded.insert(padded.end(), record.begin(), record.end()); // straight copy
+  for (int i=1;i<=width;++i) padded.push_back(record.at(record.size() - i)); // flipped data padding right of end
+
+  return padded;
+}

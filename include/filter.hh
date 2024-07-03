@@ -61,4 +61,23 @@ class MatchedFilter
         vec_t pattern;
 };
 
+
+class MovingAverage {
+
+ private:
+  int      fMAwidth = 5;        // Moving Average filter width, default=5
+  double   fresponse;
+  waveform_t padding(waveform_t &record, int width);
+
+ public:
+  MovingAverage() = default;
+  virtual  ~MovingAverage() = default;
+
+  waveform_t Filter(waveform_t &record);
+
+  // setter and getter
+  void     setMovingAverageWidth(int width);  // set averaging window width
+
+};
+
 #endif
