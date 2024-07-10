@@ -21,7 +21,7 @@ vec_t PatchAntenna::voltage_response(Event<std::any>& ev)
     try
     {
       quantity<Hz> avomega;
-      auto omega = std::any_cast<std::vector<double>>(ev["omega"]); // ang freq
+      auto omega = std::any_cast<std::vector<double>>(ev["OmVec"]); // ang freq
       double effperm = 0.5*(epsr+1.0) + 0.5*(epsr-1.0)/std::sqrt(1.0+12.0*height/width);
       double temp=0.0;
       for (size_t i=0; i<omega.size();++i) { // check units

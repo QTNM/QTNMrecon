@@ -24,6 +24,7 @@ DataPack AntennaResponse::operator()(DataPack dp)
     int counter = 0;
     for (auto* antenna : receiver) {
         std::string tkey = "VoltageVec_" + std::to_string(counter) + "_[V]";
+	std::cout << "in antenna resp, made key: " << tkey << std::endl;
         outdata[tkey] = std::make_any<vec_t>(antenna->voltage_response(indata));
         counter++;
     }
@@ -37,7 +38,7 @@ DataPack AntennaResponse::operator()(DataPack dp)
     dp.getRef()[inkey].erase("axVec"); // copied hence remove from source
     dp.getRef()[inkey].erase("ayVec"); // copied hence remove from source
     dp.getRef()[inkey].erase("azVec"); // copied hence remove from source
-    dp.getRef()[inkey].erase("omega"); // copied hence remove from source
+    dp.getRef()[inkey].erase("OmVec"); // copied hence remove from source
 
     dp.getRef()[outkey] = outdata;
 

@@ -37,6 +37,7 @@ class QTNMSimKinematicsReader
     TTreeReaderValue<double> kine;
     TTreeReaderValue<double> pangle;
     TTreeReaderValue<std::vector<double>> tvec;
+    TTreeReaderValue<std::vector<double>> omvec;
     TTreeReaderValue<std::vector<double>> pxvec;
     TTreeReaderValue<std::vector<double>> pyvec;
     TTreeReaderValue<std::vector<double>> pzvec;

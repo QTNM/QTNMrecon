@@ -15,7 +15,7 @@
 class WaveformSampling
 {
     public:
-        WaveformSampling(std::string inbox, std::string outbox); // constructor; required
+        WaveformSampling(std::string source, std::string inbox, std::string outbox);
         // Configures the module. Could have more config parameters
         // String Key outbox label as input.
 
@@ -33,6 +33,7 @@ class WaveformSampling
         quantity<ns> sampletime;
 
     // these below serve as string keys to access (read/write) the Event map
+        std::string originkey;
         std::string inkey;
         std::string outkey;
 };

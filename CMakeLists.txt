@@ -55,6 +55,7 @@ modules/AntennaResponse.cpp
 modules/WaveformSampling.cpp 
 modules/AddNoise.cpp
 modules/Digitize.cpp
+modules/writeDigitizerToRoot.cpp
 modules/printSimReader.cpp)
 target_link_libraries(ReconModules QTNMTools ${ROOT_LIBRARIES})
 
@@ -65,6 +66,8 @@ add_executable(exsc.exe apps/example_sine_csv.cpp)
 target_link_libraries(exsc.exe PUBLIC ReconModules QTNMTools)
 add_executable(exrip.exe apps/example_interpolate_print.cpp)
 target_link_libraries(exrip.exe PUBLIC ReconModules QTNMTools)
+add_executable(exnoant.exe apps/example_noAnt_read.cpp)
+target_link_libraries(exnoant.exe PUBLIC ReconModules QTNMTools)
 
 # Build testing executables separately for file output
 add_executable(testbw examples/bwfiltertest.cpp)

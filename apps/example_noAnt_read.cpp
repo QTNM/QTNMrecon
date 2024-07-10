@@ -17,10 +17,16 @@
 // ROOT
 #include "TFile.h"
 #include "TTreeReader.h"
+#include "Math/Vector3D.h" // XYZVector
+#include "Math/Point3D.h" // XYZPoint
+
+using namespace ROOT::Math;
 
 // us
 #include "yap/pipeline.h"
-#include "modules/QTNMSimAntennaReader.hh"
+#include "modules/QTNMSimKinematicsReader.hh"
+#include "modules/AntennaResponse.hh"
+#include "receiver/HalfWaveDipole.hh"
 #include "modules/WaveformSampling.hh"
 #include "CLI11.hpp"
 #include <Event.hh>
@@ -96,24 +102,47 @@ int main(int argc, char** argv)
 
   CLI11_PARSE(app, argc, argv);
 
+  // keys to set
+  std::string origin = "raw";
+  std::string resp = "response";
+  std::string samp = "sampled";
+
   // data source: read from ROOT file, store under key 'raw'
   TFile ff(fname.data(),"READ");
   TTreeReader re("ntuple/Signal", &ff);
-  auto source = QTNMSimAntennaReader(re, "raw");
+  auto source = QTNMSimKinematicsReader(re, origin);
   source.setMaxEventNumber(nevents); // default = all events in file
 
-  // transformer, here interpolation
-  auto interpolator = WaveformSampling("raw","","sampled");
+  // transformer
+  auto antresponse = AntennaResponse(origin, resp);
+
+  // configure antennae
+  std::vector<VReceiver*> allantenna;
+  XYZPoint  apos1(0.027, 0.0, 0.0); // fix from geometry, SI unit [m]
+  XYZVector apol1(0.0, 1.0, 0.0); // unit vector
+  VReceiver* ant1 = new HalfWaveDipole(apos1, apol1); // insert as pointer
+  allantenna.push_back(ant1);
+  XYZPoint  apos2(0.0, 0.027, 0.0); // fix from geometry
+  XYZVector apol2(1.0, 0.0, 0.0); // unit vector
+  VReceiver* ant2 = new HalfWaveDipole(apos2, apol2); // insert as pointer
+  allantenna.push_back(ant2);
+
+  antresponse.setAntennaCollection(allantenna); // finished antenna configuration
+
+  // transformer
+  auto interpolator = WaveformSampling(origin,resp,samp);
   quantity<ns> stime = 0.008 * ns;
   int nant = 2;
   interpolator.setSampleTime(stime);
   interpolator.setAntennaNumber(nant);
   
   // data sink: simply print to screen, take from key
-  auto sink   = printInterpolator("sampled","raw");
+  auto sink   = printInterpolator(samp,origin);
   
-  auto pl = yap::Pipeline{} | source | interpolator | sink;
+  auto pl = yap::Pipeline{} | source | antresponse | interpolator | sink;
   
   pl.consume();
   ff.Close();
+  delete ant1;
+  delete ant2;
 }

@@ -21,6 +21,7 @@ QTNMSimKinematicsReader::QTNMSimKinematicsReader(TTreeReader& re, std::string ou
     kine(reader, "KinEnergy"),
     pangle(reader, "PitchAngle"),
     tvec(reader, "TimeVec"),
+    omvec(reader, "OmVec"),
     pxvec(reader, "PosxVec"),
     pyvec(reader, "PosyVec"),
     pzvec(reader, "PoszVec"),
@@ -58,6 +59,7 @@ DataPack QTNMSimKinematicsReader::operator()()
         outdata["VKinEnergy"] = std::any(*kine); // vertex energy
         outdata["VPitchAngle"] = std::any(*pangle); // vertex pitch angle to z-axis
         outdata["TimeVec"] = std::make_any<std::vector<double>>(tvec->begin(),tvec->end());
+        outdata["OmVec"] = std::make_any<std::vector<double>>(omvec->begin(),omvec->end());
         outdata["pxVec"] = std::make_any<std::vector<double>>(pxvec->begin(),pxvec->end());
         outdata["pyVec"] = std::make_any<std::vector<double>>(pyvec->begin(),pyvec->end());
         outdata["pzVec"] = std::make_any<std::vector<double>>(pzvec->begin(),pzvec->end());
@@ -72,6 +74,7 @@ DataPack QTNMSimKinematicsReader::operator()()
         throw yap::GeneratorExit{};
 
     // at the end, store new data product in dictionary event map.
+    std::cout << "read time vec size: " << tvec->size() << std::endl;
     eventmap[outkey] = outdata; // with outdata an Event<std::any>
     DataPack dp(eventmap);
     return dp;
