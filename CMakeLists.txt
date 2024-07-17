@@ -35,6 +35,7 @@ include_directories(include
 add_library(QTNMTools SHARED src/digitizer.cpp 
 src/dsp.cpp 
 src/filter.cpp
+src/spline.cpp
 src/LIA.cpp 
 src/CustomNoiseGen.cpp
 src/SineGenerator.cpp
@@ -54,6 +55,7 @@ modules/SineSigGenerator.cpp
 modules/AntennaResponse.cpp
 modules/WaveformSampling.cpp 
 modules/AddNoise.cpp
+modules/Mixer.cpp
 modules/Digitize.cpp
 modules/writeDigitizerToRoot.cpp
 modules/printSimReader.cpp)
@@ -68,6 +70,8 @@ add_executable(exrip.exe apps/example_interpolate_print.cpp)
 target_link_libraries(exrip.exe PUBLIC ReconModules QTNMTools)
 add_executable(exnoant.exe apps/example_noAnt_read.cpp)
 target_link_libraries(exnoant.exe PUBLIC ReconModules QTNMTools)
+add_executable(noantwrite.exe apps/example_noAnt_write.cpp)
+target_link_libraries(noantwrite.exe PUBLIC ReconModules QTNMTools)
 
 # Build testing executables separately for file output
 add_executable(testbw examples/bwfiltertest.cpp)
@@ -96,3 +100,5 @@ add_executable(testmovav examples/movavtest.cpp)
 target_link_libraries(testmovav PUBLIC QTNMTools)
 add_executable(testmix examples/mixertest.cpp)
 target_link_libraries(testmix PUBLIC QTNMTools)
+add_executable(testmixsamp examples/mixsampletest.cpp)
+target_link_libraries(testmixsamp PUBLIC QTNMTools)

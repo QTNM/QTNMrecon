@@ -25,7 +25,6 @@ void xCsvWriter::operator()(DataPack dp)
         std::cout << "input key not in dictionary!" << std::endl;
         return; // not found, return unchanged map, no processing
     }
-    std::cout << "in csvwriter: inkey is " << inkey << " with counter " << counter << std::endl;
     Event<std::any> indata = dp.getRef()[inkey]; // access L1 dictionary
     // yields a L2 unordered map called Event<std::any> with the 
     // help of the inkey label.

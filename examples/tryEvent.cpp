@@ -86,7 +86,38 @@ int main() {
     {
         std::cerr << e.what() << '\n';
     }
-    
+
+    // try a DataPack
+    DataPack dp(evmap);
+    std::cout << "Event map from DataPack" << std::endl;
+    auto& evdp = dp.getRef()["test"]; // evdp is L1 unordered_map
+    // for values need to know what is stored
+    try // casting can go wrong; throws at run-time, catch it.
+    {
+        std::cout << std::any_cast<int>(evdp["d1"]) << std::endl;
+        std::cout << std::any_cast<int>(evdp["d2"]) << std::endl;
+        // can also cast the container
+        auto vv1 = std::any_cast<std::vector<double>>(evdp["d3"]);
+        for (auto& y : vv1) std::cout << y << " ";
+        std::cout << std::endl;
+        auto vv2 = std::any_cast<std::vector<double>>(evdp["d4"]);
+        for (auto& y : vv2) std::cout << y << " ";
+        std::cout << std::endl;
+    }
+    catch (const std::bad_any_cast& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+    // test other data members in data pack
+    // assign values
+    dp.getTruthRef().vertex.eventID = 21;
+    dp.getTruthRef().vertex.trackID = 1;
+    dp.getTruthRef().nantenna = 2;
+    dp.getTruthRef().sampling_time = ti;
+    dp.getTruthRef().vertex.kineticenergy = en;
+    std::cout << "evID: " << dp.getTruthRef().vertex.eventID << std::endl;
+    std::cout << "quantity stime: " << dp.getTruthRef().sampling_time << std::endl;
+    std::cout << "quantity energy: " << dp.getTruthRef().vertex.kineticenergy << std::endl;
     return 0;
 }
 

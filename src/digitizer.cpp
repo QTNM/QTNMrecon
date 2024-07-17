@@ -10,6 +10,7 @@
 
 Digitizer::Digitizer() : 
 vrange(0.0 * V),
+gain(1.0),
 bitrange(12) // default 12-bits
 {
     bmax = (int)pow(2,bitrange-1); // for signed range
@@ -25,6 +26,7 @@ bitrange(12) // default 12-bits
 
 Digitizer::Digitizer(quantity<V> voltrange, int b) : 
 vrange(voltrange),
+gain(1.0),
 bitrange(b)
 {
     setADCBits(b);
@@ -34,7 +36,8 @@ void Digitizer::dumpInfo()
 {
     std::cout << "Digitizer Info: " << std::endl;
     std::cout << "voltage range [V]: " << vrange.in(V)
-            << " ADC bits: " << bitrange << std::endl;
+        << " gain factor: " << gain
+        << " ADC bits: " << bitrange << std::endl;
 }
 
 waveform_t Digitizer::digitize(const waveform_t& wfm)
@@ -52,8 +55,9 @@ void Digitizer::digitize_raw(const waveform_t& wfm)
     dwave.clear();
     if (wfm.empty()) return; // empty in; empty result
 
-    quantity<V> vmax = *std::max_element(wfm.begin(),wfm.end());
-    quantity<V> vmin = *std::min_element(wfm.begin(),wfm.end());
+    // can be larger than vrange -> clipping permitted
+    quantity<V> vmax = *std::max_element(wfm.begin(),wfm.end()) * gain;
+    quantity<V> vmin = *std::min_element(wfm.begin(),wfm.end()) * gain;
 
     if (vrange <= 0.0 * V) // no voltage range set, take from data
         vrange = vmax - vmin;
@@ -72,6 +76,7 @@ void Digitizer::digitize_raw(const waveform_t& wfm)
 std::int16_t Digitizer::_adc(waveform_value val)
 {
     std::int16_t idx = 0;
+    val *= gain; // scale up waveform
     for (auto it=begin(calarray); it!=end(calarray) && (*it)<=val; ++it) 
         ++idx; // count to find first index for val > darray
     if (idx>=2*bmax) idx = 2*bmax-1; // saturation range, get last entry

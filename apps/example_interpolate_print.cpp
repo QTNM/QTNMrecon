@@ -31,9 +31,8 @@
 class printInterpolator
 {
 public:
-  printInterpolator(std::string inbox, std::string inbox2) :
-    inkey1(std::move(inbox)),
-    inkey2(std::move(inbox2)) {}; // constructor; required
+  printInterpolator(std::string inbox) :
+    inkey1(std::move(inbox)) {}; // constructor; required
   
   //  void operator()(Event_map<std::any> emap); // this is called by the pipeline
   void operator()(DataPack dp); // this is called by the pipeline
@@ -41,7 +40,6 @@ public:
 private:
     // these below serve as string keys to access (read/write) the Event map
   std::string inkey1;
-  std::string inkey2;
 
 };
 
@@ -55,7 +53,6 @@ void printInterpolator::operator()(DataPack dp)
     }
     //    Event_map<std::any> mymap = std::move(emap); // move from buffer copy
     Event<std::any> indata1 = dp.getRef()[inkey1]; // access L1 dictionary
-    Event<std::any> indata2 = dp.getRef()[inkey2]; // access L1 dictionary
     // yields a L2 unordered map called Event<std::any> with the 
     // help of the inkey1 label.
 
@@ -64,9 +61,9 @@ void printInterpolator::operator()(DataPack dp)
     try // casting can go wrong; throws at run-time, catch it.
     {
       // from raw
-      std::cout << "evID " << std::any_cast<int>(indata2["eventID"]) << std::endl;
+      std::cout << "evID " << dp.getTruthRef().vertex.eventID << std::endl;
       // from interpolator
-      std::cout << "Sampling " << std::any_cast<quantity<ns>>(indata1["sample_time[ns]"]) << std::endl;
+      std::cout << "Sampling " << dp.getTruthRef().sampling_time << std::endl;
         // can also cast the container
         auto vvv1 = std::any_cast<std::vector<double>>(indata1["sampled_0_[V]"]);
         std::cout << "Sampled antenna 1 size = " << vvv1.size() << std::endl;
@@ -110,7 +107,7 @@ int main(int argc, char** argv)
   interpolator.setAntennaNumber(nant);
   
   // data sink: simply print to screen, take from key
-  auto sink   = printInterpolator("sampled","raw");
+  auto sink   = printInterpolator("sampled");
   
   auto pl = yap::Pipeline{} | source | interpolator | sink;
   

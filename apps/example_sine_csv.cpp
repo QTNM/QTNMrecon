@@ -1,5 +1,5 @@
 // example application
-// how to running a reconstruction pipeline
+// how to run a reconstruction pipeline
 // make a main program, include and instantiate all the modules
 // as required for the intended purpose and send them
 // into the pipeline object.

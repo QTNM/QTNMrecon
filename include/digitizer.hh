@@ -31,6 +31,7 @@ class Digitizer
         // config parameter
         inline void setVRange(quantity<V> v) {vrange = v;}
         inline void setADCBits(int b);
+        inline void setGainFactor(double g) {gain = g;}
 
         void dumpInfo(); // report by print
 
@@ -41,6 +42,7 @@ class Digitizer
 
         int bitrange; // 16 bit max
         int bmax;     // max number from bitrange
+        double gain;
         quantity<V> vrange;
 
         digi_t darray; // digitizer array

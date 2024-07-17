@@ -12,8 +12,9 @@ int main()
     quantity<Hz> freq = 1.0 * Hz;
 
     Digitizer digi(1.0 * V, 8); // range +- 1V
-    SineGenerator sinsig(2.0 * V, freq, srate, dur, 0.0*deg); // 2V amplitude
+    SineGenerator sinsig(1.0 * V, freq, srate, dur, 0.0*deg); // 2V amplitude
 
+    digi.setGainFactor(2.0);
     digi.dumpInfo();
     waveform_t xo = sinsig.generate();
     waveform_t dout = digi.digitize(xo);

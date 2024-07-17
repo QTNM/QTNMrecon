@@ -51,13 +51,6 @@ DataPack QTNMSimKinematicsReader::operator()()
     // collect all Signal info from file, reader holds event iterator
     
     if (reader.Next()) { // variables filled from file
-        outdata["eventID"] = std::any(*eventID); // de-reference an int to std::any
-        outdata["trackID"] = std::any(*trackID);
-        outdata["VPosx"] = std::any(*posx); // vertex position
-        outdata["VPosy"] = std::any(*posy); 
-        outdata["VPosz"] = std::any(*posz); 
-        outdata["VKinEnergy"] = std::any(*kine); // vertex energy
-        outdata["VPitchAngle"] = std::any(*pangle); // vertex pitch angle to z-axis
         outdata["TimeVec"] = std::make_any<std::vector<double>>(tvec->begin(),tvec->end());
         outdata["OmVec"] = std::make_any<std::vector<double>>(omvec->begin(),omvec->end());
         outdata["pxVec"] = std::make_any<std::vector<double>>(pxvec->begin(),pxvec->end());
@@ -69,13 +62,21 @@ DataPack QTNMSimKinematicsReader::operator()()
         outdata["axVec"] = std::make_any<std::vector<double>>(axvec->begin(),axvec->end());
         outdata["ayVec"] = std::make_any<std::vector<double>>(ayvec->begin(),ayvec->end());
         outdata["azVec"] = std::make_any<std::vector<double>>(azvec->begin(),azvec->end());
+        eventmap[outkey] = outdata; // with outdata an Event<std::any>
     }
     else // no more entries in TTreeReader
         throw yap::GeneratorExit{};
 
     // at the end, store new data product in dictionary event map.
-    std::cout << "read time vec size: " << tvec->size() << std::endl;
-    eventmap[outkey] = outdata; // with outdata an Event<std::any>
     DataPack dp(eventmap);
+    // fill truth struct with vertex info
+    dp.getTruthRef().vertex.eventID = *eventID;
+    dp.getTruthRef().vertex.trackID = *trackID;
+    dp.getTruthRef().vertex.posx = *posx * mm;
+    dp.getTruthRef().vertex.posy = *posy * mm;
+    dp.getTruthRef().vertex.posz = *posz * mm;
+    dp.getTruthRef().vertex.kineticenergy = *kine * keV;
+    dp.getTruthRef().vertex.pitchangle = *pangle * rad;
+    std::cout << "reader Next() done, evt:  " << evcounter << std::endl;
     return dp;
 }

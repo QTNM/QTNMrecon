@@ -3,13 +3,13 @@
 
 // std
 #include <iostream>
+#include <algorithm>
 
 // us
 #include "writeDigitizerToRoot.hh"
 #include "types.hh"
 
-WriterDigiToRoot::WriterDigiToRoot(TTree* tr, int na, std::string in) : 
-  inkey(std::move(in)),
+WriterDigiToRoot::WriterDigiToRoot(TTree* tr, int na) : 
   mytree(tr),
   nantenna(na)
 {
@@ -18,41 +18,95 @@ WriterDigiToRoot::WriterDigiToRoot(TTree* tr, int na, std::string in) :
   for (int i=0;i<nantenna;++i) {
     std::vector<double> vv;
     scopedata.push_back(vv); // vector in scopedata initialized
+    std::vector<double> p;
+    purewave.push_back(p); // vector in purewave initialized
   }
-  // can now point branch at address
+  // can now point branch at dummy addresses; makes header only
+  mytree->Branch("truth.nantenna",&nant,"truth.nantenna/I");
+  mytree->Branch("truth.snratio",&snratio,"truth.snratio/D");
+  mytree->Branch("truth.samplingtime_s",&samplingtime,"truth.samplingtime/D");
+  mytree->Branch("truth.avomega_Hz",&avomega,"truth.avomega/D");
+  mytree->Branch("vertex.evID",&evID,"vertex.evID/I");
+  mytree->Branch("vertex.trackID",&trID,"vertex.trackID/I");
+  mytree->Branch("vertex.posx_m",&posx,"vertex.posx/D");
+  mytree->Branch("vertex.posy_m",&posy,"vertex.posy/D");
+  mytree->Branch("vertex.posz_m",&posz,"vertex.posz/D");
+  mytree->Branch("vertex.kinenergy_eV",&kEnergy,"vertex.kinenergy/D");
+  mytree->Branch("vertex.pitchangle_deg",&pangle,"vertex.pitchangle/D");
+  mytree->Branch("digi.gain",&gain,"digi.gain/D");
+  mytree->Branch("digi.tfrequency_Hz",&tfrequency,"digi.tfrequency/D");
+  mytree->Branch("digi.samplingrate_Hz",&digisamplingrate,"digi.samplingrate/D");
   for (int i=0;i<nantenna;++i) {
     std::string brname = "signal_" + std::to_string(i) + "_V"; // unit in name
     mytree->Branch(brname.data(), &scopedata.at(i)); // point to std::vector<double>
+    brname = "pure_" + std::to_string(i) + "_V"; // unit in name
+    mytree->Branch(brname.data(), &purewave.at(i)); // point to std::vector<double>
   }
 }
 
 
 void WriterDigiToRoot::operator()(DataPack dp)
 {
-  // example getting hold of requested input data for processing
-  if (! dp.getRef().count(inkey)) { 
-    std::cout << "input key not in dictionary!" << std::endl;
-    return; // not found, return unchanged map, no processing
+  // extract from datapack and assign to output branch variables with the correct address
+  nant    = dp.getTruthRef().nantenna;
+  mytree->SetBranchAddress("truth.nantenna",&nant);
+  snratio     = dp.getTruthRef().snratio;
+  mytree->SetBranchAddress("truth.snratio",&snratio);
+  samplingtime = dp.getTruthRef().sampling_time.numerical_value_in(s); // from quantity<ns> no unit for output
+  mytree->SetBranchAddress("truth.samplingtime_s",&samplingtime);
+  avomega      = dp.getTruthRef().average_omega.numerical_value_in(Hz); // quantity<Hz>
+  mytree->SetBranchAddress("truth.avomega_Hz",&avomega);
+  // vertex
+  evID = dp.getTruthRef().vertex.eventID;
+  mytree->SetBranchAddress("vertex.evID",&evID);
+  trID = dp.getTruthRef().vertex.trackID;
+  mytree->SetBranchAddress("vertex.trackID",&trID);
+  posx    = dp.getTruthRef().vertex.posx.numerical_value_in(m); // quantity<m>
+  mytree->SetBranchAddress("vertex.posx_m",&posx);
+  posy    = dp.getTruthRef().vertex.posy.numerical_value_in(m); // quantity<m>
+  mytree->SetBranchAddress("vertex.posy_m",&posy);
+  posz    = dp.getTruthRef().vertex.posz.numerical_value_in(m); // quantity<m>
+  mytree->SetBranchAddress("vertex.posz_m",&posz);
+  kEnergy = dp.getTruthRef().vertex.kineticenergy.numerical_value_in(eV); // quantity<eV>
+  mytree->SetBranchAddress("vertex.kinenergy_eV",&kEnergy);
+  pangle  = dp.getTruthRef().vertex.pitchangle.numerical_value_in(deg); // quantity<deg>
+  mytree->SetBranchAddress("vertex.pitchangle_deg",&pangle);
+  // experiment
+  gain  = dp.getExperimentRef().gain;
+  mytree->SetBranchAddress("digi.gain",&gain);
+  tfrequency   = dp.getExperimentRef().target_frequency.numerical_value_in(Hz); // quantity<Hz>
+  mytree->SetBranchAddress("digi.tfrequency_Hz",&tfrequency);
+  digisamplingrate = dp.getExperimentRef().digi_sampling_rate.numerical_value_in(Hz); // quantity<Hz>
+  mytree->SetBranchAddress("digi.samplingrate_Hz",&digisamplingrate);
+
+  for (int i=0;i<nantenna;++i) {
+    waveform_t sig = dp.getExperimentRef().signals.at(i);
+    std::cout << "got wave size " << sig.size() << std::endl;
+    // strip units from vector entries
+    scopedata.at(i).resize(sig.size());
+    std::transform(sig.begin(), sig.end(), scopedata.at(i).begin(),[](waveform_value x){return x.numerical_value_in(V);});
+    // store with right address
+    std::vector<double>* sptr = &scopedata.at(i);
+    std::string brname = "signal_" + std::to_string(i) + "_V"; // unit in name
+    mytree->SetBranchAddress(brname.data(), &sptr);
+
+    waveform_t pure = dp.getTruthRef().pure.at(i);
+    std::cout << "got truth wave size " << pure.size() << std::endl;
+    // strip units from vector entries
+    purewave.at(i).resize(pure.size());
+    std::transform(pure.begin(), pure.end(), purewave.at(i).begin(),[](waveform_value x){return x.numerical_value_in(V);});
+    // store
+    std::vector<double>* pptr = &purewave.at(i);
+    brname = "pure_" + std::to_string(i) + "_V"; // unit in name
+    mytree->SetBranchAddress(brname.data(), &pptr);
   }
-  Event<std::any> indata = dp.getRef()[inkey]; // access L1 dictionary
-  // yields a L2 unordered map called Event<std::any> with the 
-  // help of the inkey label.
-  try // casting can go wrong; throws at run-time, catch it.
-    {
-      for (int i=0;i<nantenna;++i) {
-	std::string ikey = "signal_" + std::to_string(i); // from Digitizer, fixed
-	auto sig = std::any_cast<waveform_t>(indata[ikey]); // has unit
-	std::cout << "got wave size " << sig.size() << std::endl;
-	for (auto entry : sig) // strip units from vector entries
-	  scopedata.at(i).push_back(entry.numerical_value_in(V));
-        mytree->Fill();
-        // output streamed, clear memory
-	scopedata.at(i).clear();
-      }
-    }
-  catch (const std::bad_any_cast& e)
-    {
-      std::cout << e.what() << std::endl;
-    }
-  return;
+  // all output collected, write it
+  mytree->Fill();
+
+  // clear memory
+  for (int i=0;i<nantenna;++i) {
+    scopedata.at(i).clear();
+    purewave.at(i).clear();
+  }
+
 }

@@ -6,10 +6,12 @@
 
 // us
 #include "printSimReader.hh"
+#include <mp-units/ostream.h> // for cout stream
 
 printSimReader::printSimReader(std::string in) : 
     inkey(std::move(in)) {}
 
+//void printSimReader::operator()(Event_map<std::any> emap)
 void printSimReader::operator()(DataPack dp)
 {
     // example getting hold of requested input data for processing
@@ -17,6 +19,7 @@ void printSimReader::operator()(DataPack dp)
         std::cout << "input key not in dictionary!" << std::endl;
         return; // not found, return unchanged map, no processing
     }
+  //    Event_map<std::any> mymap = std::move(emap); // move from buffer copy
   Event<std::any> indata = dp.getRef()[inkey]; // access L1 dictionary
     // yields a L2 unordered map called Event<std::any> with the 
     // help of the inkey label.
@@ -28,13 +31,13 @@ void printSimReader::operator()(DataPack dp)
     // for values need to know what is stored
     try // casting can go wrong; throws at run-time, catch it.
     {
-        std::cout << "evID " << std::any_cast<int>(indata["eventID"]) << std::endl;
-        std::cout << "trID " << std::any_cast<int>(indata["trackID"]) << std::endl;
-        std::cout << "posx " << std::any_cast<double>(indata["VPosx"]) << std::endl;
-        std::cout << "posy " << std::any_cast<double>(indata["VPosy"]) << std::endl;
-        std::cout << "posz " << std::any_cast<double>(indata["VPosz"]) << std::endl;
-        std::cout << "KE " << std::any_cast<double>(indata["VKinEnergy"]) << std::endl;
-        std::cout << "Angle " << std::any_cast<double>(indata["VPitchAngle"]) << std::endl;
+        std::cout << "evID " << dp.getTruthRef().vertex.eventID << std::endl;
+        std::cout << "trID " << dp.getTruthRef().vertex.trackID << std::endl;
+        std::cout << "posx " << dp.getTruthRef().vertex.posx << std::endl;
+        std::cout << "posy " << dp.getTruthRef().vertex.posy << std::endl;
+        std::cout << "posz " << dp.getTruthRef().vertex.posz << std::endl;
+        std::cout << "KE " << dp.getTruthRef().vertex.kineticenergy << std::endl;
+        std::cout << "Angle " << dp.getTruthRef().vertex.pitchangle << std::endl;
         // can also cast the container
         auto aID = std::any_cast<std::vector<int>>(indata["AntennaID"]);
         std::cout << "AntennaID size = " << aID.size() << std::endl;

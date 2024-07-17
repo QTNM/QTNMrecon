@@ -67,7 +67,7 @@ waveform_t CustomNoiseGenerator::generate()
 
     double step = sampling_rate.numerical_value_in(Hz)/2.0 / entries;
     vec_t interpolatedPowerSpec;
-    tk::spline ip(frequencies, powerspec); // interpolator
+    spline ip(frequencies, powerspec); // interpolator
 
     // add white noise contribution to averaged power spec at 1dB = scale 1.26
     for (int i=0;i<entries;++i) {

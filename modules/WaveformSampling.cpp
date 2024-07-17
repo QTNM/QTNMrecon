@@ -60,7 +60,8 @@ DataPack WaveformSampling::operator()(DataPack dp)
       {
 	std::cerr << e.what() << '\n';
       }
-    outdata["sample_time[ns]"] = std::make_any<quantity<ns>>(sampletime);
+    dp.getTruthRef().nantenna = nantenna;
+    dp.getTruthRef().sampling_time = sampletime;
     dp.getRef()[outkey] = outdata;
     
     // clear obsolete data in Event_map
@@ -87,7 +88,7 @@ DataPack WaveformSampling::operator()(DataPack dp)
 	  vec_t resampled = interpolate(tiv, tv);
 	  // store result
 	  std::string okey = "sampled_" + std::to_string(i) + "_[V]";
-	  outdata[okey] = std::make_any<vec_t>(resampled);
+	  outdata[okey] = std::make_any<vec_t>(resampled); // for later transformation and deletion
 	  dp.getRef()[inkey].erase(ikey); // used; not needed anymore
 	}
       }
@@ -95,7 +96,9 @@ DataPack WaveformSampling::operator()(DataPack dp)
       {
 	std::cerr << e.what() << '\n';
       }
-    outdata["sample_time[ns]"] = std::make_any<quantity<ns>>(sampletime);
+
+    dp.getTruthRef().nantenna = nantenna;
+    dp.getTruthRef().sampling_time = sampletime;
     dp.getRef()[outkey] = outdata;
     
     // clear obsolete data in Event_map
@@ -112,7 +115,7 @@ vec_t WaveformSampling::interpolate(const vec_t& tvals, const vec_t& vvals)
     double interval = tvals.back() - tvals.front();
     int maxpoints = (int)floor(interval / sampletime.numerical_value_in(ns));
 
-    tk::spline ip(tvals, vvals); // interpolator
+    spline ip(tvals, vvals); // interpolator
     for (int i=1;i<=maxpoints;++i)
         resampled.push_back(ip(i * sampletime.numerical_value_in(ns)));
     return resampled;

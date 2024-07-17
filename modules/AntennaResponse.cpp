@@ -41,6 +41,6 @@ DataPack AntennaResponse::operator()(DataPack dp)
     dp.getRef()[inkey].erase("OmVec"); // copied hence remove from source
 
     dp.getRef()[outkey] = outdata;
-
+    dp.getTruthRef().average_omega = std::any_cast<quantity<Hz>>(indata["avomega_[Hz]"]); // stored from antenna
     return dp;
 }

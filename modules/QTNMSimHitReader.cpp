@@ -1,4 +1,4 @@
-// QTNMSim Hit reader module implementation
+// reader module implementation
 
 // std
 #include <iostream>
@@ -7,6 +7,8 @@
 #include "QTNMSimHitReader.hh"
 #include "yap/pipeline.h"
 
+// ROOT
+#include "TTreeReaderValue.h"
 
 QTNMSimHitReader::QTNMSimHitReader(TTreeReader& re, std::string out) : 
     outkey(std::move(out)),

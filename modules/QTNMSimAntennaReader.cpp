@@ -1,4 +1,7 @@
-// QTNMSim Antenna signal reader module implementation
+// template module implementation
+// necessarily empty since nothing is supposed to happen
+// for this example, showing boiler-plate code for any 
+// processing module.
 
 // std
 #include <iostream>
@@ -7,6 +10,8 @@
 #include "QTNMSimAntennaReader.hh"
 #include "yap/pipeline.h"
 
+// ROOT
+#include "TTreeReaderValue.h"
 
 QTNMSimAntennaReader::QTNMSimAntennaReader(TTreeReader& re, std::string out) : 
     outkey(std::move(out)),
@@ -27,7 +32,7 @@ QTNMSimAntennaReader::QTNMSimAntennaReader(TTreeReader& re, std::string out) :
     std::cout << "in reader n entries: " << reader.GetEntries() << std::endl;
 }
 
-
+//Event_map<std::any> QTNMSimAntennaReader::operator()()
 DataPack QTNMSimAntennaReader::operator()()
 {
     // catch event number limit in pipeline, -1 = all, default
@@ -44,23 +49,25 @@ DataPack QTNMSimAntennaReader::operator()()
     // collect all Signal info from file, reader holds event iterator
     std::cout << "reader called" << std::endl;
     if (reader.Next()) { // variables filled from file
-        outdata["eventID"] = std::any(*eventID); // de-reference an int to std::any
-        outdata["trackID"] = std::any(*trackID);
-        outdata["VPosx"] = std::any(*posx); // vertex position
-        outdata["VPosy"] = std::any(*posy); 
-        outdata["VPosz"] = std::any(*posz); 
-        outdata["VKinEnergy"] = std::any(*kine); // vertex energy
-        outdata["VPitchAngle"] = std::any(*pangle); // vertex pitch angle to z-axis
         outdata["AntennaID"] = std::make_any<std::vector<int>>(aID->begin(),aID->end());
         outdata["TimeVec"] = std::make_any<std::vector<double>>(tvec->begin(),tvec->end());
         outdata["VoltageVec"] = std::make_any<std::vector<double>>(vvec->begin(),vvec->end());
+        eventmap[outkey] = outdata; // with outdata an Event<std::any>
     }
     else // no more entries in TTreeReader
         throw yap::GeneratorExit{};
 
-    std::cout << "reader Next() done, evt:  " << evcounter << std::endl;
+    // make data product
     // at the end, store new data product in dictionary event map.
-    eventmap[outkey] = outdata; // with outdata an Event<std::any>
     DataPack dp(eventmap);
+    // fill truth struct with vertex info
+    dp.getTruthRef().vertex.eventID = *eventID;
+    dp.getTruthRef().vertex.trackID = *trackID;
+    dp.getTruthRef().vertex.posx = *posx * mm;
+    dp.getTruthRef().vertex.posy = *posy * mm;
+    dp.getTruthRef().vertex.posz = *posz * mm;
+    dp.getTruthRef().vertex.kineticenergy = *kine * keV;
+    dp.getTruthRef().vertex.pitchangle = *pangle * rad;
+    std::cout << "reader Next() done, evt:  " << evcounter << std::endl;
     return dp;
 }

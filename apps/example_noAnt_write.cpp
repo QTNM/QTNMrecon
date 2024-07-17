@@ -6,8 +6,6 @@
 // Needs a data source and a data sink at the least.
 // Any data processing needs to be placed in between these bookends.
 //
-// Current data model assumes the exchange of an Event_map from module to module
-// with the definition in Event.hh
 
 // std
 #include<iostream>
@@ -16,6 +14,7 @@
 
 // ROOT
 #include "TFile.h"
+#include "TTree.h"
 #include "TTreeReader.h"
 #include "Math/Vector3D.h" // XYZVector
 #include "Math/Point3D.h" // XYZPoint
@@ -28,63 +27,16 @@ using namespace ROOT::Math;
 #include "modules/AntennaResponse.hh"
 #include "receiver/HalfWaveDipole.hh"
 #include "modules/WaveformSampling.hh"
+#include "modules/AddNoise.hh"
+#include "modules/Mixer.hh"
+#include "modules/Digitize.hh"
+#include "modules/writeDigitizerToRoot.hh"
+
 #include "CLI11.hpp"
 #include <Event.hh>
 #include "types.hh"
 #include <mp-units/format.h>
 #include <mp-units/ostream.h>
-
-class printInterpolator
-{
-public:
-  printInterpolator(std::string inbox) :
-    inkey1(std::move(inbox)) {}; // constructor; required
-  
-  //  void operator()(Event_map<std::any> emap); // this is called by the pipeline
-  void operator()(DataPack dp); // this is called by the pipeline
-  
-private:
-    // these below serve as string keys to access (read/write) the Event map
-  std::string inkey1;
-
-};
-
-//void printInterpolator::operator()(Event_map<std::any> emap)
-void printInterpolator::operator()(DataPack dp)
-{
-    // example getting hold of requested input data for processing
-  if (! dp.getRef().count(inkey1)) { 
-        std::cout << "input key not in dictionary!" << std::endl;
-        return; // not found, return unchanged map, no processing
-    }
-    //    Event_map<std::any> mymap = std::move(emap); // move from buffer copy
-    Event<std::any> indata1 = dp.getRef()[inkey1]; // access L1 dictionary
-    // yields a L2 unordered map called Event<std::any> with the 
-    // help of the inkey1 label.
-
-    std::cout << "Event_map values:" << std::endl;
-    // for values need to know what is stored
-    try // casting can go wrong; throws at run-time, catch it.
-    {
-      // from raw
-      std::cout << "evID " << dp.getTruthRef().vertex.eventID << std::endl;
-      // from interpolator
-      std::cout << "Sampling " << dp.getTruthRef().sampling_time << std::endl;
-        // can also cast the container
-        auto vvv1 = std::any_cast<std::vector<double>>(indata1["sampled_0_[V]"]);
-        std::cout << "Sampled antenna 1 size = " << vvv1.size() << std::endl;
-        auto vvv2 = std::any_cast<std::vector<double>>(indata1["sampled_1_[V]"]);
-        std::cout << "Sampled antenna 2 size = " << vvv2.size() << std::endl;
-    }
-    catch (const std::bad_any_cast& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-
-    // action of module template module.
-    
-    return;
-}
 
 
 int main(int argc, char** argv)
@@ -93,9 +45,11 @@ int main(int argc, char** argv)
   CLI::App app{"Example Recon Pipeline"};
   int nevents = -1;
   std::string fname = "qtnm.root";
+  std::string outfname = "recon.root";
 
   app.add_option("-n,--nevents", nevents, "<number of events> Default: -1");
   app.add_option("-i,--input", fname, "<input file name> Default: qtnm.root");
+  app.add_option("-o,--output", outfname, "<output file name> Default: recon.root");
 
   CLI11_PARSE(app, argc, argv);
 
@@ -103,6 +57,10 @@ int main(int argc, char** argv)
   std::string origin = "raw";
   std::string resp = "response";
   std::string samp = "sampled";
+  std::string noisy = "noisy";
+  std::string mixed = "mixer";
+  std::string l2noise = "noisy_";
+  std::string l2mix = "mixed_";
 
   // data source: read from ROOT file, store under key 'raw'
   TFile ff(fname.data(),"READ");
@@ -110,9 +68,8 @@ int main(int argc, char** argv)
   auto source = QTNMSimKinematicsReader(re, origin);
   source.setMaxEventNumber(nevents); // default = all events in file
 
-  // transformer
+  // transformer (1)
   auto antresponse = AntennaResponse(origin, resp);
-
   // configure antennae
   std::vector<VReceiver*> allantenna;
   XYZPoint  apos1(0.027, 0.0, 0.0); // fix from geometry, SI unit [m]
@@ -126,20 +83,47 @@ int main(int argc, char** argv)
 
   antresponse.setAntennaCollection(allantenna); // finished antenna configuration
 
-  // transformer
+  // transformer (2)
   auto interpolator = WaveformSampling(origin,resp,samp);
   quantity<ns> stime = 0.008 * ns;
   int nant = 2;
   interpolator.setSampleTime(stime);
   interpolator.setAntennaNumber(nant);
-  
+
+  // add noise, step (3), fill more truth with units
+  auto noiseAdder = AddNoise(samp, noisy, l2noise);
+  noiseAdder.setSignalToNoise(1.0);
+
+  // mixer, step (4), waveform in from l2 key, out in l2 key
+  auto mixer = Mixer(noisy, mixed, l2noise, l2mix);
+  quantity<Hz> tfreq = 50.0 * MHz;
+  mixer.setTargetFrequency(tfreq);
+
+  // digitizer, step (5), waveform from l2 key
+  auto digitizer = Digitize(mixed, l2mix);
+  quantity<Hz> dsampling = 1.0 * GHz;
+  quantity<V> vert = 1.0 * V;
+  digitizer.setDigiSamplingRate(dsampling);
+  digitizer.setVerticalRange(vert);
+  digitizer.setGainFactor(10.0);
+  digitizer.setBitNumber(12);
+
   // data sink: simply print to screen, take from key
-  auto sink   = printInterpolator(samp);
+  TFile* outfile = new TFile(outfname.data(), "RECREATE");
+  TTree* tr = new TTree("recon","reconstructed data");
+  tr->SetDirectory(outfile);
+  auto sink = WriterDigiToRoot(tr, nant);
   
-  auto pl = yap::Pipeline{} | source | antresponse | interpolator | sink;
+  auto pl = yap::Pipeline{} | source | antresponse | interpolator | noiseAdder | mixer | digitizer | sink;
   
   pl.consume();
+  
+  std::cout << "in app: " << std::endl;
+  tr->Show(1);
+  tr->Write();
+  outfile->Close(); // free TTree
   ff.Close();
+
   delete ant1;
   delete ant2;
 }

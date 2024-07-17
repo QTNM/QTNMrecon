@@ -6,6 +6,7 @@
 // mp-units
 #include <mp-units/systems/si/si.h>
 #include <mp-units/systems/isq/isq.h>
+#include <mp-units/systems/hep/hep.h>
 
 // std
 #include <complex>
@@ -16,6 +17,7 @@ constexpr auto Pi = 3.141592653589793238462643383279502884;
 
 using namespace mp_units;
 using namespace mp_units::si::unit_symbols; // work in SI units
+using namespace mp_units::hep::unit_symbols; // work in hep units
 
 // waveform data comes in [Volt]
 using waveform_value = quantity<isq::voltage[V]>; // type double in quantity
