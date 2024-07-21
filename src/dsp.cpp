@@ -51,7 +51,7 @@ pattern_arg DSP::rfft1d(pattern_arg &xi, const fft_dir &dir) {
     for (int i = 0; i < msb; ++i) {
         int bm = 1 << i; // butterfly mask
         int bw = 2 << i; // butterfly width
-        double ang = double(dir) * Pi / double(bm); // precomputation
+        double ang = double(dir) * myPi / double(bm); // precomputation
 
         // fft butterflies
         for (int j = 0; j < (cnt/2); ++j) {

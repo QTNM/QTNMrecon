@@ -1,8 +1,7 @@
 // VReceiver member function implementation
 
 #include "VReceiver.hh"
-// ROOT
-#include "TMath.h"
+
 
 std::vector<XYZVector> VReceiver::calculate_Efield(Event<std::any>& event, XYZPoint& eval_point)
 {
@@ -25,15 +24,15 @@ std::vector<XYZVector> VReceiver::calculate_Efield(Event<std::any>& event, XYZPo
 	XYZVector beta(bx[i],by[i],bz[i]);
 	XYZVector acc(ax[i],ay[i],az[i]);
 
-	double fac   = -1*TMath::Qe() / (4.0*TMath::Pi()*eps0_SI*TMath::C());
+	double fac   = -1*qe_SI / (4.0*myPi*eps0_SI*c_SI);
 	double dist  = (eval_point - pos).R();
   
 	XYZVector Runit = (eval_point - pos).Unit();
 	double dummy = 1.0 - Runit.Dot(beta);
 	fac /= dummy*dummy*dummy;
   
-	XYZVector relFarEField = fac*(Runit.Cross((Runit-beta).Cross(acc/TMath::C()))) / dist;    
-	XYZVector relNearEField = fac*TMath::C()*((1.0-beta.Mag2())*(Runit-beta)) / (dist*dist);
+	XYZVector relFarEField = fac*(Runit.Cross((Runit-beta).Cross(acc/c_SI))) / dist;    
+	XYZVector relNearEField = fac*c_SI*((1.0-beta.Mag2())*(Runit-beta)) / (dist*dist);
 	fields_at_point.push_back(relFarEField + relNearEField);
       }
 

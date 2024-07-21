@@ -3,8 +3,6 @@
 // us
 #include "PatchAntenna.hh"
 
-// ROOT
-#include "TMath.h"
 
 PatchAntenna::PatchAntenna(XYZPoint apos, XYZVector apol, double w, double h, double er) : 
 antPos(apos),
@@ -25,7 +23,7 @@ vec_t PatchAntenna::voltage_response(Event<std::any>& ev)
       double effperm = 0.5*(epsr+1.0) + 0.5*(epsr-1.0)/std::sqrt(1.0+12.0*height/width);
       double temp=0.0;
       for (size_t i=0; i<omega.size();++i) { // check units
-        double effL = TMath::C() / (omega[i]/TMath::Pi()*std::sqrt(effperm));
+        double effL = c_SI / (omega[i]/myPi*std::sqrt(effperm));
         double resp = (effL * efield[i].Dot(antPol)); // unit [V]
         response.push_back(resp);
         temp += omega[i];

@@ -33,8 +33,10 @@ template <typename T> using Event_map = std::unordered_map<std::string, Event<T>
 struct truth_t {
   int nantenna; // from sampling or antenna response
   double snratio; // from adding noise
+  quantity<T> bfield;
   quantity<ns> sampling_time; // from sampling
-  quantity<Hz> average_omega; // from mixer
+  quantity<Hz> average_omega; // from antenna
+  quantity<Hz/s> chirp_rate;
   std::vector<waveform_t> pure; // sampled signal, no noise, one per antenna
   
   struct vertex_t {

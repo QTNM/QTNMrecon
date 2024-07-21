@@ -4,8 +4,6 @@
 // us
 #include "HalfWaveDipole.hh"
 
-// ROOT
-#include "TMath.h"
 
 HalfWaveDipole::HalfWaveDipole(XYZPoint apos, XYZVector apol) : 
 antPos(apos),
@@ -23,8 +21,8 @@ vec_t HalfWaveDipole::voltage_response(Event<std::any>& ev)
       auto omega = std::any_cast<std::vector<double>>(ev["OmVec"]); // ang freq
       double temp=0.0;
       for (size_t i=0; i<omega.size();++i) { // check units
-  	    double wvlg = TMath::C() / (omega[i] / TMath::TwoPi()); // c in SI units = wvlg in [m]
-	      double resp = (wvlg/TMath::Pi() * efield[i].Dot(antPol)); // unit [V]
+	double wvlg = c_SI / (omega[i] / (2.0*myPi)); // c in SI units = wvlg in [m]
+	      double resp = (wvlg/myPi * efield[i].Dot(antPol)); // unit [V]
         response.push_back(resp);
         temp += omega[i];
       }

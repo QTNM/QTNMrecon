@@ -38,8 +38,8 @@ class WriterDigiToRoot
       int nant, evID, trID;
       double snratio;
       double samplingtime; // from quantity<ns>
-      double tfrequency; // quantity<Hz>
       double avomega; // quantity<Hz>
+      double chirprate; // quantity<Hz/s>
       // vertex
       double posx; // quantity<m>
       double posy; // quantity<m>
@@ -48,6 +48,7 @@ class WriterDigiToRoot
       double pangle; // quantity<deg>
       // experiment
       double gain;
+      double tfrequency; // quantity<Hz>
       double digisamplingrate; // quantity<Hz>
 
 };

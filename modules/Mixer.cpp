@@ -5,7 +5,6 @@
 #include <stdexcept>
 #include <vector>
 #include <cmath>
-#include <numbers>
 
 // us
 #include "Mixer.hh"
@@ -46,7 +45,7 @@ DataPack Mixer::operator()(DataPack dp)
 	std::cout << "mixer module " << stime << " sampling time set" << std::endl;
 
         quantity<Hz> avom = dp.getTruthRef().average_omega;
-        quantity<Hz> losc = (avom/(2.0*std::numbers::pi)) - targetFrequency;
+        quantity<Hz> losc = (avom/(2.0*myPi)) - targetFrequency;
         demod.setLOfrequency(losc); // mixer fully configured
 	std::cout << "mixer module " << losc << " losc freq set" << std::endl;
 

@@ -78,7 +78,7 @@ waveform_t CustomNoiseGenerator::generate()
     DSP dsp;
     pattern_arg interpolatedComplexSpec; // vec of complex double
     for (double entry : interpolatedPowerSpec) { // sqrt(power) times random phase
-      interpolatedComplexSpec.push_back(std::sqrt(entry) * std::exp(urand(generator) * j*2.0*Pi));
+      interpolatedComplexSpec.push_back(std::sqrt(entry) * std::exp(urand(generator) * j*2.0*myPi));
     }
     interpolatedPowerSpec.clear(); // not needed anymore
     pattern_arg interpolatedSpecFull = dsp.rfft1d(interpolatedComplexSpec, fft_dir::DIR_BWD); // inv FFT

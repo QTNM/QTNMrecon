@@ -13,7 +13,10 @@
 #include <vector>
 #include <cstdint>
 
-constexpr auto Pi = 3.141592653589793238462643383279502884;
+constexpr auto myPi = 3.141592653589793238462643383279502884;
+constexpr double me_SI = 9.109383701528e-31; // [kg]
+constexpr double c_SI  = 299792458.0; // [m/s]
+constexpr double qe_SI = 1.602176634e-19; // [C]
 
 using namespace mp_units;
 using namespace mp_units::si::unit_symbols; // work in SI units

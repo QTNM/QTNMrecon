@@ -17,6 +17,7 @@ QTNMSimAntennaReader::QTNMSimAntennaReader(TTreeReader& re, std::string out) :
     outkey(std::move(out)),
     maxEventNumber(-1), // default -1 for a all events
     evcounter(0),
+    Bfield(-1.0 * T),
     reader(re),
     eventID(reader, "EventID"), // needs reader by reference
     trackID(reader, "TrackID"),
@@ -26,6 +27,8 @@ QTNMSimAntennaReader::QTNMSimAntennaReader(TTreeReader& re, std::string out) :
     kine(reader, "KinEnergy"),
     pangle(reader, "PitchAngle"),
     aID(reader, "AntennaID"),
+    kevec(reader, "KEVec"),
+    omvec(reader, "OmVec"),
     tvec(reader, "TimeVec"),
     vvec(reader, "VoltageVec")
 {
@@ -36,12 +39,16 @@ QTNMSimAntennaReader::QTNMSimAntennaReader(TTreeReader& re, std::string out) :
 DataPack QTNMSimAntennaReader::operator()()
 {
     // catch event number limit in pipeline, -1 = all, default
-  if ((evcounter > maxEventNumber &&   // reached maximum event number
-       maxEventNumber > 0) ||          // max has been set
-      evcounter >= reader.GetEntries()) // reached end of file
+    if ((evcounter > maxEventNumber &&   // reached maximum event number
+        maxEventNumber > 0) ||          // max has been set
+        evcounter >= reader.GetEntries()) // reached end of file
     
-    throw yap::GeneratorExit{};
-  evcounter++;
+        throw yap::GeneratorExit{};
+    evcounter++;
+    if (Bfield < 0 * T) {
+        std::cout << "WARNING: Bfield is required input to pipeline. Exit" << std::endl;
+        throw yap::GeneratorExit{};
+    }
 
   Event_map<std::any> eventmap; // data item for delivery
     Event<std::any> outdata; // to hold all the data items from file
@@ -52,6 +59,8 @@ DataPack QTNMSimAntennaReader::operator()()
         outdata["AntennaID"] = std::make_any<std::vector<int>>(aID->begin(),aID->end());
         outdata["TimeVec"] = std::make_any<std::vector<double>>(tvec->begin(),tvec->end());
         outdata["VoltageVec"] = std::make_any<std::vector<double>>(vvec->begin(),vvec->end());
+        outdata["OmVec"] = std::make_any<std::vector<double>>(omvec->begin(),omvec->end());
+        outdata["KEVec"] = std::make_any<std::vector<double>>(kevec->begin(),kevec->end());
         eventmap[outkey] = outdata; // with outdata an Event<std::any>
     }
     else // no more entries in TTreeReader
@@ -69,5 +78,7 @@ DataPack QTNMSimAntennaReader::operator()()
     dp.getTruthRef().vertex.kineticenergy = *kine * keV;
     dp.getTruthRef().vertex.pitchangle = *pangle * rad;
     std::cout << "reader Next() done, evt:  " << evcounter << std::endl;
+
+    dp.getTruthRef().bfield = Bfield; // store input truth
     return dp;
 }

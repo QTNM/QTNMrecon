@@ -38,6 +38,8 @@ void printSimReader::operator()(DataPack dp)
         std::cout << "posz " << dp.getTruthRef().vertex.posz << std::endl;
         std::cout << "KE " << dp.getTruthRef().vertex.kineticenergy << std::endl;
         std::cout << "Angle " << dp.getTruthRef().vertex.pitchangle << std::endl;
+        std::cout << "Chirp rate " << dp.getTruthRef().chirp_rate << std::endl;
+
         // can also cast the container
         auto aID = std::any_cast<std::vector<int>>(indata["AntennaID"]);
         std::cout << "AntennaID size = " << aID.size() << std::endl;

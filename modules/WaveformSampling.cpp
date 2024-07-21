@@ -16,7 +16,6 @@ WaveformSampling::WaveformSampling(std::string source, std::string in, std::stri
     originkey(std::move(source)),
     inkey(std::move(in)),
     outkey(std::move(out)),
-    nantenna(1),
     sampletime(1.0 * ns)
 {}
 
@@ -27,6 +26,10 @@ DataPack WaveformSampling::operator()(DataPack dp)
     throw std::logic_error("origin key not in dictionary!");
   }
   std::cout << "interpolator called" << std::endl;
+
+  // set before: antenna read by add chirp/ kinematic by anntenna response
+  int nantenna = dp.getTruthRef().nantenna;
+
   Event<std::any> origindata = dp.getRef()[originkey];
   Event<std::any> outdata; // to hold all the data items
   // get hold of relevant data, transform and store in outdata
@@ -60,7 +63,6 @@ DataPack WaveformSampling::operator()(DataPack dp)
       {
 	std::cerr << e.what() << '\n';
       }
-    dp.getTruthRef().nantenna = nantenna;
     dp.getTruthRef().sampling_time = sampletime;
     dp.getRef()[outkey] = outdata;
     
@@ -68,6 +70,8 @@ DataPack WaveformSampling::operator()(DataPack dp)
     dp.getRef()[originkey].erase("AntennaID");
     dp.getRef()[originkey].erase("TimeVec");
     dp.getRef()[originkey].erase("VoltageVec");
+    dp.getRef()[originkey].erase("OmVec");
+    dp.getRef()[originkey].erase("KEVec");
   }
   else { // sample from antenna response calculator, has inkey
     if (! dp.getRef().count(inkey)) { 
@@ -79,12 +83,13 @@ DataPack WaveformSampling::operator()(DataPack dp)
       {
 	// cast the containers from reader and inkey from processing
 	auto tiv = std::any_cast<std::vector<double>>(origindata["TimeVec"]);
-	std::cout << "in antenna resp sampling time vec size: " << tiv.size() << std::endl;
+
 	for (int i=0;i<nantenna;++i) {
 	  std::string ikey = "VoltageVec_" + std::to_string(i) + "_[V]";
 	  auto tv = std::any_cast<vec_t>(indata[ikey]);
 	  // sample by interpolation
-	  std::cout << "before interpolation, got v vec size: " << tv.size() << std::endl;
+	  std::cout << "before interpolation, got v vec size: " << tv.size() 
+              << " time vec size " << tiv.size()<< std::endl;
 	  vec_t resampled = interpolate(tiv, tv);
 	  // store result
 	  std::string okey = "sampled_" + std::to_string(i) + "_[V]";
@@ -97,7 +102,6 @@ DataPack WaveformSampling::operator()(DataPack dp)
 	std::cerr << e.what() << '\n';
       }
 
-    dp.getTruthRef().nantenna = nantenna;
     dp.getTruthRef().sampling_time = sampletime;
     dp.getRef()[outkey] = outdata;
     
@@ -112,7 +116,7 @@ DataPack WaveformSampling::operator()(DataPack dp)
 vec_t WaveformSampling::interpolate(const vec_t& tvals, const vec_t& vvals)
 {
     vec_t resampled;
-    double interval = tvals.back() - tvals.front();
+    double interval = tvals.back() - tvals.front(); // in [ns]
     int maxpoints = (int)floor(interval / sampletime.numerical_value_in(ns));
 
     spline ip(tvals, vvals); // interpolator

@@ -26,6 +26,7 @@ WriterDigiToRoot::WriterDigiToRoot(TTree* tr, int na) :
   mytree->Branch("truth.snratio",&snratio,"truth.snratio/D");
   mytree->Branch("truth.samplingtime_s",&samplingtime,"truth.samplingtime/D");
   mytree->Branch("truth.avomega_Hz",&avomega,"truth.avomega/D");
+  mytree->Branch("truth.chirp_Hz_s",&chirprate,"truth.chirp_rate/D");
   mytree->Branch("vertex.evID",&evID,"vertex.evID/I");
   mytree->Branch("vertex.trackID",&trID,"vertex.trackID/I");
   mytree->Branch("vertex.posx_m",&posx,"vertex.posx/D");
@@ -56,6 +57,8 @@ void WriterDigiToRoot::operator()(DataPack dp)
   mytree->SetBranchAddress("truth.samplingtime_s",&samplingtime);
   avomega      = dp.getTruthRef().average_omega.numerical_value_in(Hz); // quantity<Hz>
   mytree->SetBranchAddress("truth.avomega_Hz",&avomega);
+  chirprate    = dp.getTruthRef().chirp_rate.numerical_value_in(Hz/s); // quantity<Hz>
+  mytree->SetBranchAddress("truth.chirp_Hz_s",&chirprate);
   // vertex
   evID = dp.getTruthRef().vertex.eventID;
   mytree->SetBranchAddress("vertex.evID",&evID);

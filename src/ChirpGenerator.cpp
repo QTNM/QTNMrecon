@@ -60,7 +60,7 @@ waveform_t ChirpGenerator::generate()
         for (int i=0;i<entries;++i) {
             quantity<s> tval = i / sampling_rate;
             // define linear chirp
-            tsig.push_back(amplitude * sin(2*Pi * (frequency * tval + 
+            tsig.push_back(amplitude * sin(2*myPi * (frequency * tval + 
                      0.5* chirprate * tval*tval).numerical_value_in(one) + phase.numerical_value_in(rad)));
         }
         state_change = false; // recycle signal if nothing changes

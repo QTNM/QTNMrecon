@@ -25,6 +25,7 @@ using namespace ROOT::Math;
 // us
 #include "yap/pipeline.h"
 #include "modules/QTNMSimKinematicsReader.hh"
+#include "modules/AddChirpToTruth.hh"
 #include "modules/AntennaResponse.hh"
 #include "receiver/HalfWaveDipole.hh"
 #include "modules/WaveformSampling.hh"
@@ -68,8 +69,9 @@ void printInterpolator::operator()(DataPack dp)
     {
       // from raw
       std::cout << "evID " << dp.getTruthRef().vertex.eventID << std::endl;
+      std::cout << "chirp rate " << dp.getTruthRef().chirp_rate << std::endl;
       // from interpolator
-      std::cout << "Sampling " << dp.getTruthRef().sampling_time << std::endl;
+      std::cout << "Sampling " << std::any_cast<quantity<ns>>(indata1["sample_time[ns]"]) << std::endl;
         // can also cast the container
         auto vvv1 = std::any_cast<std::vector<double>>(indata1["sampled_0_[V]"]);
         std::cout << "Sampled antenna 1 size = " << vvv1.size() << std::endl;
@@ -92,6 +94,7 @@ int main(int argc, char** argv)
       // command line interface
   CLI::App app{"Example Recon Pipeline"};
   int nevents = -1;
+  quantity<T> bfield = 0.7 * T; // constant sim b-field value [T]
   std::string fname = "qtnm.root";
 
   app.add_option("-n,--nevents", nevents, "<number of events> Default: -1");
@@ -109,6 +112,10 @@ int main(int argc, char** argv)
   TTreeReader re("ntuple/Signal", &ff);
   auto source = QTNMSimKinematicsReader(re, origin);
   source.setMaxEventNumber(nevents); // default = all events in file
+  source.setSimConstantBField(bfield); // MUST be set
+
+  // add truth
+  auto addchirp = AddChirpToTruth(origin); // default antenna number
 
   // transformer
   auto antresponse = AntennaResponse(origin, resp);
@@ -129,14 +136,12 @@ int main(int argc, char** argv)
   // transformer
   auto interpolator = WaveformSampling(origin,resp,samp);
   quantity<ns> stime = 0.008 * ns;
-  int nant = 2;
   interpolator.setSampleTime(stime);
-  interpolator.setAntennaNumber(nant);
   
   // data sink: simply print to screen, take from key
   auto sink   = printInterpolator(samp);
   
-  auto pl = yap::Pipeline{} | source | antresponse | interpolator | sink;
+  auto pl = yap::Pipeline{} | source | addchirp | antresponse | interpolator | sink;
   
   pl.consume();
   ff.Close();

@@ -117,10 +117,10 @@ waveform_t Butterworth::LPassFilter(const waveform_t &record)
     if (recalc) { // coefficients calculated previously
         nyfreq = 1.0 / (2.0 * ftimebase);  // Nyquist frequency
         if (flowfreq < nyfreq) {  // must be smaller than Nyquist frequency
-            a  = tan(Pi * (flowfreq * ftimebase).numerical_value_in(one));
+            a  = tan(myPi * (flowfreq * ftimebase).numerical_value_in(one));
             a2 = a*a;
             for (int i=0;i<n; ++i) {
-	            r = std::sin(Pi*(2.0*i+1)/(4.0*n));
+	            r = std::sin(myPi*(2.0*i+1)/(4.0*n));
                 s = a2 + 2.0*r*a + 1.0;
                 A[i]  = a2/s;
                 d1[i] = 2.0*(1.0-a2)/s;
@@ -162,13 +162,13 @@ waveform_t Butterworth::BPassFilter(const waveform_t &record)
     if (recalc) { // coefficients calculated previously
         nyfreq = 1.0 / (2.0 * ftimebase);  // Nyquist frequency
         if (flowfreq < nyfreq) {  // must be smaller than Nyquist frequency
-	  a  = cos(Pi * ((fhighfreq+flowfreq) * ftimebase).numerical_value_in(one)) /
-	       cos(Pi * ((fhighfreq-flowfreq) * ftimebase).numerical_value_in(one));
+	  a  = cos(myPi * ((fhighfreq+flowfreq) * ftimebase).numerical_value_in(one)) /
+	       cos(myPi * ((fhighfreq-flowfreq) * ftimebase).numerical_value_in(one));
 	  a2 = a*a;
-	  b  = tan(Pi * ((fhighfreq-flowfreq) * ftimebase).numerical_value_in(one));
+	  b  = tan(myPi * ((fhighfreq-flowfreq) * ftimebase).numerical_value_in(one));
 	  b2 = b*b;
             for (int i=0;i<n; ++i) {
-	        r = std::sin(Pi*(2.0*i+1)/(4.0*n));
+	        r = std::sin(myPi*(2.0*i+1)/(4.0*n));
                 s = b2 + 2.0*r*b + 1.0;
                 A[i]  = b2/s;
                 d1[i] = 4.0*a*(1.0 + b*r)/s;

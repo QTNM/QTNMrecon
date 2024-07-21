@@ -16,7 +16,7 @@ add_subdirectory(external/fmt)
 add_subdirectory(external/mp-units/src)
 
 #Require ROOT, find installed root
-find_package(ROOT REQUIRED)
+find_package(ROOT REQUIRED Minuit)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ROOT_CXX_FLAGS}")
 
 # find the headers
@@ -52,6 +52,7 @@ modules/QTNMSimHitReader.cpp
 modules/QTNMSimKinematicsReader.cpp 
 modules/xCsvWriter.cpp 
 modules/SineSigGenerator.cpp 
+modules/AddChirpToTruth.cpp
 modules/AntennaResponse.cpp
 modules/WaveformSampling.cpp 
 modules/AddNoise.cpp

@@ -21,11 +21,13 @@ class QTNMSimAntennaReader
 
         // default = -1 for all events
         inline void setMaxEventNumber(int nend) {maxEventNumber = nend;}
+        inline void setSimConstantBField(quantity<T> b) {Bfield = b;}
 
     private:
     // include any configuration data members for internal use here.
     int maxEventNumber;
     int evcounter;
+    quantity<T> Bfield;
 
     // ROOT file access for member functions
     TTreeReader& reader;
@@ -37,6 +39,8 @@ class QTNMSimAntennaReader
     TTreeReaderValue<double> kine;
     TTreeReaderValue<double> pangle;
     TTreeReaderValue<std::vector<int>> aID;
+    TTreeReaderValue<std::vector<double>> kevec;
+    TTreeReaderValue<std::vector<double>> omvec;
     TTreeReaderValue<std::vector<double>> tvec;
     TTreeReaderValue<std::vector<double>> vvec;
 

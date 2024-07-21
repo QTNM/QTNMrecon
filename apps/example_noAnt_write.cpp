@@ -24,6 +24,7 @@ using namespace ROOT::Math;
 // us
 #include "yap/pipeline.h"
 #include "modules/QTNMSimKinematicsReader.hh"
+#include "modules/AddChirpToTruth.hh"
 #include "modules/AntennaResponse.hh"
 #include "receiver/HalfWaveDipole.hh"
 #include "modules/WaveformSampling.hh"
@@ -44,6 +45,7 @@ int main(int argc, char** argv)
       // command line interface
   CLI::App app{"Example Recon Pipeline"};
   int nevents = -1;
+  quantity<T> bfield = 0.7 * T; // constant sim b-field value [T]
   std::string fname = "qtnm.root";
   std::string outfname = "recon.root";
 
@@ -67,8 +69,13 @@ int main(int argc, char** argv)
   TTreeReader re("ntuple/Signal", &ff);
   auto source = QTNMSimKinematicsReader(re, origin);
   source.setMaxEventNumber(nevents); // default = all events in file
+  source.setSimConstantBField(bfield); // MUST be set
+
+  // add truth
+  auto addchirp = AddChirpToTruth(origin); // default antenna number
 
   // transformer (1)
+  int nant = 2;
   auto antresponse = AntennaResponse(origin, resp);
   // configure antennae
   std::vector<VReceiver*> allantenna;
@@ -86,9 +93,7 @@ int main(int argc, char** argv)
   // transformer (2)
   auto interpolator = WaveformSampling(origin,resp,samp);
   quantity<ns> stime = 0.008 * ns;
-  int nant = 2;
   interpolator.setSampleTime(stime);
-  interpolator.setAntennaNumber(nant);
 
   // add noise, step (3), fill more truth with units
   auto noiseAdder = AddNoise(samp, noisy, l2noise);
@@ -114,7 +119,7 @@ int main(int argc, char** argv)
   tr->SetDirectory(outfile);
   auto sink = WriterDigiToRoot(tr, nant);
   
-  auto pl = yap::Pipeline{} | source | antresponse | interpolator | noiseAdder | mixer | digitizer | sink;
+  auto pl = yap::Pipeline{} | source | addchirp |antresponse | interpolator | noiseAdder | mixer | digitizer | sink;
   
   pl.consume();
   

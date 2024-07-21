@@ -22,6 +22,7 @@ QTNMSimKinematicsReader::QTNMSimKinematicsReader(TTreeReader& re, std::string ou
     pangle(reader, "PitchAngle"),
     tvec(reader, "TimeVec"),
     omvec(reader, "OmVec"),
+    kevec(reader, "KEVec"),
     pxvec(reader, "PosxVec"),
     pyvec(reader, "PosyVec"),
     pzvec(reader, "PoszVec"),
@@ -45,6 +46,11 @@ DataPack QTNMSimKinematicsReader::operator()()
         throw yap::GeneratorExit{};
     evcounter++;
 
+    if (Bfield < 0 * T) {
+        std::cout << "WARNING: Bfield is required input to pipeline. Exit" << std::endl;
+        throw yap::GeneratorExit{};
+    }
+
     Event_map<std::any> eventmap; // data item for delivery
     Event<std::any> outdata; // to hold all the data items from file
 
@@ -53,6 +59,7 @@ DataPack QTNMSimKinematicsReader::operator()()
     if (reader.Next()) { // variables filled from file
         outdata["TimeVec"] = std::make_any<std::vector<double>>(tvec->begin(),tvec->end());
         outdata["OmVec"] = std::make_any<std::vector<double>>(omvec->begin(),omvec->end());
+        outdata["KEVec"] = std::make_any<std::vector<double>>(kevec->begin(),kevec->end());
         outdata["pxVec"] = std::make_any<std::vector<double>>(pxvec->begin(),pxvec->end());
         outdata["pyVec"] = std::make_any<std::vector<double>>(pyvec->begin(),pyvec->end());
         outdata["pzVec"] = std::make_any<std::vector<double>>(pzvec->begin(),pzvec->end());
@@ -78,5 +85,7 @@ DataPack QTNMSimKinematicsReader::operator()()
     dp.getTruthRef().vertex.kineticenergy = *kine * keV;
     dp.getTruthRef().vertex.pitchangle = *pangle * rad;
     std::cout << "reader Next() done, evt:  " << evcounter << std::endl;
+
+    dp.getTruthRef().bfield = Bfield; // store input truth
     return dp;
 }

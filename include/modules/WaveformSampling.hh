@@ -24,12 +24,10 @@ class WaveformSampling
 
         // getter/setter methods for configuration could live here.
         inline void setSampleTime(quantity<ns> st) {sampletime = st;}
-        inline void setAntennaNumber(int n) {nantenna = n;}
 
     private:
     // include any configuration data members for internal use here.
         vec_t interpolate(const vec_t& tvals, const vec_t& vvals);
-        int nantenna;
         quantity<ns> sampletime;
 
     // these below serve as string keys to access (read/write) the Event map
