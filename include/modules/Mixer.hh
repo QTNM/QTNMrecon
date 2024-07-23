@@ -1,4 +1,4 @@
-// Transformer G4 waveform to sampled waveform for a pipeline module
+// Mixer module for a pipeline module
 #ifndef mixer_HH
 #define mixer_HH 1
 

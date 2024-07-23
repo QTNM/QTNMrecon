@@ -1,4 +1,4 @@
-// Half-Wave Dipole response implementation
+// Patch Antenna response implementation
 
 // us
 #include "PatchAntenna.hh"
@@ -29,7 +29,8 @@ vec_t PatchAntenna::voltage_response(Event<std::any>& ev)
         temp += omega[i];
       }
       avomega = temp/omega.size() * Hz;
-      ev["avomega_[Hz]"] = std::make_any<quantity<Hz>>(avomega);
+      if (!ev.count("avomega_[Hz]")) // no need to overwrite multiple times
+	ev["avomega_[Hz]"] = std::make_any<quantity<Hz>>(avomega);
       omega.clear();
     }
     catch (const std::bad_any_cast& e)

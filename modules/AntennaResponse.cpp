@@ -38,7 +38,6 @@ DataPack AntennaResponse::operator()(DataPack dp)
     dp.getRef()[inkey].erase("axVec"); // used hence remove from source
     dp.getRef()[inkey].erase("ayVec"); // used hence remove from source
     dp.getRef()[inkey].erase("azVec"); // used hence remove from source
-    dp.getRef()[inkey].erase("OmVec"); // used hence remove from source
     dp.getRef()[inkey].erase("KEVec"); // used hence remove from source
 
     dp.getRef()[outkey] = outdata;

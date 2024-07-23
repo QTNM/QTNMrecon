@@ -39,6 +39,7 @@ class WriterDigiToRoot
       double snratio;
       double samplingtime; // from quantity<ns>
       double avomega; // quantity<Hz>
+      double beatf; // quantity<Hz>
       double chirprate; // quantity<Hz/s>
       // vertex
       double posx; // quantity<m>

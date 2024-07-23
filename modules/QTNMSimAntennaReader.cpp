@@ -1,7 +1,5 @@
-// template module implementation
-// necessarily empty since nothing is supposed to happen
-// for this example, showing boiler-plate code for any 
-// processing module.
+// QTNM Antenna sim output reader
+// must set the constant B-field from sim as meta-data.
 
 // std
 #include <iostream>

@@ -28,6 +28,7 @@ using namespace ROOT::Math;
 #include "modules/AntennaResponse.hh"
 #include "receiver/HalfWaveDipole.hh"
 #include "modules/WaveformSampling.hh"
+#include "modules/OmegaBeatToTruth.hh"
 #include "modules/AddNoise.hh"
 #include "modules/Mixer.hh"
 #include "modules/Digitize.hh"
@@ -95,6 +96,9 @@ int main(int argc, char** argv)
   quantity<ns> stime = 0.008 * ns;
   interpolator.setSampleTime(stime);
 
+  // add truth, 'omout' is just for checking
+  auto addbeat = OmegaBeatToTruth(samp,"omout");
+
   // add noise, step (3), fill more truth with units
   auto noiseAdder = AddNoise(samp, noisy, l2noise);
   noiseAdder.setSignalToNoise(1.0);
@@ -119,7 +123,8 @@ int main(int argc, char** argv)
   tr->SetDirectory(outfile);
   auto sink = WriterDigiToRoot(tr, nant);
   
-  auto pl = yap::Pipeline{} | source | addchirp |antresponse | interpolator | noiseAdder | mixer | digitizer | sink;
+  auto pl = yap::Pipeline{} | source | addchirp |antresponse | interpolator | addbeat |
+    noiseAdder | mixer | digitizer | sink;
   
   pl.consume();
   

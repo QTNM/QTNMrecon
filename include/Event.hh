@@ -36,6 +36,7 @@ struct truth_t {
   quantity<T> bfield;
   quantity<ns> sampling_time; // from sampling
   quantity<Hz> average_omega; // from antenna
+  quantity<Hz> beat_frequency;
   quantity<Hz/s> chirp_rate;
   std::vector<waveform_t> pure; // sampled signal, no noise, one per antenna
   

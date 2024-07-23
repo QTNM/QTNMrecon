@@ -1,4 +1,4 @@
-// Sim Antenna Reader for a pipeline module
+// Sim no-antenna Reader for a pipeline module
 #ifndef simkinreader_HH
 #define simkinreader_HH 1
 

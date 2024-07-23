@@ -1,4 +1,5 @@
 // QTNMSim source kinematics reader module implementation
+// must set the constant B-field from sim as meta-data.
 
 // std
 #include <iostream>
@@ -12,6 +13,7 @@ QTNMSimKinematicsReader::QTNMSimKinematicsReader(TTreeReader& re, std::string ou
     outkey(std::move(out)),
     maxEventNumber(-1), // default -1 for a all events
     evcounter(0),
+    Bfield(-1.0 * T),
     reader(re),
     eventID(reader, "EventID"),
     trackID(reader, "TrackID"),

@@ -1,4 +1,4 @@
-// Waveform interpolator module implementation
+// Waveform digitizer module implementation
 
 // std
 #include <iostream>

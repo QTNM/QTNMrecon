@@ -1,20 +1,18 @@
-// Simply add the chirp rate to truth data in module
-#ifndef addchirp_HH
-#define addchirp_HH 1
+// Add the beat frequency from omega to truth data in module
+#ifndef addbeat_HH
+#define addbeat_HH 1
 
 // std includes
 #include <string>
 
-// ROOT includes
-#include "TLinearFitter.h"
-
 // must have include for pipeline
 #include <Event.hh>
+#include <dsp.hh>
 
-class AddChirpToTruth
+class OmegaBeatToTruth
 {
     public:
-        AddChirpToTruth(std::string inbox); // constructor; required
+  OmegaBeatToTruth(std::string inbox, std::string outbox); // constructor; required
         // Configures the module. Could have more config parameters
         // Minimum required are the key labels for input and output 
         // of Event Map data item. String Key inbox label and new Key outbox label.
@@ -26,15 +24,13 @@ class AddChirpToTruth
         // and Writers only receive an event map and return void as signature.
 
         // getter/setter methods for configuration could live here.
-        inline void setAntennaNumber(int n) {nantenna = n;} // default set to 1
 
     private:
     // include any configuration data members for internal use here.
-    TLinearFitter* lft = nullptr;
-    int nantenna;
-    quantity<Hz> e2f(quantity<keV> energy, quantity<T> bf); // convert keV to Hz for chirp
+    DSP dsp;
 
     // these below serve as string keys to access (read/write) the Event map
     std::string inkey;
+    std::string outkey;
 };
 #endif

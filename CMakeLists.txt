@@ -51,8 +51,10 @@ add_library(ReconModules SHARED modules/QTNMSimAntennaReader.cpp
 modules/QTNMSimHitReader.cpp 
 modules/QTNMSimKinematicsReader.cpp 
 modules/xCsvWriter.cpp 
+modules/x2CsvWriter.cpp 
 modules/SineSigGenerator.cpp 
 modules/AddChirpToTruth.cpp
+modules/OmegaBeatToTruth.cpp
 modules/AntennaResponse.cpp
 modules/WaveformSampling.cpp 
 modules/AddNoise.cpp
@@ -69,6 +71,8 @@ add_executable(exsc.exe apps/example_sine_csv.cpp)
 target_link_libraries(exsc.exe PUBLIC ReconModules QTNMTools)
 add_executable(exrip.exe apps/example_interpolate_print.cpp)
 target_link_libraries(exrip.exe PUBLIC ReconModules QTNMTools)
+add_executable(exintwrite.exe apps/example_interpolate_csv.cpp)
+target_link_libraries(exintwrite.exe PUBLIC ReconModules QTNMTools)
 add_executable(exnoant.exe apps/example_noAnt_read.cpp)
 target_link_libraries(exnoant.exe PUBLIC ReconModules QTNMTools)
 add_executable(noantwrite.exe apps/example_noAnt_write.cpp)

@@ -40,10 +40,11 @@ DataPack WaveformSampling::operator()(DataPack dp)
 	auto aID = std::any_cast<std::vector<int>>(origindata["AntennaID"]);
 	auto tiv = std::any_cast<std::vector<double>>(origindata["TimeVec"]);
 	auto vvv = std::any_cast<std::vector<double>>(origindata["VoltageVec"]);
+	// also sample the omega vector for reconstruction
+	auto omvec = std::any_cast<std::vector<double>>(origindata["OmVec"]);
 	ROOT::VecOps::RVec<int> tempant(aID); // temporary
 	ROOT::VecOps::RVec<double> tempt(tiv); // temporary
 	ROOT::VecOps::RVec<double> tempv(vvv); // temporary
-	std::cout << "interpolator RVecs done" << std::endl;
 	
 	for (int i=0;i<nantenna;++i) {
 	  auto selecttvec = tempt[tempant==i]; // like NumPy selection
@@ -58,6 +59,10 @@ DataPack WaveformSampling::operator()(DataPack dp)
 	  std::string tkey = "sampled_" + std::to_string(i) + "_[V]";
 	  outdata[tkey] = std::make_any<vec_t>(resampled);
 	}
+	auto selecttvec = tempt[tempant==0]; // like NumPy selection
+	vec_t tt(selecttvec.begin(),selecttvec.end()); // sample_time same for any antenna
+	vec_t omresampled = interpolate(tt, omvec);
+	outdata["omega"] = std::make_any<vec_t>(omresampled);
       }
     catch(const std::bad_any_cast& e)
       {
@@ -68,9 +73,7 @@ DataPack WaveformSampling::operator()(DataPack dp)
     
     // clear obsolete data in Event_map
     dp.getRef()[originkey].erase("AntennaID");
-    dp.getRef()[originkey].erase("TimeVec");
     dp.getRef()[originkey].erase("VoltageVec");
-    dp.getRef()[originkey].erase("OmVec");
     dp.getRef()[originkey].erase("KEVec");
   }
   else { // sample from antenna response calculator, has inkey
@@ -83,6 +86,8 @@ DataPack WaveformSampling::operator()(DataPack dp)
       {
 	// cast the containers from reader and inkey from processing
 	auto tiv = std::any_cast<std::vector<double>>(origindata["TimeVec"]);
+	// also sample the omega vector for reconstruction
+	auto omvec = std::any_cast<std::vector<double>>(origindata["OmVec"]);
 
 	for (int i=0;i<nantenna;++i) {
 	  std::string ikey = "VoltageVec_" + std::to_string(i) + "_[V]";
@@ -96,6 +101,8 @@ DataPack WaveformSampling::operator()(DataPack dp)
 	  outdata[okey] = std::make_any<vec_t>(resampled); // for later transformation and deletion
 	  dp.getRef()[inkey].erase(ikey); // used; not needed anymore
 	}
+	vec_t omresampled = interpolate(tiv, omvec);
+	outdata["omega"] = std::make_any<vec_t>(omresampled);
       }
     catch(const std::bad_any_cast& e)
       {
@@ -107,6 +114,7 @@ DataPack WaveformSampling::operator()(DataPack dp)
     
     // clear obsolete data in Event_map
     dp.getRef()[originkey].erase("TimeVec");
+    dp.getRef()[originkey].erase("OmVec");
   }
   std::cout << "interpolator finish." << std::endl;
   

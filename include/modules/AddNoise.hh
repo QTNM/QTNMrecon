@@ -1,4 +1,4 @@
-// Transformer G4 waveform to sampled waveform for a pipeline module
+// Adding Noise module for a pipeline
 #ifndef addnoise_HH
 #define addnoise_HH 1
 

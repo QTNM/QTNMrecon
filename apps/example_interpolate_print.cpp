@@ -6,7 +6,7 @@
 // Needs a data source and a data sink at the least.
 // Any data processing needs to be placed in between these bookends.
 //
-// Current data model assumes the exchange of an Event_map from module to module
+// Current data model assumes the exchange of a DataPack from module to module
 // with the definition in Event.hh
 
 // std
@@ -23,6 +23,7 @@
 #include "modules/QTNMSimAntennaReader.hh"
 #include "modules/AddChirpToTruth.hh"
 #include "modules/WaveformSampling.hh"
+#include "modules/OmegaBeatToTruth.hh"
 #include "CLI11.hpp"
 #include <Event.hh>
 #include "types.hh"
@@ -64,8 +65,9 @@ void printInterpolator::operator()(DataPack dp)
       // from raw
       std::cout << "evID " << dp.getTruthRef().vertex.eventID << std::endl;
       std::cout << "chirp rate " << dp.getTruthRef().chirp_rate << std::endl;
+      std::cout << "beat frequency " << dp.getTruthRef().beat_frequency << std::endl;
       // from interpolator
-      std::cout << "Sampling " << std::any_cast<quantity<ns>>(indata1["sample_time[ns]"]) << std::endl;
+      std::cout << "Sampling time " << dp.getTruthRef().sampling_time << std::endl;
         // can also cast the container
         auto vvv1 = std::any_cast<std::vector<double>>(indata1["sampled_0_[V]"]);
         std::cout << "Sampled antenna 1 size = " << vvv1.size() << std::endl;
@@ -113,10 +115,13 @@ int main(int argc, char** argv)
   quantity<ns> stime = 0.008 * ns;
   interpolator.setSampleTime(stime);
   
+  // add truth
+  auto addbeat = OmegaBeatToTruth("sampled","omout");
+
   // data sink: simply print to screen, take from key
   auto sink   = printInterpolator("sampled");
   
-  auto pl = yap::Pipeline{} | source | addchirp | interpolator | sink;
+  auto pl = yap::Pipeline{} | source | addchirp | interpolator | addbeat | sink;
   
   pl.consume();
   ff.Close();

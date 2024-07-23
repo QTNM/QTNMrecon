@@ -6,7 +6,7 @@
 // Needs a data source and a data sink at the least.
 // Any data processing needs to be placed in between these bookends.
 //
-// Current data model assumes the exchange of an Event_map from module to module
+// Current data model assumes the exchange of a DataPack from module to module
 // with the definition in Event.hh
 
 // std
