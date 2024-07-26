@@ -9,30 +9,25 @@
 
 // std
 #include<iostream>
+#include<fstream>
 #include<string>
 #include<vector>
 
 // ROOT
 #include "TFile.h"
-#include "TTree.h"
 #include "TTreeReader.h"
-#include "Math/Vector3D.h" // XYZVector
-#include "Math/Point3D.h" // XYZPoint
-
-using namespace ROOT::Math;
 
 // us
 #include "yap/pipeline.h"
-#include "modules/QTNMSimKinematicsReader.hh"
+#include "modules/QTNMSimAntennaReader.hh"
 #include "modules/AddChirpToTruth.hh"
-#include "modules/AntennaResponse.hh"
-#include "receiver/HalfWaveDipole.hh"
 #include "modules/WaveformSampling.hh"
 #include "modules/OmegaBeatToTruth.hh"
 #include "modules/AddNoise.hh"
 #include "modules/Mixer.hh"
 #include "modules/Digitize.hh"
-#include "modules/writeDigitizerToRoot.hh"
+//#include "modules/xCsvWriter.hh"
+#include "modules/digiCsvWriter.hh"
 
 #include "CLI11.hpp"
 #include <Event.hh>
@@ -46,13 +41,12 @@ int main(int argc, char** argv)
       // command line interface
   CLI::App app{"Example Recon Pipeline"};
   int nevents = -1;
-  quantity<T> bfield = 0.7 * T; // constant sim b-field value [T]
   std::string fname = "qtnm.root";
-  std::string outfname = "recon.root";
+  std::string outname = "out.csv";
+  quantity<T> bfield = 0.7 * T; // constant sim b-field value [T]
 
   app.add_option("-n,--nevents", nevents, "<number of events> Default: -1");
   app.add_option("-i,--input", fname, "<input file name> Default: qtnm.root");
-  app.add_option("-o,--output", outfname, "<output file name> Default: recon.root");
 
   CLI11_PARSE(app, argc, argv);
 
@@ -68,30 +62,16 @@ int main(int argc, char** argv)
   // data source: read from ROOT file, store under key 'raw'
   TFile ff(fname.data(),"READ");
   TTreeReader re("ntuple/Signal", &ff);
-  auto source = QTNMSimKinematicsReader(re, origin);
+  auto source = QTNMSimAntennaReader(re, origin);
   source.setMaxEventNumber(nevents); // default = all events in file
   source.setSimConstantBField(bfield); // MUST be set
 
   // add truth
   auto addchirp = AddChirpToTruth(origin); // default antenna number
-
-  // transformer (1)
   int nant = 2;
-  auto antresponse = AntennaResponse(origin, resp);
-  // configure antennae
-  std::vector<VReceiver*> allantenna;
-  XYZPoint  apos1(0.027, 0.0, 0.0); // fix from geometry, SI unit [m]
-  XYZVector apol1(0.0, 1.0, 0.0); // unit vector
-  VReceiver* ant1 = new HalfWaveDipole(apos1, apol1); // insert as pointer
-  allantenna.push_back(ant1);
-  XYZPoint  apos2(0.0, 0.027, 0.0); // fix from geometry
-  XYZVector apol2(1.0, 0.0, 0.0); // unit vector
-  VReceiver* ant2 = new HalfWaveDipole(apos2, apol2); // insert as pointer
-  allantenna.push_back(ant2);
+  addchirp.setAntennaNumber(nant);
 
-  antresponse.setAntennaCollection(allantenna); // finished antenna configuration
-
-  // transformer (2)
+  // transformer
   auto interpolator = WaveformSampling(origin,resp,samp);
   quantity<ns> stime = 0.008 * ns;
   interpolator.setSampleTime(stime);
@@ -99,16 +79,16 @@ int main(int argc, char** argv)
   // add truth, 'omout' is just for checking
   auto addbeat = OmegaBeatToTruth(samp,"omout");
 
-  // add noise, step (3), fill more truth with units
+  // add noise fill more truth with units
   auto noiseAdder = AddNoise(samp, noisy, l2noise);
   noiseAdder.setSignalToNoise(1.0);
 
-  // mixer, step (4), waveform in from l2 key, out in l2 key
+  // mixer waveform in from l2 key, out in l2 key
   auto mixer = Mixer(noisy, mixed, l2noise, l2mix);
-  quantity<Hz> tfreq = 50.0 * MHz;
+  quantity<Hz> tfreq = 100.0 * MHz;
   mixer.setTargetFrequency(tfreq);
 
-  // digitizer, step (5), waveform from l2 key
+  // digitizer waveform from l2 key
   auto digitizer = Digitize(mixed, l2mix);
   quantity<Hz> dsampling = 1.0 * GHz;
   quantity<V> vert = 1.0 * V;
@@ -117,22 +97,21 @@ int main(int argc, char** argv)
   digitizer.setGainFactor(10.0);
   digitizer.setBitNumber(12);
 
-  // data sink: simply print to screen, take from key
-  TFile* outfile = new TFile(outfname.data(), "RECREATE");
-  TTree* tr = new TTree("recon","reconstructed data");
-  tr->SetDirectory(outfile);
-  auto sink = WriterDigiToRoot(tr, nant);
+  // data sink: write to disk, take from key 'wave', L2 key 'waveform[V]'
+  // assumes L2 key has a waveform_t
+  std::ofstream ofs(outname, std::ofstream::out); // open
+  if (! ofs.is_open()) {
+    throw std::logic_error("Cannot open output file");
+  }
+  ofs << "Event ID,Wave value[V]\n" << std::flush; // header
+  //auto sink   = xCsvWriter(ofs, mixed, l2mix); // write signals vector
+  auto sink   = digiCsvWriter(ofs); // write digitized signals vector
   
-  auto pl = yap::Pipeline{} | source | addchirp |antresponse | interpolator | addbeat |
+  auto pl = yap::Pipeline{} | source | addchirp | interpolator | addbeat |
     noiseAdder | mixer | digitizer | sink;
   
   pl.consume();
-  
-  std::cout << "in app: " << std::endl;
-  tr->Write();
-  outfile->Close(); // free TTree
-  ff.Close();
 
-  delete ant1;
-  delete ant2;
+  ff.Close();
+  ofs.close();
 }

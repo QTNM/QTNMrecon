@@ -59,7 +59,7 @@ DataPack Mixer::operator()(DataPack dp)
 
             std::string okey = l2out + std::to_string(i);
             outdata[okey] = std::make_any<waveform_t>(mixedsig);
-            dp.getRef()[inkey].erase(ikey); // obsolete, have transformed
+            //dp.getRef()[inkey].erase(ikey); // obsolete, have transformed
         }
     }
     catch(const std::bad_any_cast& e)

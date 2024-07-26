@@ -29,12 +29,16 @@ void xCsvWriter::operator()(DataPack dp)
     // yields a L2 unordered map called Event<std::any> with the 
     // help of the inkey label.
     std::cout << "got indata event size " << indata.size() << std::endl;
+    int nant = dp.getTruthRef().nantenna;
     try // casting can go wrong; throws at run-time, catch it.
     {
-        auto wave = std::any_cast<waveform_t>(indata[l2key]);
+      for (int i=0;i<nant;i++) {
+	std::string l2in = l2key + std::to_string(i);
+        auto wave = std::any_cast<waveform_t>(indata[l2in]);
 	std::cout << "got wave size " << wave.size() << std::endl;
         for (auto entry : wave)
-	  myofs << counter << "," << entry.numerical_value_in(V) << "\n" << std::flush;
+	  myofs << counter << "," << i << "," << entry.numerical_value_in(V) << "\n" << std::flush;
+      }
     }
     catch (const std::bad_any_cast& e)
     {

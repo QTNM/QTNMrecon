@@ -38,7 +38,7 @@ struct truth_t {
   quantity<Hz> average_omega; // from antenna
   quantity<Hz> beat_frequency;
   quantity<Hz/s> chirp_rate;
-  std::vector<waveform_t> pure; // sampled signal, no noise, one per antenna
+  std::vector<vec_t> pure; // sampled signal, no noise, one per antenna
   
   struct vertex_t {
     int eventID;
@@ -53,7 +53,7 @@ struct experiment_t {
   double gain; // set by digitizer or earlier
   quantity<Hz> target_frequency; // from mixer
   quantity<Hz> digi_sampling_rate; // set-up with digitizer
-  std::vector<waveform_t> signals; // digitized endproduct
+  std::vector<vec_t> signals; // digitized endproduct, no unit for storage
 };
 
 // pipeline data structure

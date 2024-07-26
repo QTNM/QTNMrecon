@@ -13,6 +13,19 @@ vrange(0.0 * V),
 gain(1.0),
 bitrange(12) // default 12-bits
 {
+  reset();
+}
+
+Digitizer::Digitizer(quantity<V> voltrange, int b) : 
+vrange(voltrange),
+gain(1.0),
+bitrange(b)
+{
+  setADCBits(b);
+}
+
+void Digitizer::reset()
+{
     bmax = (int)pow(2,bitrange-1); // for signed range
     calarray.clear();
     darray.clear();
@@ -22,14 +35,6 @@ bitrange(12) // default 12-bits
         darray[i+bmax] = i; // digi_t contains std::int16_t
         calarray[i+bmax] = (double)i * V;
     }
-}
-
-Digitizer::Digitizer(quantity<V> voltrange, int b) : 
-vrange(voltrange),
-gain(1.0),
-bitrange(b)
-{
-    setADCBits(b);
 }
 
 void Digitizer::dumpInfo()

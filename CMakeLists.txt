@@ -52,6 +52,7 @@ modules/QTNMSimHitReader.cpp
 modules/QTNMSimKinematicsReader.cpp 
 modules/xCsvWriter.cpp 
 modules/x2CsvWriter.cpp 
+modules/digiCsvWriter.cpp 
 modules/SineSigGenerator.cpp 
 modules/AddChirpToTruth.cpp
 modules/OmegaBeatToTruth.cpp
@@ -65,6 +66,10 @@ modules/printSimReader.cpp)
 target_link_libraries(ReconModules QTNMTools ${ROOT_LIBRARIES})
 
 # Build apps
+add_executable(exdw.exe apps/example_digi_write.cpp)
+target_link_libraries(exdw.exe PUBLIC ReconModules QTNMTools)
+add_executable(exdp.exe apps/example_digi_print.cpp)
+target_link_libraries(exdp.exe PUBLIC ReconModules QTNMTools)
 add_executable(exrp.exe apps/example_read_print.cpp)
 target_link_libraries(exrp.exe PUBLIC ReconModules QTNMTools)
 add_executable(exsc.exe apps/example_sine_csv.cpp)

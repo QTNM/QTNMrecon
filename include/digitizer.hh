@@ -29,15 +29,16 @@ class Digitizer
         waveform_t  digitize(const waveform_t&);
 
         // config parameter
-        inline void setVRange(quantity<V> v) {vrange = v;}
+        inline void setVRange(quantity<V> v) {vrange = v; reset();}
         inline void setADCBits(int b);
-        inline void setGainFactor(double g) {gain = g;}
+        inline void setGainFactor(double g) {gain = g; reset();}
 
         void dumpInfo(); // report by print
 
     private:
         // internal operation
         void digitize_raw(const waveform_t&);
+        void reset();
         std::int16_t _adc(waveform_value);
 
         int bitrange; // 16 bit max
@@ -54,16 +55,7 @@ inline void Digitizer::setADCBits(int b)
 {
     bitrange = b;
     if (bitrange>16) bitrange = 16; // hard limit at 16 bits
-    bmax = (int)pow(2,bitrange-1); // for signed range, max +- 15 bit range
-
-    calarray.clear();
-    darray.clear();
-    calarray.resize(2*bmax);
-    darray.resize(2*bmax);
-    for (std::int16_t i=(std::int16_t)-bmax;i<(std::int16_t)bmax;++i) {
-        darray[i+bmax] = i; // digi_t contains std::int16_t
-        calarray[i+bmax] = (double)i * V;
-    }
+    reset();
 }
 
 

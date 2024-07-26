@@ -4,6 +4,7 @@
 // std
 #include <iostream>
 #include <algorithm>
+#include <memory>
 
 // us
 #include "writeDigitizerToRoot.hh"
@@ -16,9 +17,9 @@ WriterDigiToRoot::WriterDigiToRoot(TTree* tr, int na) :
   // N antennae, one for each waveform; need to know at construction for writing
   // construct scopedata entries
   for (int i=0;i<nantenna;++i) {
-    std::vector<double> vv;
+    vec_t* vv;
     scopedata.push_back(vv); // vector in scopedata initialized
-    std::vector<double> p;
+    vec_t* p;
     purewave.push_back(p); // vector in purewave initialized
   }
   // can now point branch at dummy addresses; makes header only
@@ -39,10 +40,12 @@ WriterDigiToRoot::WriterDigiToRoot(TTree* tr, int na) :
   mytree->Branch("digi.tfrequency_Hz",&tfrequency,"digi.tfrequency/D");
   mytree->Branch("digi.samplingrate_Hz",&digisamplingrate,"digi.samplingrate/D");
   for (int i=0;i<nantenna;++i) {
+    // std::cout << "in write: sptr address for " << i << ", " << &scopedata.at(i) << std::endl;
+    // std::cout << "in write: pptr address for " << i << ", " << &purewave.at(i) << std::endl;
     std::string brname = "signal_" + std::to_string(i) + "_V"; // unit in name
-    mytree->Branch(brname.data(), &scopedata.at(i)); // point to std::vector<double>
+    mytree->Branch(brname.data(), &scopedata.at(i)); // point to vec_t dummy address
     brname = "pure_" + std::to_string(i) + "_V"; // unit in name
-    mytree->Branch(brname.data(), &purewave.at(i)); // point to std::vector<double>
+    mytree->Branch(brname.data(), &purewave.at(i)); // point to vec_t dummy address
   }
 }
 
@@ -85,34 +88,20 @@ void WriterDigiToRoot::operator()(DataPack dp)
   digisamplingrate = dp.getExperimentRef().digi_sampling_rate.numerical_value_in(Hz); // quantity<Hz>
   mytree->SetBranchAddress("digi.samplingrate_Hz",&digisamplingrate);
 
+  std::string brname;
   for (int i=0;i<nantenna;++i) {
-    waveform_t sig = dp.getExperimentRef().signals.at(i);
-    std::cout << "got wave size " << sig.size() << std::endl;
-    // strip units from vector entries
-    scopedata.at(i).resize(sig.size());
-    std::transform(sig.begin(), sig.end(), scopedata.at(i).begin(),[](waveform_value x){return x.numerical_value_in(V);});
-    // store with right address
-    std::vector<double>* sptr = &scopedata.at(i);
-    std::string brname = "signal_" + std::to_string(i) + "_V"; // unit in name
-    mytree->SetBranchAddress(brname.data(), &sptr);
-
-    waveform_t pure = dp.getTruthRef().pure.at(i);
-    std::cout << "got truth wave size " << pure.size() << std::endl;
-    // strip units from vector entries
-    purewave.at(i).resize(pure.size());
-    std::transform(pure.begin(), pure.end(), purewave.at(i).begin(),[](waveform_value x){return x.numerical_value_in(V);});
+    purewave.at(i) = &dp.getTruthRef().pure.at(i); // vec_t*, copy
     // store
-    std::vector<double>* pptr = &purewave.at(i);
+    // std::cout << "pptr address for " << i << ", " << &purewave.at(i) << std::endl;
     brname = "pure_" + std::to_string(i) + "_V"; // unit in name
-    mytree->SetBranchAddress(brname.data(), &pptr);
+    mytree->SetBranchAddress(brname.data(), &purewave.at(i));
+
+    scopedata.at(i) = &dp.getExperimentRef().signals.at(i); // vec_t*
+    // store with right address
+    // std::cout << "sptr address for " << i << ", " << &scopedata.at(i) << std::endl;
+    brname = "signal_" + std::to_string(i) + "_V"; // unit in name
+    mytree->SetBranchAddress(brname.data(), &scopedata.at(i));
   }
   // all output collected, write it
   mytree->Fill();
-
-  // clear memory
-  for (int i=0;i<nantenna;++i) {
-    scopedata.at(i).clear();
-    purewave.at(i).clear();
-  }
-
 }

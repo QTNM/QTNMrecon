@@ -62,7 +62,8 @@ DataPack WaveformSampling::operator()(DataPack dp)
 	auto selecttvec = tempt[tempant==0]; // like NumPy selection
 	vec_t tt(selecttvec.begin(),selecttvec.end()); // sample_time same for any antenna
 	vec_t omresampled = interpolate(tt, omvec);
-	outdata["omega"] = std::make_any<vec_t>(omresampled);
+	outdata["omega"] = std::make_any<vec_t>(omresampled); // for the beat freq
+	dp.getTruthRef().average_omega = average_omega(omvec);
       }
     catch(const std::bad_any_cast& e)
       {
@@ -74,7 +75,8 @@ DataPack WaveformSampling::operator()(DataPack dp)
     // clear obsolete data in Event_map
     dp.getRef()[originkey].erase("AntennaID");
     dp.getRef()[originkey].erase("VoltageVec");
-    dp.getRef()[originkey].erase("KEVec");
+    dp.getRef()[originkey].erase("TimeVec");
+    dp.getRef()[originkey].erase("OmVec");
   }
   else { // sample from antenna response calculator, has inkey
     if (! dp.getRef().count(inkey)) { 
@@ -101,8 +103,9 @@ DataPack WaveformSampling::operator()(DataPack dp)
 	  outdata[okey] = std::make_any<vec_t>(resampled); // for later transformation and deletion
 	  dp.getRef()[inkey].erase(ikey); // used; not needed anymore
 	}
+	dp.getTruthRef().average_omega = average_omega(omvec);
 	vec_t omresampled = interpolate(tiv, omvec);
-	outdata["omega"] = std::make_any<vec_t>(omresampled);
+	outdata["omega"] = std::make_any<vec_t>(omresampled); // for the beat freq
       }
     catch(const std::bad_any_cast& e)
       {
@@ -120,6 +123,16 @@ DataPack WaveformSampling::operator()(DataPack dp)
   
   return dp;
 }
+
+
+quantity<Hz> WaveformSampling::average_omega(const vec_t& omvec)
+{
+  double omsum = 0.0;
+  for (auto entry : omvec) omsum += entry;
+  quantity<Hz> res = omsum/omvec.size() * Hz;
+  return res;
+}
+
 
 vec_t WaveformSampling::interpolate(const vec_t& tvals, const vec_t& vvals)
 {

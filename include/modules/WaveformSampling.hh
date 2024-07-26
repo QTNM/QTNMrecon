@@ -27,6 +27,7 @@ class WaveformSampling
 
     private:
     // include any configuration data members for internal use here.
+        quantity<Hz> average_omega(const vec_t& omvec);
         vec_t interpolate(const vec_t& tvals, const vec_t& vvals);
         quantity<ns> sampletime;
 

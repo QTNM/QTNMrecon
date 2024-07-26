@@ -52,8 +52,12 @@ DataPack Digitize::operator()(DataPack dp)
             // digitize
             waveform_t dsig = adc.digitize(resampled); // use the digitizer
 	    std::cout << "digitize gives " << dsig.size() << " dsig size." << std::endl;
-            dp.getExperimentRef().signals.push_back(dsig); // copy to experiment_t for storage
-            dp.getRef()[inkey].erase(ikey); // obsolete, have transformed
+	    vec_t nounit(dsig.size());
+	    std::transform(dsig.begin(),dsig.end(),nounit.begin(),[](waveform_value x){return x.numerical_value_in(V);});
+            dp.getExperimentRef().signals.push_back(nounit); // copy to experiment_t for storage
+
+	    // reset configuration
+	    adc.setVRange(vrange);
         }
     }
     catch(const std::bad_any_cast& e)

@@ -6,6 +6,7 @@
 // std includes
 #include <string>
 #include <vector>
+#include <array>
 
 // ROOT
 #include "TTree.h"
@@ -32,8 +33,8 @@ class WriterDigiToRoot
     // include any configuration data members for internal use here.
       int nantenna; // needed for construction of output file
       TTree* mytree;
-      std::vector<std::vector<double>> scopedata; // no unit storage in ROOT file
-      std::vector<std::vector<double>> purewave; // no unit storage in ROOT file
+      std::vector<vec_t*> scopedata; // no unit storage in ROOT file
+      std::vector<vec_t*> purewave; // no unit storage in ROOT file
       // doubles/int for values without unit
       int nant, evID, trID;
       double snratio;
