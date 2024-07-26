@@ -51,6 +51,8 @@ DataPack AddChirpToTruth::operator()(DataPack dp)
         std::cerr << e.what() << '\n';
     }
         
+    dp.getRef()[inkey].erase("KEVec"); // used, obsolete
+
     // at the end, store truth data.
     dp.getTruthRef().nantenna = nantenna; // store for subsequent modules
     return dp;
