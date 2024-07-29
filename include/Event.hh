@@ -15,6 +15,7 @@
 #define tryEvent_HH 1
 
 #include <unordered_map>
+#include <vector>
 #include <string>
 #include <any>
 // us
@@ -36,7 +37,7 @@ struct truth_t {
   quantity<T> bfield;
   quantity<ns> sampling_time; // from sampling
   quantity<Hz> average_omega; // from antenna
-  quantity<Hz> beat_frequency;
+  quantity<Hz> beat_frequency; // from omega vector
   quantity<Hz/s> chirp_rate;
   std::vector<vec_t> pure; // sampled signal, no noise, one per antenna
   
@@ -49,11 +50,22 @@ struct truth_t {
   } vertex;
 };
 
+struct hit_t {
+  int eventID;
+  int trackID;
+  quantity<m> locx, locy,locz; // turn no unit numbers from file
+  quantity<ns> timestamp;
+  quantity<eV> edeposit;
+  quantity<eV> kepre;  // into quantities with unit.
+  quantity<eV> kepost;  // into quantities with unit.
+  quantity<deg> anglepre, anglepost;
+};
+
 struct experiment_t {
   double gain; // set by digitizer or earlier
   quantity<Hz> target_frequency; // from mixer
   quantity<Hz> digi_sampling_rate; // set-up with digitizer
-  std::vector<vec_t> signals; // digitized endproduct, no unit for storage
+  std::vector<vec_t> signals; // digitized endproduct
 };
 
 // pipeline data structure
@@ -63,6 +75,8 @@ class DataPack
     Event_map<std::any> mymap; // defined at construction
     truth_t truthPack; // undefined at construction; bag with structure
     experiment_t expPack; // undefined at construction; fill structure
+    hit_t hitPack; // undefined at construction; fill structure
+    std::vector<hit_t> hits; // for multiple hits per event
 
   public:
     DataPack(Event_map<std::any> emap) noexcept : mymap(std::move(emap))
@@ -76,6 +90,9 @@ class DataPack
     inline Event_map<std::any>& getRef() {return mymap;} // access
     inline truth_t& getTruthRef() {return truthPack;} // access
     inline experiment_t& getExperimentRef() {return expPack;} // access
+    inline hit_t& getHitRef() {return hitPack;} // access
+    inline hit_t getHit() {return hitPack;} // access
+    inline std::vector<hit_t>& hitsRef() {return hits;} // access
 
 };
 

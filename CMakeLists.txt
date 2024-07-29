@@ -48,7 +48,8 @@ src/WhiteNoiseGen.cpp)
 
 # module library
 add_library(ReconModules SHARED modules/QTNMSimAntennaReader.cpp 
-modules/QTNMSimHitReader.cpp 
+modules/FullKinematicsSimReader.cpp
+modules/FullAntennaSimReader.cpp
 modules/QTNMSimKinematicsReader.cpp 
 modules/xCsvWriter.cpp 
 modules/x2CsvWriter.cpp 
@@ -62,6 +63,7 @@ modules/AddNoise.cpp
 modules/Mixer.cpp
 modules/Digitize.cpp
 modules/writeDigitizerToRoot.cpp
+modules/writeHitDigiToRoot.cpp
 modules/printSimReader.cpp)
 target_link_libraries(ReconModules QTNMTools ${ROOT_LIBRARIES})
 

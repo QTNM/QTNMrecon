@@ -41,8 +41,10 @@ DataPack AddNoise::operator()(DataPack dp)
 	    std::cout << "retrieve key " << ikey << " waveform of size " << pure.size() << std::endl;
 
             // set up the noise generator
-            double maxel = *std::max_element(pure.begin(),pure.end()); // Amplitude A
-            quantity<V> nlevel = maxel / std::numbers::sqrt2 / SNr * V; // A/sqrt(2) * noise/sig ratio
+            double maxel = *std::max_element(pure.begin(),pure.begin()+50); // max from initial few oscillations
+            double minel = *std::min_element(pure.begin(),pure.begin()+50); // min
+	    double amp = 0.5*(maxel - minel);
+            quantity<V> nlevel = amp / std::numbers::sqrt2 / SNr * V; // A/sqrt(2) * noise/sig ratio
 	    std::cout << "amplitude in V: " << maxel << " noise level in V " << nlevel << std::endl;
             noisegen.setScale(nlevel); // is std.dev of Gaussian = RMS to reach SNR=(A/sqrt2)/RMS
             noisegen.setSampling_rate(1.0/stime.numerical_value_in(s) * Hz); // inverse time!=frequency
