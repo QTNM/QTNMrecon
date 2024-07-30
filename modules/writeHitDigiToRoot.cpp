@@ -112,26 +112,27 @@ void WriterHitDigiToRoot::operator()(DataPack dp)
     brname = "signal_" + std::to_string(i) + "_V"; // unit in name
     mytree->SetBranchAddress(brname.data(), &scopedata.at(i));
   }
-  // extract hit data
-  for (hit_t hit : dp.hitsRef()) { // get hit struct from vector<hit_t>
-    hitevID->push_back(hit.eventID);
-    hittrID->push_back(hit.trackID);
-    hitx->push_back(hit.locx.numerical_value_in(m)); // no unit in root file
-    hity->push_back(hit.locy.numerical_value_in(m));
-    hitz->push_back(hit.locz.numerical_value_in(m));
-    hitedep->push_back(hit.edeposit.numerical_value_in(eV));
-    hittime->push_back(hit.timestamp.numerical_value_in(ns));
-    hitposttheta->push_back(hit.anglepost.numerical_value_in(deg));
+  if (! dp.hitsRef().empty()) { // there are hits to store
+    // extract hit data
+    for (hit_t hit : dp.hitsRef()) { // get hit struct from vector<hit_t>
+      hitevID->push_back(hit.eventID);
+      hittrID->push_back(hit.trackID);
+      hitx->push_back(hit.locx.numerical_value_in(m)); // no unit in root file
+      hity->push_back(hit.locy.numerical_value_in(m));
+      hitz->push_back(hit.locz.numerical_value_in(m));
+      hitedep->push_back(hit.edeposit.numerical_value_in(eV));
+      hittime->push_back(hit.timestamp.numerical_value_in(ns));
+      hitposttheta->push_back(hit.anglepost.numerical_value_in(deg));
+    }
+    mytree->SetBranchAddress("hit.eventID", &hitevID); // point to vec<int>* real address
+    mytree->SetBranchAddress("hit.trackID", &hittrID); // point to vec<int>* real address
+    mytree->SetBranchAddress("hit.locx_m", &hitx); // point to vec<double>* real address
+    mytree->SetBranchAddress("hit.locy_m", &hity); // point to vec<double>* real address
+    mytree->SetBranchAddress("hit.locz_m", &hitz); // point to vec<double>* real address
+    mytree->SetBranchAddress("hit.time_ns", &hittime); // point to vec<double>* real address
+    mytree->SetBranchAddress("hit.edep_eV", &hitedep); // point to vec<double>* real address
+    mytree->SetBranchAddress("hit.posttheta_deg", &hitposttheta); // point to vec<double>* real address
   }
-  mytree->SetBranchAddress("hit.eventID", &hitevID); // point to vec<int>* real address
-  mytree->SetBranchAddress("hit.trackID", &hittrID); // point to vec<int>* real address
-  mytree->SetBranchAddress("hit.locx_m", &hitx); // point to vec<double>* real address
-  mytree->SetBranchAddress("hit.locy_m", &hity); // point to vec<double>* real address
-  mytree->SetBranchAddress("hit.locz_m", &hitz); // point to vec<double>* real address
-  mytree->SetBranchAddress("hit.time_ns", &hittime); // point to vec<double>* real address
-  mytree->SetBranchAddress("hit.edep_eV", &hitedep); // point to vec<double>* real address
-  mytree->SetBranchAddress("hit.posttheta_deg", &hitposttheta); // point to vec<double>* real address
-
   // all output collected, write it
   mytree->Fill();
 }
