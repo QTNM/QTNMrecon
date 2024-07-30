@@ -42,14 +42,15 @@ DataPack SineSigGenerator::operator()()
     Event_map<std::any> eventmap; // data item for delivery
     Event<std::any> outdata; // to hold all the data items
 
-    outdata["waveform[V]"] = std::make_any<waveform_t>(sig.generate()); // use generator
-    outdata["amplitude[V]"] = std::make_any<quantity<V>>(amplitude);
-    outdata["frequency[Hz]"] = std::make_any<quantity<Hz>>(frequency);
-    outdata["sampling[Hz]"] = std::make_any<quantity<Hz>>(sampling_rate);
-    outdata["duration[s]"] = std::make_any<quantity<s>>(duration);
-    outdata["phase[rad]"] = std::make_any<quantity<rad>>(phase);
+    outdata["waveform_V_0"] = std::make_any<waveform_t>(sig.generate()); // use generator
+    outdata["amplitude_V_0"] = std::make_any<quantity<V>>(amplitude);
+    outdata["frequency_Hz_0"] = std::make_any<quantity<Hz>>(frequency);
+    outdata["sampling_Hz_0"] = std::make_any<quantity<Hz>>(sampling_rate);
+    outdata["duration_s_0"] = std::make_any<quantity<s>>(duration);
+    outdata["phase_rad_0"] = std::make_any<quantity<rad>>(phase);
     std::cout << "sine gen: counter " << counter << ", in key " << outkey << std::endl;
     eventmap[outkey] = outdata;
     DataPack dp(eventmap);
+    dp.getTruthRef().nantenna = 1; // required for outputs
     return dp;
 }

@@ -35,9 +35,9 @@ int main(int argc, char** argv)
 
   // data source: sine signal generator, store under key 'wave'
   quantity<V> amp = 1.0 * V;
-  quantity<Hz> srate = 25.0 * Hz;
-  quantity<s>  dur = 2.0 * s;
-  quantity<Hz> freq = 1.0 * Hz;
+  quantity<Hz> srate = 1.0 * GHz;
+  quantity<s>  dur = 100.0 * ns;
+  quantity<Hz> freq = 100.0 * MHz;
   quantity<rad> ph = 0.0 * deg;
 
   auto source = SineSigGenerator("wave",amp,freq,srate,dur,ph);
@@ -50,7 +50,7 @@ int main(int argc, char** argv)
     throw std::logic_error("Cannot open output file");
   }
   ofs << "Event ID,Wave value[V]\n" << std::flush; // header
-  auto sink   = xCsvWriter(ofs, "wave", "waveform[V]");
+  auto sink   = xCsvWriter(ofs, "wave", "waveform_V_");
   
   auto pl = yap::Pipeline{} | source | sink;
   

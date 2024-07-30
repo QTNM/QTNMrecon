@@ -42,7 +42,7 @@ void xCsvWriter::operator()(DataPack dp)
     }
     catch (const std::bad_any_cast& e)
     {
-        std::cout << e.what() << std::endl;
+      std::cout << "xCsvWriter: " << e.what() << std::endl;
     }
     counter++;
     return;
