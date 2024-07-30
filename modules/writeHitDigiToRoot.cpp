@@ -135,4 +135,13 @@ void WriterHitDigiToRoot::operator()(DataPack dp)
   }
   // all output collected, write it
   mytree->Fill();
+  // clear internal
+  hitevID->clear();
+  hittrID->clear();
+  hitx->clear();
+  hity->clear();
+  hitz->clear();
+  hittime->clear();
+  hitedep->clear();
+  hitposttheta->clear();
 }
