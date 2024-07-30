@@ -52,6 +52,7 @@ class FullAntennaSimReader
     TTreeReaderValue<double> kine;
     TTreeReaderValue<double> pangle;
     TTreeReaderValue<std::vector<int>> aID;
+    TTreeReaderValue<std::vector<double>> kevec;
     TTreeReaderValue<std::vector<double>> omvec;
     TTreeReaderValue<std::vector<double>> tvec;
     TTreeReaderValue<std::vector<double>> vvec;

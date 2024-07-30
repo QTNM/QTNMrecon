@@ -50,7 +50,7 @@ void printSimReader::operator()(DataPack dp)
     }
     catch (const std::bad_any_cast& e)
     {
-        std::cout << e.what() << std::endl;
+      std::cout << "printSimReader: " << e.what() << std::endl;
     }
 
     // action of module template module.

@@ -37,6 +37,7 @@ FullAntennaSimReader::FullAntennaSimReader(TTreeReader& re1, TTreeReader& re2, s
     pangle(reader1, "PitchAngle"),
     aID(reader1, "AntennaID"),
     omvec(reader1, "OmVec"),
+    kevec(reader1, "KEVec"),
     tvec(reader1, "TimeVec"),
     vvec(reader1, "VoltageVec")
 {
@@ -68,6 +69,7 @@ DataPack FullAntennaSimReader::operator()()
         outdata["TimeVec"] = std::make_any<std::vector<double>>(tvec->begin(),tvec->end());
         outdata["VoltageVec"] = std::make_any<std::vector<double>>(vvec->begin(),vvec->end());
         outdata["OmVec"] = std::make_any<std::vector<double>>(omvec->begin(),omvec->end());
+        outdata["KEVec"] = std::make_any<std::vector<double>>(kevec->begin(),kevec->end());
         eventmap[outkey] = outdata; // with outdata an Event<std::any>
     }
     else // no more entries in TTreeReader

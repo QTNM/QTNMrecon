@@ -14,7 +14,7 @@ xCsvWriter::xCsvWriter(std::ofstream& ofs, std::string in, std::string l2) :
     myofs(ofs),
     counter(0) 
 {
-  std::cout << "constructor called before file open" << std::endl;
+  std::cout << "xCsvWriter constructor called." << std::endl;
 }
 
 

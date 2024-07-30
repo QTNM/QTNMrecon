@@ -48,7 +48,7 @@ DataPack AddChirpToTruth::operator()(DataPack dp)
     }
     catch(const std::bad_any_cast& e)
     {
-        std::cerr << e.what() << '\n';
+      std::cerr << "AddChirpTo Truth: " << e.what() << '\n';
     }
         
     dp.getRef()[inkey].erase("KEVec"); // used, obsolete

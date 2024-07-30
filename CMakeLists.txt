@@ -68,6 +68,8 @@ modules/printSimReader.cpp)
 target_link_libraries(ReconModules QTNMTools ${ROOT_LIBRARIES})
 
 # Build apps
+add_executable(exhdprint.exe apps/example_hitdigi_print.cpp)
+target_link_libraries(exhdprint.exe PUBLIC ReconModules QTNMTools)
 add_executable(exdw.exe apps/example_digi_write.cpp)
 target_link_libraries(exdw.exe PUBLIC ReconModules QTNMTools)
 add_executable(exdp.exe apps/example_digi_print.cpp)

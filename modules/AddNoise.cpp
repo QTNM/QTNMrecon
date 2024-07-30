@@ -72,7 +72,7 @@ DataPack AddNoise::operator()(DataPack dp)
     }
     catch(const std::bad_any_cast& e)
     {
-        std::cerr << e.what() << '\n';
+      std::cerr << "AddNoise: " << e.what() << '\n';
     }
     dp.getRef()[outkey] = outdata;
     dp.getTruthRef().snratio = SNr;

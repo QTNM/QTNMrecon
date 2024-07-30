@@ -48,7 +48,7 @@ DataPack OmegaBeatToTruth::operator()(DataPack dp)
     }
     catch(const std::bad_any_cast& e)
     {
-        std::cerr << e.what() << '\n';
+      std::cerr << "OmegaBeatToTruth: " << e.what() << '\n';
     }
     dp.getRef()[outkey] = outdata;
     return dp;

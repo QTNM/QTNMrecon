@@ -62,7 +62,7 @@ DataPack Digitize::operator()(DataPack dp)
     }
     catch(const std::bad_any_cast& e)
     {
-        std::cerr << e.what() << '\n';
+      std::cerr << "Digitize: " << e.what() << '\n';
     }
 
     return dp;

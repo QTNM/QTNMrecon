@@ -12,7 +12,7 @@ digiCsvWriter::digiCsvWriter(std::ofstream& ofs) :
     myofs(ofs),
     counter(0) 
 {
-  std::cout << "constructor called before file open" << std::endl;
+  std::cout << "digiCsvWriter constructor called." << std::endl;
 }
 
 

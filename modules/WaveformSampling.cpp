@@ -67,7 +67,7 @@ DataPack WaveformSampling::operator()(DataPack dp)
       }
     catch(const std::bad_any_cast& e)
       {
-	std::cerr << e.what() << '\n';
+	std::cerr << "WaveformSampling: " << e.what() << '\n';
       }
     dp.getTruthRef().sampling_time = sampletime;
     dp.getRef()[outkey] = outdata;
