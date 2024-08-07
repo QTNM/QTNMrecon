@@ -74,7 +74,7 @@ waveform_t ChirpGenerator::add(waveform_t& sig, size_t pos)
     // changes signal but leave state unchanged for repeat requests
     // avoiding repeated addition operations. Reset by any configuration 
     // setter call.
-
+  if (state_change) generate();
     // add other to existing tsig at position pos, 
     // up to at most end of tsig, irrespective of the length of other
     std::transform(tsig.begin()+pos,tsig.end(),sig.begin(),tsig.begin()+pos,std::plus<waveform_value>());
