@@ -12,7 +12,7 @@
 ChirpGenerator::ChirpGenerator() : 
 amplitude(0.0 * V),
 frequency(-1.0 * Hz),
-chirprate(0.0 * Hz*Hz),
+chirprate(0.0 * Hz/s),
 sampling_rate(-1.0 * Hz),
 duration(0.0 * s),
 phase(0.0 * rad)
@@ -22,7 +22,7 @@ phase(0.0 * rad)
 }
 
 
-ChirpGenerator::ChirpGenerator(quantity<V> amp, quantity<Hz> ff, quantity<Hz*Hz> ch, 
+ChirpGenerator::ChirpGenerator(quantity<V> amp, quantity<Hz> ff, quantity<Hz/s> ch, 
         quantity<Hz> sr, quantity<s> d, quantity<rad> phr) : 
 amplitude(amp),
 frequency(ff),

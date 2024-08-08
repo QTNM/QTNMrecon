@@ -10,7 +10,7 @@ int main()
     quantity<Hz> srate = 100.0 * Hz; // Hz
     quantity<s>  dur = 2.0 * s; // [s]
     quantity<Hz> freq = 1.0 * Hz;
-    quantity<Hz*Hz> chrate = 1.0 * Hz*Hz;
+    quantity<Hz/s> chrate = 1.0 * Hz/s;
     int seed = 1235;
     ChirpGenerator chirpsig(2.0*V, freq, chrate, srate, dur, 0.0*deg);
 

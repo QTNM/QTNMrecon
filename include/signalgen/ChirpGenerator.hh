@@ -12,7 +12,7 @@ class ChirpGenerator : VSignal
 {
     public:
         ChirpGenerator(); // constructor
-        ChirpGenerator(quantity<V> amp, quantity<Hz> freq, quantity<Hz*Hz> chrate, quantity<Hz> srate, 
+        ChirpGenerator(quantity<V> amp, quantity<Hz> freq, quantity<Hz/s> chrate, quantity<Hz> srate, 
                         quantity<s> dur, quantity<rad> phrad); // full constructor
         virtual ~ChirpGenerator() = default; // default destructor
 
@@ -22,7 +22,7 @@ class ChirpGenerator : VSignal
 
         inline void setAmplitude(quantity<V> a) {amplitude = a; state_change = true;}
         inline void setFrequency(quantity<Hz> ff) {frequency = ff; state_change = true;}
-        inline void setChirprate(quantity<Hz*Hz> ch) {chirprate = ch; state_change = true;}
+        inline void setChirprate(quantity<Hz/s> ch) {chirprate = ch; state_change = true;}
         inline void setSampling_rate(quantity<Hz> sr) {sampling_rate = sr; state_change = true;}
         inline void setDuration(quantity<s> d) {duration = d; state_change = true;}
         inline void setPhase_rad(quantity<rad> phr) {phase = phr; state_change = true;}
@@ -32,7 +32,7 @@ class ChirpGenerator : VSignal
 
         quantity<V>     amplitude;
         quantity<Hz>    frequency;
-        quantity<Hz*Hz> chirprate;
+        quantity<Hz/s>  chirprate;
         quantity<Hz>    sampling_rate;
         quantity<s>     duration;
         quantity<rad>   phase;
