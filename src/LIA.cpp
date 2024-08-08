@@ -48,8 +48,6 @@ waveform_t LIA::quadrature(waveform_t& signal)
         part1.push_back(signal[ii] * reference[ii]);
         part2.push_back(signal[ii] * coreference[ii]);
     }
-    std::cout << std::endl;
-
     // filter
     waveform_t f1 = bw.LPassFilter(part1);
     waveform_t f2 = bw.LPassFilter(part2);
