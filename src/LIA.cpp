@@ -35,6 +35,12 @@ waveform_t LIA::quadrature(waveform_t& signal)
         std::cout << "ref or cross-ref empty" << std::endl;
         return res; // not set-up, return empty
     }
+    // check 2
+    if (reference.size() != signal.size()) {
+        std::cout << "ref and signal have different length, no operation." << std::endl;
+        return res; // not set-up, return empty
+    }
+
     waveform_t part1, part2; // temp
     // mix
     for (size_t ii=0;ii<signal.size();++ii)
