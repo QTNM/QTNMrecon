@@ -80,6 +80,10 @@ waveform_t SineGenerator::add(waveform_t& sig, size_t pos)
         generate(); 
     // add other to existing tsig at position pos, 
     // up to at most end of tsig, irrespective of the length of other
-    std::transform(tsig.begin()+pos,tsig.end(),sig.begin(),tsig.begin()+pos,std::plus<waveform_value>());
+    size_t j = 0;
+    for (size_t i=pos;i<tsig.size() && j<sig.size();++i) {
+      tsig[i] += sig[j];
+      ++j;
+    }
     return tsig;
 }
