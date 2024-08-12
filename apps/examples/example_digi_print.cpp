@@ -81,7 +81,9 @@ int main(int argc, char** argv)
 
   // add noise fill more truth with units
   auto noiseAdder = AddNoise(samp, noisy, l2noise);
-  noiseAdder.setSignalToNoise(1.0);
+  noiseAdder.setSignalToNoise(10.0);
+  noiseAdder.setSampleLength(100.0 * us);
+  noiseAdder.setOnsetPercent(10.0);
 
   // mixer waveform in from l2 key, out in l2 key
   auto mixer = Mixer(noisy, mixed, l2noise, l2mix);
