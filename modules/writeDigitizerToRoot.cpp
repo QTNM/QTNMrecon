@@ -23,22 +23,22 @@ WriterDigiToRoot::WriterDigiToRoot(TTree* tr, int na) :
     purewave.push_back(p); // vector in purewave initialized
   }
   // can now point branch at dummy addresses; makes header only
-  mytree->Branch("truth.nantenna",&nant,"truth.nantenna/I");
-  mytree->Branch("truth.snratio",&snratio,"truth.snratio/D");
-  mytree->Branch("truth.samplingtime_s",&samplingtime,"truth.samplingtime/D");
-  mytree->Branch("truth.avomega_Hz",&avomega,"truth.avomega/D");
-  mytree->Branch("truth.beatf_Hz",&beatf,"truth.beatf/D");
-  mytree->Branch("truth.chirp_Hz_s",&chirprate,"truth.chirp_rate/D");
-  mytree->Branch("vertex.evID",&evID,"vertex.evID/I");
-  mytree->Branch("vertex.trackID",&trID,"vertex.trackID/I");
-  mytree->Branch("vertex.posx_m",&posx,"vertex.posx/D");
-  mytree->Branch("vertex.posy_m",&posy,"vertex.posy/D");
-  mytree->Branch("vertex.posz_m",&posz,"vertex.posz/D");
-  mytree->Branch("vertex.kinenergy_eV",&kEnergy,"vertex.kinenergy/D");
-  mytree->Branch("vertex.pitchangle_deg",&pangle,"vertex.pitchangle/D");
-  mytree->Branch("digi.gain",&gain,"digi.gain/D");
-  mytree->Branch("digi.tfrequency_Hz",&tfrequency,"digi.tfrequency/D");
-  mytree->Branch("digi.samplingrate_Hz",&digisamplingrate,"digi.samplingrate/D");
+  mytree->Branch("truth_nantenna",&nant,"truth_nantenna/I");
+  mytree->Branch("truth_snratio",&snratio,"truth_snratio/D");
+  mytree->Branch("truth_samplingtime_s",&samplingtime,"truth_samplingtime/D");
+  mytree->Branch("truth_avomega_Hz",&avomega,"truth_avomega/D");
+  mytree->Branch("truth_beatf_Hz",&beatf,"truth_beatf/D");
+  mytree->Branch("truth_chirp_Hz_s",&chirprate,"truth_chirp_rate/D");
+  mytree->Branch("vertex_evID",&evID,"vertex_evID/I");
+  mytree->Branch("vertex_trackID",&trID,"vertex_trackID/I");
+  mytree->Branch("vertex_posx_m",&posx,"vertex_posx/D");
+  mytree->Branch("vertex_posy_m",&posy,"vertex_posy/D");
+  mytree->Branch("vertex_posz_m",&posz,"vertex_posz/D");
+  mytree->Branch("vertex_kinenergy_eV",&kEnergy,"vertex_kinenergy/D");
+  mytree->Branch("vertex_pitchangle_deg",&pangle,"vertex_pitchangle/D");
+  mytree->Branch("digi_gain",&gain,"digi_gain/D");
+  mytree->Branch("digi_tfrequency_Hz",&tfrequency,"digi_tfrequency/D");
+  mytree->Branch("digi_samplingrate_Hz",&digisamplingrate,"digi_samplingrate/D");
   for (int i=0;i<nantenna;++i) {
     // std::cout << "in write: sptr address for " << i << ", " << &scopedata.at(i) << std::endl;
     // std::cout << "in write: pptr address for " << i << ", " << &purewave.at(i) << std::endl;
@@ -54,39 +54,39 @@ void WriterDigiToRoot::operator()(DataPack dp)
 {
   // extract from datapack and assign to output branch variables with the correct address
   nant    = dp.getTruthRef().nantenna;
-  mytree->SetBranchAddress("truth.nantenna",&nant);
+  mytree->SetBranchAddress("truth_nantenna",&nant);
   snratio     = dp.getTruthRef().snratio;
-  mytree->SetBranchAddress("truth.snratio",&snratio);
+  mytree->SetBranchAddress("truth_snratio",&snratio);
   samplingtime = dp.getTruthRef().sampling_time.numerical_value_in(s); // from quantity<ns> no unit for output
-  mytree->SetBranchAddress("truth.samplingtime_s",&samplingtime);
+  mytree->SetBranchAddress("truth_samplingtime_s",&samplingtime);
   avomega      = dp.getTruthRef().average_omega.numerical_value_in(Hz); // quantity<Hz>
-  mytree->SetBranchAddress("truth.avomega_Hz",&avomega);
+  mytree->SetBranchAddress("truth_avomega_Hz",&avomega);
   beatf        = dp.getTruthRef().beat_frequency.numerical_value_in(Hz); // quantity<Hz>
-  mytree->SetBranchAddress("truth.beatf_Hz",&beatf);
+  mytree->SetBranchAddress("truth_beatf_Hz",&beatf);
   chirprate    = dp.getTruthRef().chirp_rate.numerical_value_in(Hz/s); // quantity<Hz>
-  mytree->SetBranchAddress("truth.chirp_Hz_s",&chirprate);
+  mytree->SetBranchAddress("truth_chirp_Hz_s",&chirprate);
   // vertex
   evID = dp.getTruthRef().vertex.eventID;
-  mytree->SetBranchAddress("vertex.evID",&evID);
+  mytree->SetBranchAddress("vertex_evID",&evID);
   trID = dp.getTruthRef().vertex.trackID;
-  mytree->SetBranchAddress("vertex.trackID",&trID);
+  mytree->SetBranchAddress("vertex_trackID",&trID);
   posx    = dp.getTruthRef().vertex.posx.numerical_value_in(m); // quantity<m>
-  mytree->SetBranchAddress("vertex.posx_m",&posx);
+  mytree->SetBranchAddress("vertex_posx_m",&posx);
   posy    = dp.getTruthRef().vertex.posy.numerical_value_in(m); // quantity<m>
-  mytree->SetBranchAddress("vertex.posy_m",&posy);
+  mytree->SetBranchAddress("vertex_posy_m",&posy);
   posz    = dp.getTruthRef().vertex.posz.numerical_value_in(m); // quantity<m>
-  mytree->SetBranchAddress("vertex.posz_m",&posz);
+  mytree->SetBranchAddress("vertex_posz_m",&posz);
   kEnergy = dp.getTruthRef().vertex.kineticenergy.numerical_value_in(eV); // quantity<eV>
-  mytree->SetBranchAddress("vertex.kinenergy_eV",&kEnergy);
+  mytree->SetBranchAddress("vertex_kinenergy_eV",&kEnergy);
   pangle  = dp.getTruthRef().vertex.pitchangle.numerical_value_in(deg); // quantity<deg>
-  mytree->SetBranchAddress("vertex.pitchangle_deg",&pangle);
+  mytree->SetBranchAddress("vertex_pitchangle_deg",&pangle);
   // experiment
   gain  = dp.getExperimentRef().gain;
-  mytree->SetBranchAddress("digi.gain",&gain);
+  mytree->SetBranchAddress("digi_gain",&gain);
   tfrequency   = dp.getExperimentRef().target_frequency.numerical_value_in(Hz); // quantity<Hz>
-  mytree->SetBranchAddress("digi.tfrequency_Hz",&tfrequency);
+  mytree->SetBranchAddress("digi_tfrequency_Hz",&tfrequency);
   digisamplingrate = dp.getExperimentRef().digi_sampling_rate.numerical_value_in(Hz); // quantity<Hz>
-  mytree->SetBranchAddress("digi.samplingrate_Hz",&digisamplingrate);
+  mytree->SetBranchAddress("digi_samplingrate_Hz",&digisamplingrate);
 
   std::string brname;
   for (int i=0;i<nantenna;++i) {
