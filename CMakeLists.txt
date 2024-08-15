@@ -123,3 +123,7 @@ add_executable(testmix examples/mixertest.cpp)
 target_link_libraries(testmix PUBLIC QTNMTools)
 add_executable(testmixsamp examples/mixsampletest.cpp)
 target_link_libraries(testmixsamp PUBLIC QTNMTools)
+
+# utils
+add_executable(checkreader utils/readHitDigifile.cpp)
+target_link_libraries(checkreader PUBLIC QTNMTools ${ROOT_LIBRARIES})
