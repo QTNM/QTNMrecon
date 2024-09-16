@@ -14,6 +14,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++20 -O3")
 add_subdirectory(external/gsl)
 add_subdirectory(external/fmt)
 add_subdirectory(external/mp-units/src)
+add_subdirectory(external/HighFive)
 
 #Require ROOT, find installed root
 find_package(ROOT REQUIRED Minuit)
@@ -27,6 +28,7 @@ include_directories(include
  include/receiver
  include/modules
  external/gsl/include
+ external/HighFive/include
  external/mp-units/src/core/include
  external/mp-units/src/systems/include
  ${ROOT_INCLUDES})
