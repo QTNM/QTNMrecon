@@ -44,11 +44,16 @@ void WriterHitDigiToHDF5::operator()(DataPack dp)
   if (bnew_event)
     eventgr = simgroup.createGroup("event_"+std::to_string(evID));
 
+  // enable compression
+  HighFive::DataSetCreateProps props;
+  props.add(HighFive::Chunking(std::vector<hsize_t>{1000})); // adjust size for IO speed
+  props.add(HighFive::Deflate(6));
+
   HighFive::Group recordgr  = eventgr.createGroup("record_"+std::to_string(trID));
   for (int antid=0;antid<nant;++antid) {
     HighFive::Group channelgr  = recordgr.createGroup("channel_"+std::to_string(antid));
-    channelgr.createDataSet("signal_V", dp.getExperimentRef().signals.at(antid)); // vector<double>
-    channelgr.createDataSet("truthwfm_V", dp.getTruthRef().pure.at(antid)); // vector<double>
+    channelgr.createDataSet("signal_V", dp.getExperimentRef().signals.at(antid), props); // compressed
+    channelgr.createDataSet("truthwfm_V", dp.getTruthRef().pure.at(antid), props); // compressed
   }
   // electron-specific attributes
   recordgr.createAttribute("vertex_posx_m", dp.getTruthRef().vertex.posx.numerical_value_in(m));
@@ -63,13 +68,13 @@ void WriterHitDigiToHDF5::operator()(DataPack dp)
   if (! dp.hitsRef().empty()) { // there are hits to store
     // extract hit data
     for (hit_t hit : dp.hitsRef()) { // get hit struct from vector<hit_t>
-      hittrID->push_back(hit.trackID);
-      hitx->push_back(hit.locx.numerical_value_in(m)); // no unit in root file
-      hity->push_back(hit.locy.numerical_value_in(m));
-      hitz->push_back(hit.locz.numerical_value_in(m));
-      hitedep->push_back(hit.edeposit.numerical_value_in(eV));
-      hittime->push_back(hit.timestamp.numerical_value_in(ns));
-      hitposttheta->push_back(hit.anglepost.numerical_value_in(deg));
+      hittrID.push_back(hit.trackID);
+      hitx.push_back(hit.locx.numerical_value_in(m)); // no unit in root file
+      hity.push_back(hit.locy.numerical_value_in(m));
+      hitz.push_back(hit.locz.numerical_value_in(m));
+      hitedep.push_back(hit.edeposit.numerical_value_in(eV));
+      hittime.push_back(hit.timestamp.numerical_value_in(ns));
+      hitposttheta.push_back(hit.anglepost.numerical_value_in(deg));
     }
     HighFive::Group hitgr     = eventgr.createGroup("hitdata_"+std::to_string(trID));
     hitgr.createDataSet("hit_trackID",hittrID); // vector<int>
@@ -79,14 +84,14 @@ void WriterHitDigiToHDF5::operator()(DataPack dp)
     hitgr.createDataSet("hit_time_ns",hittime); // vector<double>
     hitgr.createDataSet("hit_edep_eV",hitedep); // vector<double>
     hitgr.createDataSet("hit_posttheta_deg",hitposttheta); // vector<double>
-  }
 
-  // clear internal
-  hittrID->clear();
-  hitx->clear();
-  hity->clear();
-  hitz->clear();
-  hittime->clear();
-  hitedep->clear();
-  hitposttheta->clear();
+    // clear internal
+    hittrID.clear();
+    hitx.clear();
+    hity.clear();
+    hitz.clear();
+    hittime.clear();
+    hitedep.clear();
+    hitposttheta.clear();
+  }
 }

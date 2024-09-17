@@ -66,8 +66,9 @@ modules/Mixer.cpp
 modules/Digitize.cpp
 modules/writeDigitizerToRoot.cpp
 modules/writeHitDigiToRoot.cpp
+modules/writeHitDigiToHDF5.cpp
 modules/printSimReader.cpp)
-target_link_libraries(ReconModules QTNMTools ${ROOT_LIBRARIES})
+target_link_libraries(ReconModules QTNMTools HighFive ${ROOT_LIBRARIES})
 
 # Build apps and examples
 add_executable(antrecon.exe apps/antennaSimRecon.cpp)
