@@ -28,7 +28,7 @@ class WriterHitDigiToHDF5
       HighFive::Group  eventgr; // used in operator
   
       int nant, evID, trID; // ID numbers for grouping
-      bool bnew_event;
+      bool bnew_event, bnew_sim;
 
       // hit data
       std::vector<int> hittrID;

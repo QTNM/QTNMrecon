@@ -13,9 +13,11 @@
 WriterHitDigiToHDF5::WriterHitDigiToHDF5(HighFive::Group& gr) : 
   simgroup(gr)
 {
+  bnew_sim   = true; // only true once
   bnew_event = true;
   evID = -1;
   trID = -1;
+  std::cout << "in HDF5 writer constructor." << std::endl;
 }
 
 
@@ -28,21 +30,25 @@ void WriterHitDigiToHDF5::operator()(DataPack dp)
     evID = dp.getTruthRef().vertex.eventID;
     bnew_event = true;
   }
+  std::cout << "in HDF5 writer: new event boolean " << bnew_event << " evID=" << evID << std::endl;
 
   trID = dp.getTruthRef().vertex.trackID; // always a new track ID
   nant = dp.getTruthRef().nantenna;
 
   // global attributes
-  simgroup.createAttribute("truth_bfield_T", dp.getTruthRef().bfield);
-  simgroup.createAttribute("truth_nantenna", nant);
-  simgroup.createAttribute("truth_snratio", dp.getTruthRef().snratio);
-  simgroup.createAttribute("truth_samplingtime_s", dp.getTruthRef().sampling_time.numerical_value_in(s));
-  simgroup.createAttribute("digi_gain", dp.getExperimentRef().gain);
-  simgroup.createAttribute("digi_tfrequency_Hz", dp.getExperimentRef().target_frequency.numerical_value_in(Hz));
-  simgroup.createAttribute("digi_samplingrate_Hz", dp.getExperimentRef().digi_sampling_rate.numerical_value_in(Hz));
-
+  if (bnew_sim) {
+    simgroup.createAttribute("truth_bfield_T", dp.getTruthRef().bfield.numerical_value_in(T));
+    simgroup.createAttribute("truth_nantenna", nant);
+    simgroup.createAttribute("truth_snratio", dp.getTruthRef().snratio);
+    simgroup.createAttribute("truth_samplingtime_s", dp.getTruthRef().sampling_time.numerical_value_in(s));
+    simgroup.createAttribute("digi_gain", dp.getExperimentRef().gain);
+    simgroup.createAttribute("digi_tfrequency_Hz", dp.getExperimentRef().target_frequency.numerical_value_in(Hz));
+    simgroup.createAttribute("digi_samplingrate_Hz", dp.getExperimentRef().digi_sampling_rate.numerical_value_in(Hz));
+  }
+  
   if (bnew_event)
     eventgr = simgroup.createGroup("event_"+std::to_string(evID));
+  std::cout << "in HDF5 writer: made group with evID " << evID << std::endl;
 
   // enable compression
   HighFive::DataSetCreateProps props;
@@ -94,4 +100,5 @@ void WriterHitDigiToHDF5::operator()(DataPack dp)
     hitedep.clear();
     hitposttheta.clear();
   }
+  bnew_sim = false; // constant for entire rest of sim group
 }

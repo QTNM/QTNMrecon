@@ -76,6 +76,8 @@ target_link_libraries(antrecon.exe PUBLIC ReconModules QTNMTools)
 add_executable(noantrecon.exe apps/noAntennaSimRecon.cpp)
 target_link_libraries(noantrecon.exe PUBLIC ReconModules QTNMTools)
 
+add_executable(exwrhdf5.exe apps/examples/example_write_hdf5.cpp)
+target_link_libraries(exwrhdf5.exe PUBLIC ReconModules QTNMTools)
 add_executable(exhdwrite.exe apps/examples/example_hitdigi_write.cpp)
 target_link_libraries(exhdwrite.exe PUBLIC ReconModules QTNMTools)
 add_executable(exhdprint.exe apps/examples/example_hitdigi_print.cpp)
