@@ -42,6 +42,7 @@ class WriterHitDigiToRoot
       double avomega; // quantity<Hz>
       double beatf; // quantity<Hz>
       double chirprate; // quantity<Hz/s>
+      double bfield; // quantity<T>
       // vertex
       double posx; // quantity<m>
       double posy; // quantity<m>

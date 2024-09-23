@@ -14,6 +14,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++20 -O3")
 add_subdirectory(external/gsl)
 add_subdirectory(external/fmt)
 add_subdirectory(external/mp-units/src)
+add_subdirectory(external/HighFive)
 
 #Require ROOT, find installed root
 find_package(ROOT REQUIRED Minuit)
@@ -27,6 +28,7 @@ include_directories(include
  include/receiver
  include/modules
  external/gsl/include
+ external/HighFive/include
  external/mp-units/src/core/include
  external/mp-units/src/systems/include
  ${ROOT_INCLUDES})
@@ -64,15 +66,22 @@ modules/Mixer.cpp
 modules/Digitize.cpp
 modules/writeDigitizerToRoot.cpp
 modules/writeHitDigiToRoot.cpp
+modules/writeHitDigiToHDF5.cpp
 modules/printSimReader.cpp)
-target_link_libraries(ReconModules QTNMTools ${ROOT_LIBRARIES})
+target_link_libraries(ReconModules QTNMTools HighFive ${ROOT_LIBRARIES})
 
 # Build apps and examples
 add_executable(antrecon.exe apps/antennaSimRecon.cpp)
 target_link_libraries(antrecon.exe PUBLIC ReconModules QTNMTools)
 add_executable(noantrecon.exe apps/noAntennaSimRecon.cpp)
 target_link_libraries(noantrecon.exe PUBLIC ReconModules QTNMTools)
+add_executable(antreconHDF5.exe apps/antennaSimReconToHDF5.cpp)
+target_link_libraries(antreconHDF5.exe PUBLIC ReconModules QTNMTools)
+add_executable(noantreconHDF5.exe apps/noAntennaSimReconToHDF5.cpp)
+target_link_libraries(noantreconHDF5.exe PUBLIC ReconModules QTNMTools)
 
+add_executable(exwrhdf5.exe apps/examples/example_write_hdf5.cpp)
+target_link_libraries(exwrhdf5.exe PUBLIC ReconModules QTNMTools)
 add_executable(exhdwrite.exe apps/examples/example_hitdigi_write.cpp)
 target_link_libraries(exhdwrite.exe PUBLIC ReconModules QTNMTools)
 add_executable(exhdprint.exe apps/examples/example_hitdigi_print.cpp)

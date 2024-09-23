@@ -39,8 +39,6 @@ folder for now and may change in the future. A convenient CSV file reader (https
 and a spline algorithm for interpolation (https://github.com/ttk592/spline/tree/master). The FFT library from
 (https://github.com/jdupuy/dj_fft) has been used and heavily simplified (feature-reduced) since we only
 require 1-D FFT with real values, nothing else. The Butterworth filter algorithm comes from here
-(https://github.com/adis300/filter-c), and again was simplified to using the low-pass only. Finally, the apps
-use the command line tool CLI11 (https://github.com/CLIUtils/CLI11).
-
-
-
+(https://github.com/adis300/filter-c), and again was simplified to using the low-pass only. The apps
+use the command line tool CLI11 (https://github.com/CLIUtils/CLI11). The HDF5 file writer uses the library
+(https://github.com/BlueBrain/HighFive) in the external folder.
