@@ -15,6 +15,11 @@ i.e. a reconstruction pipeline code. There are currently 2 apps in the apps fold
 to use the pipeline in the apps/examples folder. The tools are considered fairly complete, and they would be used in modules which
 are meant to run in the pipeline. The modules folder holds examples for a few of the tools as well as
 examples for reader modules (sources) and pipeline sinks like a writer or a print to screen.
+Update: with the simulation now including secondary electron production, several waveforms could result
+for a single event. The reconstruction should be able to merge them into one before adding noise and
+subsequent operations, i.e. a track combining module should be present for that step, with appropriate
+addition of waveforms under suitable conditions, e.g sufficient kinetic energy such that a waveform of 
+interest is added.
 
 The cmake file builds all the individual little test codes from the examples folder. These should demonstrate
 the proper functioning of individual tools, at least for the case considered in the example code. They

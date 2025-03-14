@@ -36,6 +36,7 @@ struct truth_t {
   double snratio; // from adding noise
   quantity<T> bfield;
   quantity<ns> sampling_time; // from sampling
+  quantity<ns> start_time;    // from time vector for each trackID
   quantity<Hz> average_omega; // from antenna
   quantity<Hz> beat_frequency; // from omega vector
   quantity<Hz/s> chirp_rate;
