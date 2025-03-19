@@ -37,7 +37,7 @@ class WriterWfmToRoot
       TTree* mytree;
       std::vector<vec_t*> purewave; // no unit storage in ROOT file
       // doubles/int for values without unit
-      int nant, evID, trID;
+      int evID, trID;
       double samplingtime; // from quantity<ns>
       double avomega; // quantity<Hz>
       double beatf; // quantity<Hz>

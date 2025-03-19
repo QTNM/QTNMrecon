@@ -25,25 +25,31 @@ class WfmReader
     // ROOT file access for member functions
     TTreeReader& reader;
 
-    TTreeReaderValue<int> eventID;
-    TTreeReaderValue<int> trackID;
-    TTreeReaderValue<int> hitevID;
-    TTreeReaderValue<int> hittrID;
-    TTreeReaderValue<double> edep; // interaction data
-    TTreeReaderValue<double> tstamp;
-    TTreeReaderValue<double> prek;
-    TTreeReaderValue<double> postk;
-    TTreeReaderValue<double> preth;
-    TTreeReaderValue<double> postth;
-    TTreeReaderValue<double> locx; // interaction location
-    TTreeReaderValue<double> locy;
-    TTreeReaderValue<double> locz;
-    TTreeReaderValue<double> posx; // vertex data
-    TTreeReaderValue<double> posy;
-    TTreeReaderValue<double> posz;
-    TTreeReaderValue<double> kine;
-    TTreeReaderValue<double> pangle;
-    TTreeReaderValue<std::vector<vec_t*>> wfmvec;
+  TTreeReaderValue<int> nantenna;
+  TTreeReaderValue<int> eventID;
+  TTreeReaderValue<int> trackID;
+  TTreeReaderValue<double> samplingtime;
+  TTreeReaderValue<double> avomega;
+  TTreeReaderValue<double> beatf;
+  TTreeReaderValue<double> chirprate;
+  TTreeReaderValue<double> bfield;
+  // vertex
+  TTreeReaderValue<double> posx;
+  TTreeReaderValue<double> posy;
+  TTreeReaderValue<double> posz;
+  TTreeReaderValue<double> kEnergy;
+  TTreeReaderValue<double> pangle;
+  // hit data
+  TTreeReaderValue<std::vector<int>> hitevID;
+  TTreeReaderValue<std::vector<int>> hittrID;
+  TTreeReaderValue<std::vector<double>> hitedep; // interaction data
+  TTreeReaderValue<std::vector<double>> hittime;
+  TTreeReaderValue<std::vector<double>> hitposttheta;
+  TTreeReaderValue<std::vector<double>> hitx; // interaction location
+  TTreeReaderValue<std::vector<double>> hity;
+  TTreeReaderValue<std::vector<double>> hitz;
+  TTreeReaderValue<vec_t> wfm;
+  std::vector<TTreeReaderValue<vec_t>> wfmvec;
 
     // these below serve as string keys to access (read/write) the Event map
     std::string outkey;
