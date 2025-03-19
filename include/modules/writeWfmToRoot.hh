@@ -13,11 +13,12 @@
 
 // must have include for pipeline
 #include <Event.hh>
+#include "types.hh"
 
 class WriterWfmToRoot
 {
     public:
-        WriterWfmToRoot(TTree* tr, int na); // constructor; required
+  WriterWfmToRoot(std::string in, TTree* tr, int na); // constructor; required
         // Need antenna number as input for setting up output file
         // That truth data is in DataPack but not available at construction.
         // Configures the module. Could have more config parameters
@@ -31,6 +32,7 @@ class WriterWfmToRoot
 
     private:
     // include any configuration data members for internal use here.
+      std::string inkey;
       int nantenna; // needed for construction of output file
       TTree* mytree;
       std::vector<vec_t*> purewave; // no unit storage in ROOT file

@@ -32,7 +32,7 @@ DataPack OmegaBeatToTruth::operator()(DataPack dp)
     try
     {
         // get hold of truth data from sim
-        auto omvec = std::any_cast<std::vector<double>>(indata["omega"]); // sampled in wfmsampling
+        auto omvec = std::any_cast<vec_t>(indata["omega"]); // sampled in wfmsampling
         // convert to waveform_t with unit, cheat to enable use of dft()
         waveform_t res;
         for (auto entry : omvec) res.push_back(entry/1.e9/(2.0*myPi) * V); // omega/2pi as double->quantity<V>

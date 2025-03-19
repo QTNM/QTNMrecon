@@ -46,21 +46,18 @@ DataPack WaveformSampling::operator()(DataPack dp)
 	ROOT::VecOps::RVec<double> tempt(tiv); // temporary
 	ROOT::VecOps::RVec<double> tempv(vvv); // temporary
 	
+	auto selecttvec = tempt[tempant==0]; // like NumPy selection
+	vec_t tt(selecttvec.begin(),selecttvec.end()); // sample_time same for any antenna
 	for (int i=0;i<nantenna;++i) {
-	  auto selecttvec = tempt[tempant==i]; // like NumPy selection
 	  auto selectvvec = tempv[tempant==i];
-	  vec_t tt(selecttvec.begin(),selecttvec.end()); // copy from RVec
 	  vec_t tv(selectvvec.begin(),selectvvec.end());
 	  
 	  vec_t resampled = interpolate(tt, tv);
-	  tt.clear();
 	  tv.clear();
 	  std::cout << "interpolator signal done, antenna " << i << std::endl;
 	  std::string tkey = "sampled_" + std::to_string(i) + "_[V]";
 	  outdata[tkey] = std::make_any<vec_t>(resampled);
 	}
-	auto selecttvec = tempt[tempant==0]; // like NumPy selection
-	vec_t tt(selecttvec.begin(),selecttvec.end()); // sample_time same for any antenna
 	vec_t omresampled = interpolate(tt, omvec);
 	outdata["omega"] = std::make_any<vec_t>(omresampled); // for the beat freq
 	dp.getTruthRef().average_omega = average_omega(omvec);
