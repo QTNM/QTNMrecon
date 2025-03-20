@@ -21,6 +21,7 @@ WriterWfmToRoot::WriterWfmToRoot(std::string inkey, TTree* tr, int na) :
   // can now point branch at dummy addresses; makes header only
   mytree->Branch("truth_nantenna",&nantenna,"truth_nantenna/I");
   mytree->Branch("truth_samplingtime_s",&samplingtime,"truth_samplingtime/D");
+  mytree->Branch("truth_starttime_s",&starttime,"truth_starttime/D");
   mytree->Branch("truth_avomega_Hz",&avomega,"truth_avomega/D");
   mytree->Branch("truth_beatf_Hz",&beatf,"truth_beatf/D");
   mytree->Branch("truth_chirp_Hz_s",&chirprate,"truth_chirp_rate/D");
@@ -56,6 +57,8 @@ void WriterWfmToRoot::operator()(DataPack dp)
   mytree->SetBranchAddress("truth_nantenna",&nantenna);
   samplingtime = dp.getTruthRef().sampling_time.numerical_value_in(s); // from quantity<ns> no unit for output
   mytree->SetBranchAddress("truth_samplingtime_s",&samplingtime);
+  starttime = dp.getTruthRef().start_time.numerical_value_in(s); // from quantity<ns> no unit for output
+  mytree->SetBranchAddress("truth_starttime_s",&starttime);
   avomega      = dp.getTruthRef().average_omega.numerical_value_in(Hz); // quantity<Hz>
   mytree->SetBranchAddress("truth_avomega_Hz",&avomega);
   beatf        = dp.getTruthRef().beat_frequency.numerical_value_in(Hz); // quantity<Hz>

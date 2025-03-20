@@ -73,6 +73,10 @@ modules/printSimReader.cpp)
 target_link_libraries(ReconModules QTNMTools HighFive ${ROOT_LIBRARIES})
 
 # Build apps and examples
+add_executable(minantrecon.exe apps/minimalFirstStepRecon.cpp)
+target_link_libraries(minantrecon.exe PUBLIC ReconModules QTNMTools)
+add_executable(minnoantrecon.exe apps/minimalNoAntennaRecon.cpp)
+target_link_libraries(minnoantrecon.exe PUBLIC ReconModules QTNMTools)
 add_executable(antrecon.exe apps/antennaSimRecon.cpp)
 target_link_libraries(antrecon.exe PUBLIC ReconModules QTNMTools)
 add_executable(noantrecon.exe apps/noAntennaSimRecon.cpp)

@@ -30,6 +30,7 @@ private:
   TTreeReaderValue<int> eventID;
   TTreeReaderValue<int> trackID;
   TTreeReaderValue<double> samplingtime;
+  TTreeReaderValue<double> starttime;
   TTreeReaderValue<double> avomega;
   TTreeReaderValue<double> beatf;
   TTreeReaderValue<double> chirprate;

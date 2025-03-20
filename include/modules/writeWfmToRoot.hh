@@ -38,6 +38,7 @@ class WriterWfmToRoot
       // doubles/int for values without unit
       int evID, trID;
       double samplingtime; // from quantity<ns>
+      double starttime; // from quantity<ns>
       double avomega; // quantity<Hz>
       double beatf; // quantity<Hz>
       double chirprate; // quantity<Hz/s>
