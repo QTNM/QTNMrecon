@@ -16,10 +16,6 @@
 #include "TFile.h"
 #include "TTree.h"
 #include "TTreeReader.h"
-#include "Math/Vector3D.h" // XYZVector
-#include "Math/Point3D.h" // XYZPoint
-
-using namespace ROOT::Math;
 
 // us
 #include "yap/pipeline.h"
@@ -34,7 +30,6 @@ using namespace ROOT::Math;
 
 #include "CLI11.hpp"
 #include <Event.hh>
-#include "types.hh"
 #include <mp-units/format.h>
 #include <mp-units/ostream.h>
 

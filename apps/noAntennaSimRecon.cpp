@@ -36,7 +36,6 @@ using namespace ROOT::Math;
 
 #include "CLI11.hpp"
 #include <Event.hh>
-#include "types.hh"
 #include <mp-units/format.h>
 #include <mp-units/ostream.h>
 
