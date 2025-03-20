@@ -10,8 +10,9 @@
 
 WfmReader::WfmReader(TTreeReader& re, int na, std::string out) : 
     outkey(std::move(out)),
-    reader(re1),
+    reader(re),
     nant(na),
+    nantenna(reader, "truth_nantenna"),
     eventID(reader, "vertex_evID"), // needs reader by reference
     trackID(reader, "vertex_trackID"),
     hitevID(reader, "hit_eventID"), // interaction data
@@ -25,14 +26,13 @@ WfmReader::WfmReader(TTreeReader& re, int na, std::string out) :
     posx(reader, "vertex_posx_m"), // vertex data
     posy(reader, "vertex_posy_m"),
     posz(reader, "vertex_posz_m"),
-    kEnergye(reader, "vertex_kinenergy_eV"),
+    kEnergy(reader, "vertex_kinenergy_eV"),
     pangle(reader, "vertex_pitchangle_deg"),
     samplingtime(reader, "truth_samplingtime_s"),
     avomega(reader, "truth_avomega_Hz"),
     beatf(reader, "truth_beatf_Hz"),
     chirprate(reader, "truth_chirp_Hz_s"),
-    bfield(reader, "truth_bfield_T"),
-    nantenna(reader, "truth_nantenna")
+    bfield(reader, "truth_bfield_T")
 {
   // int nant for n antenna is needed at construction time
   std::string brname;
@@ -50,11 +50,12 @@ DataPack WfmReader::operator()()
 
     // collect all trajectory info from file, reader holds event iterator
     // std::cout << "reader called" << std::endl;
-    std:string brname;
+    std::string brname;
     if (reader.Next()) { // variables filled from file
       for (int i=0;i<nant;++i) {
 	brname = "sampled_" + std::to_string(i) + "_V";
-        outdata[brname] = std::make_any<vec_t>(wfm(wfmarray.at(i).begin(), wfmarray.at(i).end()));
+	vec_t wfm(wfmarray.at(i).begin(), wfmarray.at(i).end());
+        outdata[brname] = std::make_any<vec_t>(wfm);
         eventmap[outkey] = outdata; // with outdata an Event<std::any>
       }
     }
@@ -93,7 +94,7 @@ DataPack WfmReader::operator()()
     dp.getTruthRef().chirp_rate = *chirprate * Hz/s; // store input truth
     dp.getTruthRef().beat_frequency = *beatf * Hz; // store input truth
     dp.getTruthRef().average_omega = *avomega * Hz; // store input truth
-    dp.getTruthRef().sampling_time = *sampplingtime * ns; // store input truth
+    dp.getTruthRef().sampling_time = *samplingtime * ns; // store input truth
     dp.getTruthRef().bfield = *bfield * T; // store input truth
     return dp;
 }

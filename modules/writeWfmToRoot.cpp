@@ -34,7 +34,7 @@ WriterWfmToRoot::WriterWfmToRoot(std::string inkey, TTree* tr, int na) :
   mytree->Branch("vertex_pitchangle_deg",&pangle,"vertex_pitchangle/D");
   std::string brname;
   for (int i=0;i<nantenna;++i) {
-    brname = "sampled_" + std::to_string(i) + "_[V]"; // unit in name
+    brname = "sampled_" + std::to_string(i) + "_V"; // unit in name
     mytree->Branch(brname.data(), &purewave.at(i)); // point to vec_t dummy address
   }
   // hit data
@@ -50,7 +50,7 @@ WriterWfmToRoot::WriterWfmToRoot(std::string inkey, TTree* tr, int na) :
 }
 
 
-void WriterHitDigiToRoot::operator()(DataPack dp)
+void WriterWfmToRoot::operator()(DataPack dp)
 {
   // extract from datapack and assign to output branch variables with the correct address
   mytree->SetBranchAddress("truth_nantenna",&nantenna);
@@ -84,8 +84,9 @@ void WriterHitDigiToRoot::operator()(DataPack dp)
   std::string brname;
   for (int i=0;i<nantenna;++i) {
     // store
-    brname = "sampled_" + std::to_string(i) + "_[V]"; // unit in name
-    purewave.at(i) = &std::any_cast<vec_t>(indata[brname]); // vec_t*, copy
+    brname = "sampled_" + std::to_string(i) + "_V"; // unit in name
+    vec_t dummy = std::any_cast<vec_t>(indata[brname]); // construct first
+    purewave.at(i) = &dummy; // vec_t*, copy
     mytree->SetBranchAddress(brname.data(), &purewave.at(i));
   }
   if (! dp.hitsRef().empty()) { // there are hits to store

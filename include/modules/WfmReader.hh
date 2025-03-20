@@ -50,7 +50,6 @@ private:
   TTreeReaderValue<std::vector<double>> hity;
   TTreeReaderValue<std::vector<double>> hitz;
   // waveform data
-  std::vector<double> wfm;
   std::vector<TTreeReaderArray<double>> wfmarray;
 
   // these below serve as string keys to access (read/write) the Event map
