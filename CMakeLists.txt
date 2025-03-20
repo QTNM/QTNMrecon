@@ -64,9 +64,11 @@ modules/WaveformSampling.cpp
 modules/AddNoise.cpp
 modules/Mixer.cpp
 modules/Digitize.cpp
+modules/writeWfmToRoot.cpp
 modules/writeDigitizerToRoot.cpp
 modules/writeHitDigiToRoot.cpp
 modules/writeHitDigiToHDF5.cpp
+modules/WfmReader.cpp
 modules/printSimReader.cpp)
 target_link_libraries(ReconModules QTNMTools HighFive ${ROOT_LIBRARIES})
 
