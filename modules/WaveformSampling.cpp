@@ -55,7 +55,7 @@ DataPack WaveformSampling::operator()(DataPack dp)
 	  vec_t resampled = interpolate(tt, tv);
 	  tv.clear();
 	  std::cout << "interpolator signal done, antenna " << i << std::endl;
-	  std::string tkey = "sampled_" + std::to_string(i) + "_[V]";
+	  std::string tkey = "sampled_" + std::to_string(i) + "_V";
 	  outdata[tkey] = std::make_any<vec_t>(resampled);
 	}
 	vec_t omresampled = interpolate(tt, omvec);
@@ -96,7 +96,7 @@ DataPack WaveformSampling::operator()(DataPack dp)
               << " time vec size " << tiv.size()<< std::endl;
 	  vec_t resampled = interpolate(tiv, tv);
 	  // store result
-	  std::string okey = "sampled_" + std::to_string(i) + "_[V]";
+	  std::string okey = "sampled_" + std::to_string(i) + "_V";
 	  outdata[okey] = std::make_any<vec_t>(resampled); // for later transformation and deletion
 	  dp.getRef()[inkey].erase(ikey); // used; not needed anymore
 	}

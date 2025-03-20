@@ -13,7 +13,6 @@
 
 // must have include for pipeline
 #include <Event.hh>
-#include "types.hh"
 
 class WriterWfmToRoot
 {

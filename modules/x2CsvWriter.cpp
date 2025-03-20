@@ -6,7 +6,6 @@
 
 // us
 #include "x2CsvWriter.hh"
-#include "types.hh"
 
 x2CsvWriter::x2CsvWriter(std::ofstream& ofs, std::string in, std::string l21, std::string l22) : 
     inkey(std::move(in)),

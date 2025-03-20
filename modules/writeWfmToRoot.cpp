@@ -2,12 +2,10 @@
 
 // std
 #include <iostream>
-#include <algorithm>
-#include <memory>
 
 // us
 #include "writeWfmToRoot.hh"
-#include "types.hh"
+
 
 WriterWfmToRoot::WriterWfmToRoot(std::string inkey, TTree* tr, int na) : 
   inkey(std::move(inkey)),

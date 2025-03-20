@@ -8,12 +8,10 @@
 #include "WfmReader.hh"
 #include "yap/pipeline.h"
 
-// ROOT
-#include "TTreeReaderValue.h"
-
-WfmReader::WfmReader(TTreeReader& re, int nant, std::string out) : 
+WfmReader::WfmReader(TTreeReader& re, int na, std::string out) : 
     outkey(std::move(out)),
     reader(re1),
+    nant(na),
     eventID(reader, "vertex_evID"), // needs reader by reference
     trackID(reader, "vertex_trackID"),
     hitevID(reader, "hit_eventID"), // interaction data
@@ -39,8 +37,8 @@ WfmReader::WfmReader(TTreeReader& re, int nant, std::string out) :
   // int nant for n antenna is needed at construction time
   std::string brname;
   for (int i=0;i<nant;++i) {
-    brname = "sampled_" + std::to_string(i) + "_[V]";
-    wfmvec.push_back(wfm(reader, brname.data()));
+    brname = "sampled_" + std::to_string(i) + "_V";
+    wfmarray.emplace_back(reader, brname.data());
   }
   std::cout << "in reader n entries: " << reader.GetEntries() << std::endl;
 }
@@ -54,10 +52,11 @@ DataPack WfmReader::operator()()
     // std::cout << "reader called" << std::endl;
     std:string brname;
     if (reader.Next()) { // variables filled from file
-      for (int i=0;i<nantenna;++i) {
-	brname = "sampled_" + std::to_string(i) + "_[V]";
-        outdata[brname.data()] = std::make_any<vec_t>(wfmvec.at(i)->begin(), wfmvec.at(i)->end());
+      for (int i=0;i<nant;++i) {
+	brname = "sampled_" + std::to_string(i) + "_V";
+        outdata[brname] = std::make_any<vec_t>(wfm(wfmarray.at(i).begin(), wfmarray.at(i).end()));
         eventmap[outkey] = outdata; // with outdata an Event<std::any>
+      }
     }
     else // no more entries in TTreeReader
         throw yap::GeneratorExit{};

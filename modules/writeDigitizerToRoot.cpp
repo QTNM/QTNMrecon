@@ -3,12 +3,9 @@
 
 // std
 #include <iostream>
-#include <algorithm>
-#include <memory>
 
 // us
 #include "writeDigitizerToRoot.hh"
-#include "types.hh"
 
 WriterDigiToRoot::WriterDigiToRoot(TTree* tr, int na) : 
   mytree(tr),

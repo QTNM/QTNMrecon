@@ -4,11 +4,10 @@
 // std
 #include <iostream>
 #include <string>
-#include <algorithm>
 
 // us
 #include "writeHitDigiToHDF5.hh"
-#include "types.hh"
+
 
 WriterHitDigiToHDF5::WriterHitDigiToHDF5(HighFive::Group& gr) : 
   simgroup(gr)

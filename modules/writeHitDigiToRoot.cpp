@@ -3,8 +3,6 @@
 
 // std
 #include <iostream>
-#include <algorithm>
-#include <memory>
 
 // us
 #include "writeHitDigiToRoot.hh"

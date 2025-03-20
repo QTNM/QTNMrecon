@@ -7,24 +7,25 @@
 
 // ROOT
 #include "TTreeReader.h"
+#include "TTreeReaderValue.h"
+#include "TTreeReaderArray.h"
 
 // must have include for pipeline
 #include <Event.hh>
-#include "types.hh"
 
 class WfmReader
 {
-    public:
-        WfmReader(TTreeReader& re, std::string outbox); // constructor; required
-        // input file name and new Key outbox label.
+public:
+  WfmReader(TTreeReader& re, int na, std::string outbox); // constructor; required
+  // input file name and new Key outbox label.
 
-        DataPack operator()(); // this is called by the pipeline
+  DataPack operator()(); // this is called by the pipeline
 
-    private:
-    // include any configuration data members for internal use here.
-    // ROOT file access for member functions
-    TTreeReader& reader;
-
+private:
+  // include any configuration data members for internal use here.
+  // ROOT file access for member functions
+  TTreeReader& reader;
+  
   TTreeReaderValue<int> nantenna;
   TTreeReaderValue<int> eventID;
   TTreeReaderValue<int> trackID;
@@ -48,11 +49,12 @@ class WfmReader
   TTreeReaderValue<std::vector<double>> hitx; // interaction location
   TTreeReaderValue<std::vector<double>> hity;
   TTreeReaderValue<std::vector<double>> hitz;
-  TTreeReaderValue<vec_t> wfm;
-  std::vector<TTreeReaderValue<vec_t>> wfmvec;
+  // waveform data
+  std::vector<double> wfm;
+  std::vector<TTreeReaderArray<double>> wfmarray;
 
-    // these below serve as string keys to access (read/write) the Event map
-    std::string outkey;
-
+  // these below serve as string keys to access (read/write) the Event map
+  std::string outkey;
+  int nant; // configure at construction
 };
 #endif

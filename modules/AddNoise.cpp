@@ -40,7 +40,7 @@ DataPack AddNoise::operator()(DataPack dp)
         int onset = static_cast<int>(onset_percent/100.0 * (sample_length/stime).numerical_value_in(one));
         
         for (int i=0;i<nantenna;++i) {
-          std::string ikey = "sampled_" + std::to_string(i) + "_[V]";
+          std::string ikey = "sampled_" + std::to_string(i) + "_V";
           auto pure = std::any_cast<vec_t>(indata[ikey]);
           std::cout << "retrieve key " << ikey << " waveform of size " << pure.size() << std::endl;
 
