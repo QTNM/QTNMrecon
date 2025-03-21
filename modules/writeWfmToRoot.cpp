@@ -33,6 +33,7 @@ WriterWfmToRoot::WriterWfmToRoot(std::string inkey, TTree* tr, int na) :
   mytree->Branch("vertex_posz_m",&posz,"vertex_posz/D");
   mytree->Branch("vertex_kinenergy_eV",&kEnergy,"vertex_kinenergy/D");
   mytree->Branch("vertex_pitchangle_deg",&pangle,"vertex_pitchangle/D");
+  mytree->Branch("vertex_trackHistory",&trackHistory);
   std::string brname;
   for (int i=0;i<nantenna;++i) {
     brname = "sampled_" + std::to_string(i) + "_V"; // unit in name
@@ -82,6 +83,8 @@ void WriterWfmToRoot::operator()(DataPack dp)
   mytree->SetBranchAddress("vertex_kinenergy_eV",&kEnergy);
   pangle  = dp.getTruthRef().vertex.pitchangle.numerical_value_in(deg); // quantity<deg>
   mytree->SetBranchAddress("vertex_pitchangle_deg",&pangle);
+  trackHistory  = dp.getTruthRef().vertex.trackHistory; // vector<int>
+  mytree->SetBranchAddress("vertex_trackHistory",&trackHistory);
 
   Event<std::any> indata = dp.getRef()[inkey];
   std::string brname;

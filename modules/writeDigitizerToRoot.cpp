@@ -23,6 +23,7 @@ WriterDigiToRoot::WriterDigiToRoot(TTree* tr, int na) :
   mytree->Branch("truth_nantenna",&nant,"truth_nantenna/I");
   mytree->Branch("truth_snratio",&snratio,"truth_snratio/D");
   mytree->Branch("truth_samplingtime_s",&samplingtime,"truth_samplingtime/D");
+  mytree->Branch("truth_starttime_s",&starttime,"truth_starttime/D");
   mytree->Branch("truth_avomega_Hz",&avomega,"truth_avomega/D");
   mytree->Branch("truth_beatf_Hz",&beatf,"truth_beatf/D");
   mytree->Branch("truth_chirp_Hz_s",&chirprate,"truth_chirp_rate/D");
@@ -33,6 +34,7 @@ WriterDigiToRoot::WriterDigiToRoot(TTree* tr, int na) :
   mytree->Branch("vertex_posz_m",&posz,"vertex_posz/D");
   mytree->Branch("vertex_kinenergy_eV",&kEnergy,"vertex_kinenergy/D");
   mytree->Branch("vertex_pitchangle_deg",&pangle,"vertex_pitchangle/D");
+  mytree->Branch("vertex_trackHistory",&trackHistory);
   mytree->Branch("digi_gain",&gain,"digi_gain/D");
   mytree->Branch("digi_tfrequency_Hz",&tfrequency,"digi_tfrequency/D");
   mytree->Branch("digi_samplingrate_Hz",&digisamplingrate,"digi_samplingrate/D");
@@ -56,6 +58,8 @@ void WriterDigiToRoot::operator()(DataPack dp)
   mytree->SetBranchAddress("truth_snratio",&snratio);
   samplingtime = dp.getTruthRef().sampling_time.numerical_value_in(s); // from quantity<ns> no unit for output
   mytree->SetBranchAddress("truth_samplingtime_s",&samplingtime);
+  starttime = dp.getTruthRef().start_time.numerical_value_in(s); // from quantity<ns> no unit for output
+  mytree->SetBranchAddress("truth_starttime_s",&starttime);
   avomega      = dp.getTruthRef().average_omega.numerical_value_in(Hz); // quantity<Hz>
   mytree->SetBranchAddress("truth_avomega_Hz",&avomega);
   beatf        = dp.getTruthRef().beat_frequency.numerical_value_in(Hz); // quantity<Hz>
@@ -77,6 +81,8 @@ void WriterDigiToRoot::operator()(DataPack dp)
   mytree->SetBranchAddress("vertex_kinenergy_eV",&kEnergy);
   pangle  = dp.getTruthRef().vertex.pitchangle.numerical_value_in(deg); // quantity<deg>
   mytree->SetBranchAddress("vertex_pitchangle_deg",&pangle);
+  trackHistory  = dp.getTruthRef().vertex.trackHistory; // vector<int>
+  mytree->SetBranchAddress("vertex_trackHistory",&trackHistory);
   // experiment
   gain  = dp.getExperimentRef().gain;
   mytree->SetBranchAddress("digi_gain",&gain);

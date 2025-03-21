@@ -45,6 +45,7 @@ struct truth_t {
   struct vertex_t {
     int eventID;
     int trackID;
+    std::vector<int> trackHistory;
     quantity<m> posx, posy,posz; // turn no unit numbers from file
     quantity<eV> kineticenergy;  // into quantities with unit.
     quantity<deg> pitchangle;

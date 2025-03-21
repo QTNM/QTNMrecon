@@ -30,6 +30,7 @@ class WriterHitDigiToHDF5
       int nant, evID, trID; // ID numbers for grouping
       bool bnew_event, bnew_sim;
 
+      std::vector<int> trackHistory;
       // hit data
       std::vector<int> hittrID;
       std::vector<double> hitx;

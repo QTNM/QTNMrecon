@@ -49,6 +49,7 @@ class WriterWfmToRoot
       double posz; // quantity<m>
       double kEnergy; // quantity<eV>
       double pangle; // quantity<deg>
+      std::vector<int> trackHistory;
       // hit data
       std::vector<int>* hitevID;
       std::vector<int>* hittrID;

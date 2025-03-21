@@ -39,6 +39,7 @@ class WriterDigiToRoot
       int nant, evID, trID;
       double snratio;
       double samplingtime; // from quantity<ns>
+      double starttime; // from quantity<ns>
       double avomega; // quantity<Hz>
       double beatf; // quantity<Hz>
       double chirprate; // quantity<Hz/s>
@@ -48,6 +49,7 @@ class WriterDigiToRoot
       double posz; // quantity<m>
       double kEnergy; // quantity<eV>
       double pangle; // quantity<deg>
+      std::vector<int> trackHistory;
       // experiment
       double gain;
       double tfrequency; // quantity<Hz>
