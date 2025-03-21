@@ -1,12 +1,12 @@
 // QTNM signal generator chirp generator
+#ifndef QT_CHIRPGEN_H
+#define QT_CHIRPGEN_H
 
 // std
 
 // us
 #include "VSignal.hh"
 
-#ifndef QT_CHIRPGEN_H
-#define QT_CHIRPGEN_H
 
 class ChirpGenerator : VSignal
 {

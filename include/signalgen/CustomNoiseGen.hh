@@ -1,12 +1,12 @@
 // QTNM noise generator custom noise generator
+#ifndef QT_CNOISEGEN_H
+#define QT_CNOISEGEN_H
 
 // std
 
 // us
 #include "VSignal.hh"
 
-#ifndef QT_CNOISEGEN_H
-#define QT_CNOISEGEN_H
 
 class CustomNoiseGenerator : VSignal
 {

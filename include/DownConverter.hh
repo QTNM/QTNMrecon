@@ -1,12 +1,12 @@
 // Down-converting Mixer for QTNM tools
+#ifndef QT_DCONV_H
+#define QT_DCONV_H
 
 // us
 #include "types.hh"
 #include "filter.hh"
 #include "SineGenerator.hh"
 
-#ifndef QT_DCONV_H
-#define QT_DCONV_H
 
 class DownConverter
 {

@@ -1,12 +1,11 @@
 // Lock-in Amplifier (LIA) for QTNM tools
 // operating in quadrature only, no phase output
+#ifndef QT_LIA_H
+#define QT_LIA_H
 
 // us
 #include "types.hh"
 #include "filter.hh"
-
-#ifndef QT_LIA_H
-#define QT_LIA_H
 
 class LIA
 {
