@@ -4,6 +4,7 @@
 
 // std includes
 #include <string>
+#include <vector>
 
 // ROOT
 #include "TTreeReader.h"
@@ -25,14 +26,18 @@ public:
   
   DataPack Loop(); // process file row by row, construct merged data pack
   // if required, otherwise pass incoming data pack through. Writer receives pack.
+
+  DataPack readRow(); // read row in file, construct data pack
+  vec_t add(vec_t& sig, double mergetime, vec_t& other); // operation no units in file IO
+  inline void clearLocal() {localWfm.clear();}
   
 private:
-  DataPack read(); // read row in file, construct data pack
-  vec_t add(vec_t& sig, double mergetime, vec_t& other); // operation no units in file IO
-
-  DataPack intermediate; // hold one pack
+  // local copies for potential merger
   int nant; // configure at construction
   int prevID;
+  int prevTrackID;
+  double localStart;
+  vec_t<vec_t> localWfm;
   
   // ROOT file access for member functions
   TTreeReader& reader;
