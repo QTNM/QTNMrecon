@@ -89,6 +89,34 @@ trackMerger::trackMerger(TTreeReader& re, TTree* tr, int na) :
 
 void trackMerger::Loop()
 {
+  // init prevID=-1
+  int evtag;
+  int mergedID = 0; // fixed trackID for merged track
+  
+  for (int i=0;i<reader.GetEntries();++i) {
+    DataPack dp = readRow(); // data row in
+    evtag = dp.getTruthRef().vertex.eventID; // decision number
+
+    if (prevID != evtag) { // new event ID read from file
+      // local storage, ready for next iteration
+      prevID = evtag;
+      clearLocal(); // prepare for new waveform 
+      prevTrackID = dp.getTruthRef().vertex.trackID;
+      localStart = dp.getTruthRef().start_time.numerical_value_in(s);
+      for (int i=0;i<nant;++i) {
+	vec_t wfm(wfmarray.at(i).begin(), wfmarray.at(i).end());
+	localWfm.push_back(wfm); // local copy for potential merging
+      }
+      
+      writeRow(dp); // write out as is, nothing else to do
+    }
+    else { // same event ID as previous read
+      writeRow(dp); // write out as is, then merging using local data
+
+      trackHistory.push_back(prevTrackID); // still have that from previous read
+      
+    }
+  }
 }
 
 
@@ -102,12 +130,11 @@ DataPack trackMerger::readRow()
   // std::cout << "reader called" << std::endl;
   std::string brname;
   reader.Next();
-  // local storage
+
   for (int i=0;i<nant;++i) {
     brname = "sampled_" + std::to_string(i) + "_V";
     vec_t wfm(wfmarray.at(i).begin(), wfmarray.at(i).end());
     outdata[brname] = std::make_any<vec_t>(wfm);
-    localWfm.push_back(wfm); // local copy for potential merging
   }
   eventmap["internal"] = outdata; // with outdata an Event<std::any>
 
@@ -116,9 +143,7 @@ DataPack trackMerger::readRow()
   DataPack dp(eventmap);
   // fill truth struct with vertex info, restore units from branch names
   dp.getTruthRef().vertex.eventID = *eventID;
-  prevID = *eventID; // local copy
   dp.getTruthRef().vertex.trackID = *trackID;
-  prevTrackID = *trackID;
   dp.getTruthRef().vertex.posx = *posx * m;
   dp.getTruthRef().vertex.posy = *posy * m;
   dp.getTruthRef().vertex.posz = *posz * m;
@@ -147,7 +172,6 @@ DataPack trackMerger::readRow()
   dp.getTruthRef().average_omega = *avomega * Hz; // store input truth
   dp.getTruthRef().sampling_time = *samplingtime * s; // store input truth
   dp.getTruthRef().start_time = *starttime * s; // store input truth
-  localStart = *starttime; // local copy, unit [s] implicit
   dp.getTruthRef().bfield = *bfield * T; // store input truth
   return dp;
 }
@@ -218,7 +242,9 @@ void trackMerger::writeRow(DataPack dp)
   }
   // all output collected, write it
   mytree->Fill();
+
   // clear internal
+  trackHistory->clear();
   hitevIDOut->clear();
   hittrIDOut->clear();
   hitxOut->clear();
