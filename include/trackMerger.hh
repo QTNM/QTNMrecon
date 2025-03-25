@@ -7,6 +7,7 @@
 #include <vector>
 
 // ROOT
+#include "TTree.h"
 #include "TTreeReader.h"
 #include "TTreeReaderValue.h"
 #include "TTreeReaderArray.h"
@@ -21,17 +22,20 @@ class trackMerger
   // hence read in here. Writing with the writeWfmToRoot module can work.
   
 public:
-  trackMerger(TTreeReader& re, int na);
+  trackMerger(TTreeReader& re, TTree* output, int na);
   virtual ~trackMerger() = default;
   
-  DataPack Loop(); // process file row by row, construct merged data pack
+  void Loop(); // process file row by row, construct merged data pack
   // if required, otherwise pass incoming data pack through. Writer receives pack.
 
-  DataPack readRow(); // read row in file, construct data pack
-  vec_t add(vec_t& sig, double mergetime, vec_t& other); // operation no units in file IO
-  inline void clearLocal() {localWfm.clear();}
   
 private:
+  // member functions
+  DataPack readRow(); // read row in file, construct data pack
+  void writeRow(DataPack dp); // write row in file from Datapack
+  void add(vec_t& other); // operation no units in file IO
+  inline void clearLocal() {localWfm.clear();}
+
   // local copies for potential merger
   int nant; // configure at construction
   int prevID;
@@ -39,9 +43,8 @@ private:
   double localStart;
   vec_t<vec_t> localWfm;
   
-  // ROOT file access for member functions
+  // ROOT file read access for member functions
   TTreeReader& reader;
-  
   TTreeReaderValue<int> nantenna;
   TTreeReaderValue<int> eventID;
   TTreeReaderValue<int> trackID;
@@ -68,6 +71,34 @@ private:
   TTreeReaderValue<std::vector<double>> hitz;
   // waveform data
   std::vector<TTreeReaderArray<double>> wfmarray;
+
+  // ROOT file write access
+  TTree* mytree;
+  std::vector<vec_t*> purewave; // no unit storage in ROOT file
+  // doubles/int for values without unit
+  int evID, trID;
+  double samplingtimeOut; // from quantity<ns>
+  double starttimeOut; // from quantity<ns>
+  double avomegaOut; // quantity<Hz>
+  double beatfOut; // quantity<Hz>
+  double chirprateOut; // quantity<Hz/s>
+  double bfieldOut; // quantity<T>
+  // vertex
+  double posxOut; // quantity<m>
+  double posyOut; // quantity<m>
+  double poszOut; // quantity<m>
+  double kEnergyOut; // quantity<eV>
+  double pangleOut; // quantity<deg>
+  std::vector<int>* trackHistory;
+  // hit data
+  std::vector<int>* hitevIDOut;
+  std::vector<int>* hittrIDOut;
+  std::vector<double>* hitxOut;
+  std::vector<double>* hityOut;
+  std::vector<double>* hitzOut;
+  std::vector<double>* hitedepOut;
+  std::vector<double>* hittimeOut;
+  std::vector<double>* hitpostthetaOut;
 };
 
 #endif
