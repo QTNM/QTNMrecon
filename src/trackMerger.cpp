@@ -112,6 +112,7 @@ void trackMerger::Loop()
   for (int j=0;j<reader.GetEntries();++j) {
     DataPack dp = readRow(); // data row in
     evtag = dp.getTruthRef().vertex.eventID; // decision number
+    localSampling = dp.getTruthRef().sampling_time.numerical_value_in(ns); // required merge info
 
     if (prevID != evtag) { // new event ID read from file
       if (mergedDP.getTruthRef().vertex.eventID>0) { // there is a mergedDP waiting
@@ -137,7 +138,7 @@ void trackMerger::Loop()
       writeRow(dp); // write out as is, then merging using local data
 
       trackHistory->push_back(dp.getTruthRef().vertex.trackID;); // the new one to be merged
-      localStart = dp.getTruthRef().start_time.numerical_value_in(s); // required merge info
+      localStart = dp.getTruthRef().start_time.numerical_value_in(ns); // required merge info
       for (int i=0;i<nant;++i) {
 	vec_t wfm(wfmarray.at(i).begin(), wfmarray.at(i).end()); // new wfm
 	add(wfm, i); // add new wfm to previous using localStart and localWfm
@@ -280,7 +281,6 @@ void trackMerger::writeRow(DataPack dp)
   mytree->Fill();
 
   // clear internal
-  trackHistory->clear();
   hitevIDOut->clear();
   hittrIDOut->clear();
   hitxOut->clear();
@@ -294,4 +294,14 @@ void trackMerger::writeRow(DataPack dp)
 
 void trackMerger::add(vec_t& other, int whichAntenna)
 {
+  // resize localWfm to fit the merger.
+  int idx_start = (int)(localStart / localSampling); // find entry index for adding
+  int final_idx = localWfm.at(whichAntenna).size() - 1;
+  int end_other = other.size() - 1;
+  int final_other = idx_start + end_other;
+  int diff = final_other - final_idx;
+  if (diff > 0) localWfm.at(whichAntenna).resize(final_idx+diff+1);
+  // action
+  // std::transform(other.begin(), other.end(), localWfm.at(whichAntenna).begin()+idx_start
+  //                localWfm.at(whichAntenna).begin()+idx_start, std::plus<double>()); // in-place addition
 }

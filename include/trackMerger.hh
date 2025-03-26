@@ -41,6 +41,7 @@ private:
   int prevID;
   int prevTrackID;
   double localStart;
+  double localSampling;
   vec_t<vec_t> localWfm;
   
   // ROOT file read access for member functions
