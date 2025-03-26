@@ -214,7 +214,7 @@ DataPack trackMerger::readRow()
 }
 
 
-void trackMerger::writeRow(DataPack dp)
+void trackMerger::writeRow(DataPack& dp)
 {
   // extract from datapack and assign to output branch variables with the correct address
   mytree->SetBranchAddress("truth_nantenna",&nant);

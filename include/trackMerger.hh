@@ -32,7 +32,7 @@ public:
 private:
   // member functions
   DataPack readRow(); // read row in file, construct data pack
-  void writeRow(DataPack dp); // write row in file from Datapack
+  void writeRow(DataPack& dp); // write row in file from Datapack
   void add(vec_t& other, int whichAntenna); // operation no units in file IO
 
   // local copies for potential merger
