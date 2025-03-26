@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <functional>
 #include <iostream>
-#include <stdexcept>
+#include <cmath>
 
 // us
 #include "trackMerger.hh"
@@ -142,9 +142,8 @@ void trackMerger::Loop()
       for (int i=0;i<nant;++i) {
 	vec_t wfm(wfmarray.at(i).begin(), wfmarray.at(i).end()); // new wfm
 	add(wfm, i); // add new wfm to previous using localStart and localWfm
-      }
-      // assign values to DataPack to be written out separately.
-      for (int i=0;i<nant;++i) {
+
+	// assign values to DataPack to be written out separately.
 	brname = "sampled_" + std::to_string(i) + "_V";
 	outdata[brname] = std::make_any<vec_t>(localWfm.at(i)); // merged is in localWfm
       }
@@ -154,6 +153,7 @@ void trackMerger::Loop()
       mergedDP.getTruthRef().vertex.trackHistory = *trackHistory; // vector<int>
     }
   }
+  std::cout << "Loop finished." << std::endl;
 }
 
 
@@ -295,13 +295,13 @@ void trackMerger::writeRow(DataPack dp)
 void trackMerger::add(vec_t& other, int whichAntenna)
 {
   // resize localWfm to fit the merger.
-  int idx_start = (int)(localStart / localSampling); // find entry index for adding
+  int idx_start = (int)std::lround(localStart / localSampling); // find entry index for adding
   int final_idx = localWfm.at(whichAntenna).size() - 1;
   int end_other = other.size() - 1;
   int final_other = idx_start + end_other;
   int diff = final_other - final_idx;
-  if (diff > 0) localWfm.at(whichAntenna).resize(final_idx+diff+1);
+  if (diff > 0) localWfm.at(whichAntenna).resize(final_idx+diff+2);
   // action
-  // std::transform(other.begin(), other.end(), localWfm.at(whichAntenna).begin()+idx_start
-  //                localWfm.at(whichAntenna).begin()+idx_start, std::plus<double>()); // in-place addition
+  std::transform(other.begin(), other.end(), localWfm.at(whichAntenna).begin()+idx_start
+		 localWfm.at(whichAntenna).begin()+idx_start, std::plus<double>()); // in-place addition
 }
