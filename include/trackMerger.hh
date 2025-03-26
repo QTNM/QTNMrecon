@@ -34,7 +34,6 @@ private:
   DataPack readRow(); // read row in file, construct data pack
   void writeRow(DataPack dp); // write row in file from Datapack
   void add(vec_t& other, int whichAntenna); // operation no units in file IO
-  inline void clearLocal() {localWfm.clear();}
 
   // local copies for potential merger
   int nant; // configure at construction
@@ -42,7 +41,7 @@ private:
   int prevTrackID;
   double localStart;
   double localSampling;
-  vec_t<vec_t> localWfm;
+  std::vector<vec_t> localWfm;
   
   // ROOT file read access for member functions
   TTreeReader& reader;

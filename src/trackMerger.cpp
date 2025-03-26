@@ -14,7 +14,7 @@ trackMerger::trackMerger(TTreeReader& re, TTree* tr, int na) :
   nant(na),
   prevID(-1),
   reader(re),
-  mytree(tr)
+  mytree(tr),
   nantenna(reader, "truth_nantenna"),
   eventID(reader, "vertex_evID"), // needs reader by reference
   trackID(reader, "vertex_trackID"),
@@ -124,7 +124,7 @@ void trackMerger::Loop()
       // local storage, ready for next iteration
       prevID = evtag;
       trackHistory->clear();
-      clearLocal(); // prepare for new waveform 
+      localWfm.clear(); // prepare for new waveform 
       prevTrackID = dp.getTruthRef().vertex.trackID;
       trackHistory->push_back(prevTrackID); // minimum single entry
       for (int i=0;i<nant;++i) {
@@ -137,7 +137,7 @@ void trackMerger::Loop()
     else { // same event ID as previous read
       writeRow(dp); // write out as is, then merging using local data
 
-      trackHistory->push_back(dp.getTruthRef().vertex.trackID;); // the new one to be merged
+      trackHistory->push_back(dp.getTruthRef().vertex.trackID); // the new one to be merged
       localStart = dp.getTruthRef().start_time.numerical_value_in(ns); // required merge info
       for (int i=0;i<nant;++i) {
 	vec_t wfm(wfmarray.at(i).begin(), wfmarray.at(i).end()); // new wfm
@@ -217,7 +217,7 @@ DataPack trackMerger::readRow()
 void trackMerger::writeRow(DataPack dp)
 {
   // extract from datapack and assign to output branch variables with the correct address
-  mytree->SetBranchAddress("truth_nantenna",&nantenna);
+  mytree->SetBranchAddress("truth_nantenna",&nant);
   samplingtimeOut = dp.getTruthRef().sampling_time.numerical_value_in(s); // from quantity<ns> no unit for output
   mytree->SetBranchAddress("truth_samplingtime_s",&samplingtimeOut);
   starttimeOut = dp.getTruthRef().start_time.numerical_value_in(s); // from quantity<ns> no unit for output
@@ -245,11 +245,12 @@ void trackMerger::writeRow(DataPack dp)
   mytree->SetBranchAddress("vertex_kinenergy_eV",&kEnergyOut);
   pangleOut  = dp.getTruthRef().vertex.pitchangle.numerical_value_in(deg); // quantity<deg>
   mytree->SetBranchAddress("vertex_pitchangle_deg",&pangleOut);
-  trackHistory  = dp.getTruthRef().vertex.trackHistory; // vector<int>
+  trackHistory  = &dp.getTruthRef().vertex.trackHistory; // vector<int>
   mytree->SetBranchAddress("vertex_trackHistory",&trackHistory);
 
+  std::string brname;
   Event<std::any> indata = dp.getRef()["internal"];
-  for (int i=0;i<nantenna;++i) {
+  for (int i=0;i<nant;++i) {
     // store
     brname = "sampled_" + std::to_string(i) + "_V"; // unit in name
     vec_t dummy = std::any_cast<vec_t>(indata[brname]); // construct first
@@ -302,6 +303,6 @@ void trackMerger::add(vec_t& other, int whichAntenna)
   int diff = final_other - final_idx;
   if (diff > 0) localWfm.at(whichAntenna).resize(final_idx+diff+2);
   // action
-  std::transform(other.begin(), other.end(), localWfm.at(whichAntenna).begin()+idx_start
+  std::transform(other.begin(), other.end(), localWfm.at(whichAntenna).begin()+idx_start,
 		 localWfm.at(whichAntenna).begin()+idx_start, std::plus<double>()); // in-place addition
 }
