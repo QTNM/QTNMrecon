@@ -93,16 +93,16 @@ void trackMerger::Loop()
   int evtag;
   int mergedID = 0; // fixed trackID for merged track
   
-  for (int i=0;i<reader.GetEntries();++i) {
+  for (int j=0;j<reader.GetEntries();++j) {
     DataPack dp = readRow(); // data row in
     evtag = dp.getTruthRef().vertex.eventID; // decision number
 
     if (prevID != evtag) { // new event ID read from file
       // local storage, ready for next iteration
       prevID = evtag;
+      trackHistory.clear();
       clearLocal(); // prepare for new waveform 
       prevTrackID = dp.getTruthRef().vertex.trackID;
-      localStart = dp.getTruthRef().start_time.numerical_value_in(s);
       for (int i=0;i<nant;++i) {
 	vec_t wfm(wfmarray.at(i).begin(), wfmarray.at(i).end());
 	localWfm.push_back(wfm); // local copy for potential merging
@@ -114,7 +114,25 @@ void trackMerger::Loop()
       writeRow(dp); // write out as is, then merging using local data
 
       trackHistory.push_back(prevTrackID); // still have that from previous read
-      
+      trackHistory.push_back(dp.getTruthRef().vertex.trackID;); // the new one to be merged
+      localStart = dp.getTruthRef().start_time.numerical_value_in(s); // required merge info
+      for (int i=0;i<nant;++i) {
+	vec_t wfm(wfmarray.at(i).begin(), wfmarray.at(i).end()); // new wfm
+	add(wfm, i); // add new wfm to previous using localStart and localWfm
+      }
+      // make a new DataPack to be written out separately.
+      for (int i=0;i<nant;++i) {
+	brname = "sampled_" + std::to_string(i) + "_V";
+	outdata[brname] = std::make_any<vec_t>(localWfm.at(i)); // merged is in localWfm
+      }
+      eventmap["internal"] = outdata; // with outdata an Event<std::any>
+
+      // make data product, minimal info required fo a merged Wfm
+      DataPack mergedDP(eventmap);
+      mergedDP.getTruthRef().vertex.eventID = evtag;
+      mergedDP.getTruthRef().vertex.trackID = mergedID; // fix at 0 to signal merged wfm
+      mergedDP.getTruthRef().vertex.trackHistory = trackHistory; // vector<int>
+      // when to write to file.
     }
   }
 }
@@ -256,6 +274,6 @@ void trackMerger::writeRow(DataPack dp)
 }
 
 
-void trackMerger::add(vec_t& other)
+void trackMerger::add(vec_t& other, int whichAntenna)
 {
 }
