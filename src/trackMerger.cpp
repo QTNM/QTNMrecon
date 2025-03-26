@@ -92,17 +92,40 @@ void trackMerger::Loop()
   // init prevID=-1
   int evtag;
   int mergedID = 0; // fixed trackID for merged track
+
+  // set up DataPack structure for new merged track
+  std::string brname;
+  Event_map<std::any> eventmap; // data item for delivery
+  Event<std::any> outdata; // to hold all the data items from file
+  // make a new, empty DataPack to be filled.
+  for (int i=0;i<nant;++i) {
+    brname = "sampled_" + std::to_string(i) + "_V";
+    vec_t empty;
+    localWfm.push_back(empty); // construct empty structure
+    outdata[brname] = std::make_any<vec_t>(localWfm.back());
+  }
+  eventmap["internal"] = outdata; // with outdata an Event<std::any>
+  DataPack mergedDP(eventmap); // empty but structure in place
+  mergedDP.getTruthRef().vertex.eventID = prevID; // decision flag
+  mergedDP.getTruthRef().vertex.trackID = mergedID; // fix at 0 to signal merged wfm
   
   for (int j=0;j<reader.GetEntries();++j) {
     DataPack dp = readRow(); // data row in
     evtag = dp.getTruthRef().vertex.eventID; // decision number
 
     if (prevID != evtag) { // new event ID read from file
+      if (mergedDP.getTruthRef().vertex.eventID>0) { // there is a mergedDP waiting
+	writeRow(mergedDP);
+	// Reset
+	mergedDP.getTruthRef().vertex.eventID = -1; // decision flag
+      }
+      
       // local storage, ready for next iteration
       prevID = evtag;
-      trackHistory.clear();
+      trackHistory->clear();
       clearLocal(); // prepare for new waveform 
       prevTrackID = dp.getTruthRef().vertex.trackID;
+      trackHistory->push_back(prevTrackID); // minimum single entry
       for (int i=0;i<nant;++i) {
 	vec_t wfm(wfmarray.at(i).begin(), wfmarray.at(i).end());
 	localWfm.push_back(wfm); // local copy for potential merging
@@ -113,26 +136,21 @@ void trackMerger::Loop()
     else { // same event ID as previous read
       writeRow(dp); // write out as is, then merging using local data
 
-      trackHistory.push_back(prevTrackID); // still have that from previous read
-      trackHistory.push_back(dp.getTruthRef().vertex.trackID;); // the new one to be merged
+      trackHistory->push_back(dp.getTruthRef().vertex.trackID;); // the new one to be merged
       localStart = dp.getTruthRef().start_time.numerical_value_in(s); // required merge info
       for (int i=0;i<nant;++i) {
 	vec_t wfm(wfmarray.at(i).begin(), wfmarray.at(i).end()); // new wfm
 	add(wfm, i); // add new wfm to previous using localStart and localWfm
       }
-      // make a new DataPack to be written out separately.
+      // assign values to DataPack to be written out separately.
       for (int i=0;i<nant;++i) {
 	brname = "sampled_" + std::to_string(i) + "_V";
 	outdata[brname] = std::make_any<vec_t>(localWfm.at(i)); // merged is in localWfm
       }
-      eventmap["internal"] = outdata; // with outdata an Event<std::any>
-
-      // make data product, minimal info required fo a merged Wfm
-      DataPack mergedDP(eventmap);
+      // update data product, minimal info required for a merged Wfm
+      mergedDP.getRef()["internal"] = outdata; // with outdata an Event<std::any>
       mergedDP.getTruthRef().vertex.eventID = evtag;
-      mergedDP.getTruthRef().vertex.trackID = mergedID; // fix at 0 to signal merged wfm
-      mergedDP.getTruthRef().vertex.trackHistory = trackHistory; // vector<int>
-      // when to write to file.
+      mergedDP.getTruthRef().vertex.trackHistory = *trackHistory; // vector<int>
     }
   }
 }
@@ -140,7 +158,7 @@ void trackMerger::Loop()
 
 DataPack trackMerger::readRow()
 {
-  // protection against and of file must come from outside.
+  // protection against end of file must come from outside.
   Event_map<std::any> eventmap; // data item for delivery
   Event<std::any> outdata; // to hold all the data items from file
   
