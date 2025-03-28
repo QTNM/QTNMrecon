@@ -43,6 +43,7 @@ DataPack TestG4AntGenerator::operator()()
   vec_t basesig = sig.generate_pattern(); // waveform 1
 
   // second signal
+  sig.setAmplitude(amplitude/2.0); // smaller signal
   sig.setFrequency(frequency + 1.0*GHz); // shift by 1GHz, low energy generic f shift
   sig.setDuration(duration/2.0); // half length
   vec_t track2 = sig.generate_pattern(); // waveform 2
@@ -65,7 +66,7 @@ DataPack TestG4AntGenerator::operator()()
       for (int i=0;i<nantenna;++i) { // interleaving like in G4 output
 	aID.push_back(i);
 	vvec.push_back(basesig.at(j));
-	tvec.push_back(j * samplinginterval); // [ns]
+	tvec.push_back(j * sampleinterval); // [ns]
       }
     }
     outdata["AntennaID"] = std::make_any<std::vector<int>>(aID);
@@ -91,7 +92,7 @@ DataPack TestG4AntGenerator::operator()()
       for (int i=0;i<nantenna;++i) {
 	aID.push_back(i);
 	vvec.push_back(track2.at(j));
-	tvec.push_back(timeshift*samplinginterval + j * samplinginterval); // [ns]
+	tvec.push_back(timeshift*sampleinterval + j * sampleinterval); // [ns]
       } // offset tvec by timeshift
     }
     outdata["AntennaID"] = std::make_any<std::vector<int>>(aID);
