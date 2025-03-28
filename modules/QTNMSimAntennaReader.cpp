@@ -77,6 +77,10 @@ DataPack QTNMSimAntennaReader::operator()()
     dp.getTruthRef().vertex.pitchangle = *pangle * rad;
     std::cout << "reader Next() done, evt:  " << evcounter << std::endl;
 
+    if (!tvec->empty()) // book truth from trajectory
+      dp.getTruthRef().start_time = tvec->front() * ns;
+    else
+      dp.getTruthRef().start_time = -1.0 * ns;
     dp.getTruthRef().bfield = Bfield; // store input truth
     return dp;
 }

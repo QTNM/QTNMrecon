@@ -11,8 +11,9 @@
 TestG4AntGenerator::TestG4AntGenerator(std::string out) : 
   outkey(std::move(out)),
   counter(0),
-  maxEventNumber(4), // make 4 different signals for test
+  maxEventNumber(7), // make 7 different signals, to eID=4 for test
   nantenna(1),
+  eID(0),
   frequency(0.0*Hz),
   amplitude(-1.0*V), // signal incomplete config
   sampling_rate(0.0*Hz),
@@ -29,59 +30,83 @@ DataPack TestG4AntGenerator::operator()()
   }
   if (counter >= maxEventNumber)
     throw yap::GeneratorExit{};
-  counter++;
+  counter++; // first counter=1
 
   // configure generator
   // first signal
-  sig.setAmplitude(amplitude);
-  sig.setFrequency(frequency);
-  sig.setSampling_rate(sampling_rate);
-  sig.setDuration(duration);
-  sig.setPhase_rad(phase);
+  double sampleinterval = 1.0 / sampling_rate.numerical_value_in(GHz); // [ns]
+  sig.setAmplitude(amplitude); // irrelevant for test
+  sig.setFrequency(frequency); // assumes tens of GHz
+  sig.setSampling_rate(sampling_rate); // at big sampling rate GHz
+  sig.setDuration(duration); // for short duration [ns]
+  sig.setPhase_rad(phase); // not used in test
   vec_t basesig = sig.generate_pattern(); // waveform 1
 
   // second signal
-  sig.setFrequency(frequency + 1.0*GHz); // shift by 1GHz
-  sig.setDuration(duration/2.0); // half long
+  sig.setFrequency(frequency + 1.0*GHz); // shift by 1GHz, low energy generic f shift
+  sig.setDuration(duration/2.0); // half length
   vec_t track2 = sig.generate_pattern(); // waveform 2
   
   // make signal number 'counter', 4 test cases
-  int eID, tID;
-  switch(counter) {
-  case 1:
-    std::vector<int> aID;
-    vec_t vvec, tvec;
-    for (int j;j<basesig.size();j++) {
-      for (int i=0;i<nantenna;++i) {
-	aID.push_back(i);
-	vvec.push_back(basesig.at(j));
-	tvec.push_back(j/sampling_rate); // unit, check
-      }
-    }
-    eID = 1;
-    tID = 1; // just single waveform
-  case 2:
+  int tID;
+  int nsamples = duration.numerical_value_in(ns) / sampleinterval;
+  timeshift = (int)(nsamples / 4.0); // initial shift, quarter in
+  std::vector<int> aID;
+  vec_t vvec, tvec;
 
-  case 3:
-
-  case 4:
-    
-  }
-  
   // prepare fake Geant4 output data
   Event_map<std::any> eventmap; // data item for delivery
   Event<std::any> outdata; // to hold all the data items
-  
-  outdata["AntennaID"] = std::make_any<vec_t>(); // interleaved as in G4
-  outdata["VoltageVec"] = std::make_any<vec_t>();
-  outdata["TimeVec"] = std::make_any<vec_t>();
 
-  std::cout << "sine gen: counter " << counter << ", in key " << outkey << std::endl;
-  eventmap[outkey] = outdata;
-  DataPack dp(eventmap);
-  dp.getTruthRef().vertex.eventID = eID; // required for outputs
-  dp.getTruthRef().vertex.trackID = tID; // required for outputs
-  dp.getTruthRef().nantenna = nantenna; // required for outputs
+  if (counter%2) { // odd rows, eID=1,2,3,4
+    eID++; // initial = 1, final eID=4 for single track tID=1 only
+    tID = 1;
+    for (int j=0;j<basesig.size();j++) {
+      for (int i=0;i<nantenna;++i) { // interleaving like in G4 output
+	aID.push_back(i);
+	vvec.push_back(basesig.at(j));
+	tvec.push_back(j * samplinginterval); // [ns]
+      }
+    }
+    outdata["AntennaID"] = std::make_any<std::vector<int>>(aID);
+    outdata["VoltageVec"] = std::make_any<vec_t>(vvec);
+    outdata["TimeVec"] = std::make_any<vec_t>(tvec);
+    
+    eventmap[outkey] = outdata;
+    DataPack dp(eventmap);
+    dp.getTruthRef().vertex.eventID = eID; // required for outputs
+    dp.getTruthRef().vertex.trackID = tID; // required for outputs
+    dp.getTruthRef().nantenna = nantenna; // required for outputs
+    aID.clear();
+    vvec.clear();
+    tvec.clear();
 
-  return dp;
+    return dp;
+  }
+
+  else {  // even rows
+    tID = 2; // second track, track2 half-length, shift
+    timeshift = (counter-1)*timeshift; // duration/4->3d/4->5d/4
+    for (int j=0;j<track2.size();j++) {
+      for (int i=0;i<nantenna;++i) {
+	aID.push_back(i);
+	vvec.push_back(track2.at(j));
+	tvec.push_back(timeshift*samplinginterval + j * samplinginterval); // [ns]
+      } // offset tvec by timeshift
+    }
+    outdata["AntennaID"] = std::make_any<std::vector<int>>(aID);
+    outdata["VoltageVec"] = std::make_any<vec_t>(vvec);
+    outdata["TimeVec"] = std::make_any<vec_t>(tvec);
+
+    eventmap[outkey] = outdata;
+    DataPack dp(eventmap);
+    dp.getTruthRef().vertex.eventID = eID; // required for outputs
+    dp.getTruthRef().vertex.trackID = tID; // required for outputs
+    dp.getTruthRef().nantenna = nantenna; // required for outputs
+    aID.clear();
+    vvec.clear();
+    tvec.clear();
+
+    return dp;
+  }
 }

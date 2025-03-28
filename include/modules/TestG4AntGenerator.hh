@@ -31,7 +31,9 @@ public:
   
 private:
   // include any configuration data members for internal use here.
+  int eID;
   int nantenna;
+  int timeshift;
   quantity<V>   amplitude;
   quantity<Hz>  frequency;
   quantity<Hz>  sampling_rate;
