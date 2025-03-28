@@ -11,7 +11,7 @@
 
 OmegaBeatToTruth::OmegaBeatToTruth(std::string in, std::string out) : 
   inkey(std::move(in)),
-  outkey(std::move(out))
+  outkey(std::move(out)) // not used beyond testing
 {}
 
 DataPack OmegaBeatToTruth::operator()(DataPack dp)
@@ -41,15 +41,14 @@ DataPack OmegaBeatToTruth::operator()(DataPack dp)
         auto idx = std::distance(res.begin(), loc); // index of max
 	std::cout << "loc from distance; " << idx << std::endl;
         std::cout << "frequency peak at " << freq.at(idx) << std::endl; // use index on freq vector
-        dp.getTruthRef().beat_frequency = freq.at(idx);
-	// store output
-	outdata["omfft"] = std::any_cast<waveform_t>(res);   // q<V>, again cheated unit for use of dft()
-	outdata["omfreq"] = std::any_cast<std::vector<quantity<Hz>>>(freq); // q<Hz>
+        dp.getTruthRef().beat_frequency = freq.at(idx); // truth output
+	// outdata["omfft"] = std::any_cast<waveform_t>(res);   // q<V>, again cheated unit for use of dft()
+	// outdata["omfreq"] = std::any_cast<std::vector<quantity<Hz>>>(freq); // q<Hz>
     }
     catch(const std::bad_any_cast& e)
     {
       std::cerr << "OmegaBeatToTruth: " << e.what() << '\n';
     }
-    dp.getRef()[outkey] = outdata;
+    //    dp.getRef()[outkey] = outdata; // not used beyond testing
     return dp;
 }
