@@ -31,11 +31,11 @@ class FakeG4AntToRoot
   std::string inkey;
   TTree* mytree;
 
-  std::vector<int> antennaID; // interleaved like G4 output
-  vec_t timevec; // may change in QTNMSim to non-interleaved vector
-  vec_t voltagevec;
-  vec_t KEdummy; // empty for consistency with reader 
-  vec_t OMdummy; // empty
+  std::vector<int>* antennaID; // interleaved like G4 output
+  vec_t* timevec; // may change in QTNMSim to non-interleaved vector
+  vec_t* voltagevec;
+  vec_t* KEdummy; // empty for consistency with reader 
+  vec_t* OMdummy; // empty
   // doubles/int for values without unit
   int evID, trID;
   // no fake vertex
