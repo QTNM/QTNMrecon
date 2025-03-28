@@ -25,7 +25,6 @@ FakeG4AntToRoot::FakeG4AntToRoot(std::string inkey, TTree* tr) :
   mytree->Branch("VoltageVec", &voltagevec); // point to vec_t dummy address
   mytree->Branch("OmVec", &KEdummy); // point to vec_t dummy address
   mytree->Branch("KEVec", &OMdummy); // point to vec_t dummy address
-  }
 
 }
 

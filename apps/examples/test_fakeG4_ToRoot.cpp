@@ -49,10 +49,10 @@ int main(int argc, char** argv)
   source.setPhase_rad(ph);
 
   // data sink: write to Root, take from key
-  TFile* outfile = new TFile(outfname.data(), "RECREATE");
+  TFile* outfile = new TFile(fname.data(), "RECREATE");
   TTree* tr = new TTree("test","test data");
   tr->SetDirectory(outfile);
-  auto sink = ("wave", tr);
+  auto sink = FakeG4AntToRoot("wave", tr);
   
   auto pl = yap::Pipeline{} | source | sink;
   

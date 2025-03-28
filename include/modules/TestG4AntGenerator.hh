@@ -22,7 +22,7 @@ public:
   // Generators deliver an event map and receive nothing as signature.
   
   // getter/setter methods for configuration could live here.
-  inline void setNAntennna(int na) {nantenna = na;}
+  inline void setNAntenna(int na) {nantenna = na;}
   inline void setAmplitude(quantity<V>  a) {amplitude = a;}
   inline void setFrequency(quantity<Hz> ff) {frequency = ff;}
   inline void setSampling_rate(quantity<Hz> sr) {sampling_rate = sr;}
