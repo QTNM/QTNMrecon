@@ -50,12 +50,15 @@ void FakeG4AntToRoot::operator()(DataPack dp)
 
   // have generator to fill these 3 vectors
   Event<std::any> indata = dp.getRef()[inkey];
-  antennaID   = std::any_cast<std::vector<int>*>(indata["AntennaID"]); // construct first
+  std::vector<int> daID = std::any_cast<std::vector<int>>(indata["AntennaID"]); // vec<int>
+  antennaID   = &daID; // vec<int>* copy
   std::cout << " casting test: size=" << antennaID->size() << std::endl;
   mytree->SetBranchAddress("AntennaID",&antennaID);
-  timevec     = std::any_cast<vec_t*>(indata["TimeVec"]); // construct first
+  vec_t dtvec = std::any_cast<vec_t>(indata["TimeVec"]); // vec_t
+  timevec     = &dtvec; // vec_t* copy
   mytree->SetBranchAddress("TimeVec",&timevec);
-  voltagevec  = std::any_cast<vec_t*>(indata["VoltageVec"]); // construct first
+  vec_t dvvec = std::any_cast<vec_t>(indata["VoltageVec"]); // vec_t
+  voltagevec  = &dvvec; // vec_t* copy
   mytree->SetBranchAddress("VoltageVec",&voltagevec);
   mytree->SetBranchAddress("OmVec",&OMdummy); // empty
   mytree->SetBranchAddress("KEVec",&KEdummy);
