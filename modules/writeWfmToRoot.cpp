@@ -95,7 +95,7 @@ void WriterWfmToRoot::operator()(DataPack dp)
     vec_t dummy = std::any_cast<vec_t>(indata[brname]); // construct first
     purewave.at(i) = &dummy; // vec_t*, copy
     mytree->SetBranchAddress(brname.data(), &purewave.at(i));
-    std::cout << "Wfm writer, wfm size, antenna: " << dummy.size() << ", " << i << std::endl;
+    std::cout << "Wfm writer, wfm size, antenna: " << purewave.at(i)->size() << ", " << i << std::endl;
   }
   if (! dp.hitsRef().empty()) { // there are hits to store
     // extract hit data

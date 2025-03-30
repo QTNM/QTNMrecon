@@ -68,6 +68,8 @@ int main(int argc, char** argv)
   auto pl = yap::Pipeline{} | source | interpolator | sink;
   
   pl.consume();
+
+  std::cout << "app finished. " << std::endl;
   tr->Write();
   outfile->Close(); // free TTree
   ff.Close();
