@@ -21,6 +21,10 @@ DataPack AddChirpToTruth::operator()(DataPack dp)
     Event<std::any> indata = dp.getRef()[inkey]; // access L1 dictionary
     // yields a L2 unordered map called Event<std::any> with the 
     // help of the inkey label.
+    if (! indata.count("KEVec")) { 
+        std::cout << "KE vector not in dictionary!" << std::endl;
+        return dp; // not found, return unchanged map, no processing
+    }
 
     // use omega data vector for fitting
     lft = new TLinearFitter(1,"pol1",""); // line fit, intend to use robust version

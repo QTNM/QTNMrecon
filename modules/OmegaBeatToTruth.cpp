@@ -22,6 +22,10 @@ DataPack OmegaBeatToTruth::operator()(DataPack dp)
         return dp; // not found, return unchanged map, no processing
     }
     Event<std::any> indata = dp.getRef()[inkey]; // access L1 dictionary
+    if (! indata.count("omega")) { 
+        std::cout << "Omega vector not in dictionary!" << std::endl;
+        return dp; // not found, return unchanged map, no processing
+    }
     Event<std::any> outdata;
     // yields a L2 unordered map called Event<std::any> with the 
     // help of the inkey label.

@@ -16,7 +16,8 @@ WaveformSampling::WaveformSampling(std::string source, std::string in, std::stri
     originkey(std::move(source)),
     inkey(std::move(in)),
     outkey(std::move(out)),
-    sampletime(1.0 * ns)
+    sampletime(1.0 * ns),
+    localnantenna(1)
 {}
 
 
@@ -28,7 +29,11 @@ DataPack WaveformSampling::operator()(DataPack dp)
   std::cout << "interpolator called" << std::endl;
 
   // set before: antenna read by add chirp/ kinematic by anntenna response
-  int nantenna = dp.getTruthRef().nantenna;
+  int nantenna;
+  if (dp.getTruthRef().nantenna>0) // set before, normally
+    nantenna = dp.getTruthRef().nantenna;
+  else
+    nantenna = localnantenna; // test case set separately
 
   Event<std::any> origindata = dp.getRef()[originkey];
   Event<std::any> outdata; // to hold all the data items
@@ -54,12 +59,13 @@ DataPack WaveformSampling::operator()(DataPack dp)
 	  
 	  vec_t resampled = interpolate(tt, tv);
 	  tv.clear();
-	  std::cout << "interpolator signal done, antenna " << i << std::endl;
 	  std::string tkey = "sampled_" + std::to_string(i) + "_V";
 	  outdata[tkey] = std::make_any<vec_t>(resampled);
 	}
-	vec_t omresampled = interpolate(tt, omvec);
-	outdata["omega"] = std::make_any<vec_t>(omresampled); // for the beat freq
+	if (!omvec.empty()) {
+	  vec_t omresampled = interpolate(tt, omvec);
+	  outdata["omega"] = std::make_any<vec_t>(omresampled); // for the beat freq
+	}
 	dp.getTruthRef().average_omega = average_omega(omvec);
       }
     catch(const std::bad_any_cast& e)
@@ -92,17 +98,17 @@ DataPack WaveformSampling::operator()(DataPack dp)
 	  std::string ikey = "VoltageVec_" + std::to_string(i) + "_[V]";
 	  auto tv = std::any_cast<vec_t>(indata[ikey]);
 	  // sample by interpolation
-	  std::cout << "before interpolation, got v vec size: " << tv.size() 
-              << " time vec size " << tiv.size()<< std::endl;
 	  vec_t resampled = interpolate(tiv, tv);
 	  // store result
 	  std::string okey = "sampled_" + std::to_string(i) + "_V";
 	  outdata[okey] = std::make_any<vec_t>(resampled); // for later transformation and deletion
 	  dp.getRef()[inkey].erase(ikey); // used; not needed anymore
 	}
+	if (!omvec.empty()) {
+	  vec_t omresampled = interpolate(tiv, omvec);
+	  outdata["omega"] = std::make_any<vec_t>(omresampled); // for the beat freq
+	}
 	dp.getTruthRef().average_omega = average_omega(omvec);
-	vec_t omresampled = interpolate(tiv, omvec);
-	outdata["omega"] = std::make_any<vec_t>(omresampled); // for the beat freq
       }
     catch(const std::bad_any_cast& e)
       {
@@ -124,10 +130,13 @@ DataPack WaveformSampling::operator()(DataPack dp)
 
 quantity<Hz> WaveformSampling::average_omega(const vec_t& omvec)
 {
-  double omsum = 0.0;
-  for (auto entry : omvec) omsum += entry;
-  quantity<Hz> res = omsum/omvec.size() * Hz;
-  return res;
+  if (!omvec.empty()) {
+    double omsum = 0.0;
+    for (auto entry : omvec) omsum += entry;
+    quantity<Hz> res = omsum/omvec.size() * Hz;
+    return res;
+  }
+  else return 0.0*Hz;
 }
 
 

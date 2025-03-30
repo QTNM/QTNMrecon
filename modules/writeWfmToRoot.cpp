@@ -49,11 +49,15 @@ WriterWfmToRoot::WriterWfmToRoot(std::string inkey, TTree* tr, int na) :
   mytree->Branch("hit_edep_eV", &hitedep); // point to vec<double>* dummy address
   mytree->Branch("hit_posttheta_deg", &hitposttheta); // point to vec<double>* dummy address
 
+  std::cout << "Wfm writer constructed" << std::endl;
+
 }
 
 
 void WriterWfmToRoot::operator()(DataPack dp)
 {
+  std::cout << "Wfm writer called." << std::endl;
+
   // extract from datapack and assign to output branch variables with the correct address
   mytree->SetBranchAddress("truth_nantenna",&nantenna);
   samplingtime = dp.getTruthRef().sampling_time.numerical_value_in(s); // from quantity<ns> no unit for output
@@ -94,6 +98,7 @@ void WriterWfmToRoot::operator()(DataPack dp)
     vec_t dummy = std::any_cast<vec_t>(indata[brname]); // construct first
     purewave.at(i) = &dummy; // vec_t*, copy
     mytree->SetBranchAddress(brname.data(), &purewave.at(i));
+    std::cout << "Wfm writer, wfm size, antenna: " << dummy.size() << ", " << i << std::endl;
   }
   if (! dp.hitsRef().empty()) { // there are hits to store
     // extract hit data
