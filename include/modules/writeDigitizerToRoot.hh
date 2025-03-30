@@ -49,7 +49,7 @@ class WriterDigiToRoot
       double posz; // quantity<m>
       double kEnergy; // quantity<eV>
       double pangle; // quantity<deg>
-      std::vector<int> trackHistory;
+      std::vector<int>* trackHistory;
       // experiment
       double gain;
       double tfrequency; // quantity<Hz>
