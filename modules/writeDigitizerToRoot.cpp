@@ -9,7 +9,8 @@
 
 WriterDigiToRoot::WriterDigiToRoot(TTree* tr, int na) : 
   mytree(tr),
-  nantenna(na)
+  nantenna(na),
+  trackHistory(nullptr)
 {
   // N antennae, one for each waveform; need to know at construction for writing
   // construct scopedata entries
@@ -81,7 +82,7 @@ void WriterDigiToRoot::operator()(DataPack dp)
   mytree->SetBranchAddress("vertex_kinenergy_eV",&kEnergy);
   pangle  = dp.getTruthRef().vertex.pitchangle.numerical_value_in(deg); // quantity<deg>
   mytree->SetBranchAddress("vertex_pitchangle_deg",&pangle);
-  trackHistory  = &dp.getTruthRef().vertex.trackHistory; // vector<int>
+  trackHistory  = &dp.getTruthRef().vertex.trackHistory; // vector<int>*
   if (!trackHistory->empty()) // not a nullptr
     mytree->SetBranchAddress("vertex_trackHistory",&trackHistory);
   // experiment

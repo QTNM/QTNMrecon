@@ -75,6 +75,7 @@ int main(int argc, char** argv)
   TFile* outfile = new TFile(outfname.data(), "RECREATE");
   TTree* tr = new TTree("sampled","sampled data");
   tr->SetDirectory(outfile);
+
   auto sink = WriterWfmToRoot(samp, tr, nant);
   
   auto pl = yap::Pipeline{} | source | addchirp | interpolator | addbeat | sink;

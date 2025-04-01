@@ -10,7 +10,15 @@
 WriterWfmToRoot::WriterWfmToRoot(std::string inkey, TTree* tr, int na) : 
   inkey(std::move(inkey)),
   mytree(tr),
-  nantenna(na)
+  nantenna(na),
+  hitevID(nullptr),
+  hittrID(nullptr),
+  hitx(nullptr),
+  hity(nullptr),
+  hitz(nullptr),
+  hitedep(nullptr),
+  hittime(nullptr),
+  hitposttheta(nullptr)
 {
   // N antennae, one for each waveform; need to know at construction for writing
   // construct scopedata entries
@@ -56,7 +64,7 @@ WriterWfmToRoot::WriterWfmToRoot(std::string inkey, TTree* tr, int na) :
 void WriterWfmToRoot::operator()(DataPack dp)
 {
   std::cout << "Wfm writer called." << std::endl;
-
+  
   // extract from datapack and assign to output branch variables with the correct address
   mytree->SetBranchAddress("truth_nantenna",&nantenna);
   samplingtime = dp.getTruthRef().sampling_time.numerical_value_in(s); // from quantity<ns> no unit for output
@@ -95,7 +103,7 @@ void WriterWfmToRoot::operator()(DataPack dp)
     vec_t dummy = std::any_cast<vec_t>(indata[brname]); // construct first
     purewave.at(i) = &dummy; // vec_t*, copy
     mytree->SetBranchAddress(brname.data(), &purewave.at(i));
-    std::cout << "Wfm writer, wfm size, antenna: " << purewave.at(i)->size() << ", " << i << std::endl;
+    //    std::cout << "Wfm writer, wfm size, antenna: " << purewave.at(i)->size() << ", " << i << std::endl;
   }
   if (! dp.hitsRef().empty()) { // there are hits to store
     // extract hit data
@@ -121,12 +129,14 @@ void WriterWfmToRoot::operator()(DataPack dp)
   // all output collected, write it
   mytree->Fill();
   // clear internal
-  hitevID->clear();
-  hittrID->clear();
-  hitx->clear();
-  hity->clear();
-  hitz->clear();
-  hittime->clear();
-  hitedep->clear();
-  hitposttheta->clear();
+  if (!hitevID->empty()) {
+    hitevID->clear();
+    hittrID->clear();
+    hitx->clear();
+    hity->clear();
+    hitz->clear();
+    hittime->clear();
+    hitedep->clear();
+    hitposttheta->clear();
+  }
 }

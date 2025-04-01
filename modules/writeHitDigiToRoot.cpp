@@ -10,7 +10,16 @@
 
 WriterHitDigiToRoot::WriterHitDigiToRoot(TTree* tr, int na) : 
   mytree(tr),
-  nantenna(na)
+  nantenna(na),
+  trackHistory(nullptr),
+  hitevID(nullptr),
+  hittrID(nullptr),
+  hitx(nullptr),
+  hity(nullptr),
+  hitz(nullptr),
+  hitedep(nullptr),
+  hittime(nullptr),
+  hitposttheta(nullptr)
 {
   // N antennae, one for each waveform; need to know at construction for writing
   // construct scopedata entries
@@ -95,7 +104,7 @@ void WriterHitDigiToRoot::operator()(DataPack dp)
   mytree->SetBranchAddress("vertex_kinenergy_eV",&kEnergy);
   pangle  = dp.getTruthRef().vertex.pitchangle.numerical_value_in(deg); // quantity<deg>
   mytree->SetBranchAddress("vertex_pitchangle_deg",&pangle);
-  trackHistory  = &dp.getTruthRef().vertex.trackHistory; // vector<int>
+  trackHistory  = &dp.getTruthRef().vertex.trackHistory; // vector<int>*
   if (!trackHistory->empty()) // not a nullptr
     mytree->SetBranchAddress("vertex_trackHistory",&trackHistory);
   // experiment
@@ -144,12 +153,14 @@ void WriterHitDigiToRoot::operator()(DataPack dp)
   // all output collected, write it
   mytree->Fill();
   // clear internal
-  hitevID->clear();
-  hittrID->clear();
-  hitx->clear();
-  hity->clear();
-  hitz->clear();
-  hittime->clear();
-  hitedep->clear();
-  hitposttheta->clear();
+  if (!hitevID->empty()) {
+    hitevID->clear();
+    hittrID->clear();
+    hitx->clear();
+    hity->clear();
+    hitz->clear();
+    hittime->clear();
+    hitedep->clear();
+    hitposttheta->clear();
+  }
 }

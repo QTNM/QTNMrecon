@@ -15,6 +15,15 @@ trackMerger::trackMerger(TTreeReader& re, TTree* tr, int na) :
   prevID(-1),
   reader(re),
   mytree(tr),
+  trackHistory(nullptr),
+  hitevIDOut(nullptr),
+  hittrIDOut(nullptr),
+  hitxOut(nullptr),
+  hityOut(nullptr),
+  hitzOut(nullptr),
+  hitedepOut(nullptr),
+  hittimeOut(nullptr),
+  hitpostthetaOut(nullptr),
   nantenna(reader, "truth_nantenna"),
   eventID(reader, "vertex_evID"), // needs reader by reference
   trackID(reader, "vertex_trackID"),
@@ -68,7 +77,7 @@ trackMerger::trackMerger(TTreeReader& re, TTree* tr, int na) :
   mytree->Branch("vertex_posz_m",&poszOut,"vertex_posz/D");
   mytree->Branch("vertex_kinenergy_eV",&kEnergyOut,"vertex_kinenergy/D");
   mytree->Branch("vertex_pitchangle_deg",&pangleOut,"vertex_pitchangle/D");
-  mytree->Branch("vertex_trackHistory",&trackHistory); // mader in Merger
+  mytree->Branch("vertex_trackHistory",&trackHistory); // made in Merger
   for (int i=0;i<nant;++i) {
     brname = "sampled_" + std::to_string(i) + "_V"; // unit in name
     mytree->Branch(brname.data(), &purewave.at(i)); // point to vec_t dummy address
@@ -113,20 +122,25 @@ void trackMerger::Loop()
     DataPack dp = readRow(); // data row in
     evtag = dp.getTruthRef().vertex.eventID; // decision number
     localSampling = dp.getTruthRef().sampling_time.numerical_value_in(ns); // required merge info
+    std::cout << "in merger, entry read: " << evtag << ", local stime=" << localSampling << std::endl;
 
     if (prevID != evtag) { // new event ID read from file
       if (mergedDP.getTruthRef().vertex.eventID>0) { // there is a mergedDP waiting
+	std::cout << "in merger, prev!=ev, mergedDP.evID>0 case." << std::endl;      
 	writeRow(mergedDP);
 	// Reset
 	mergedDP.getTruthRef().vertex.eventID = -1; // decision flag
       }
-      
+      std::cout << "in merger, prev!=ev case." << std::endl;      
       // local storage, ready for next iteration
       prevID = evtag;
-      trackHistory->clear();
+      if (!trackHistory->empty())
+	trackHistory->clear();
       localWfm.clear(); // prepare for new waveform 
       prevTrackID = dp.getTruthRef().vertex.trackID;
       trackHistory->push_back(prevTrackID); // minimum single entry
+      dp.getTruthRef().vertex.trackHistory = *trackHistory; // vector<int>, newly set
+
       for (int i=0;i<nant;++i) {
 	vec_t wfm(wfmarray.at(i).begin(), wfmarray.at(i).end());
 	localWfm.push_back(wfm); // local copy for potential merging
@@ -135,10 +149,12 @@ void trackMerger::Loop()
       writeRow(dp); // write out as is, nothing else to do
     }
     else { // same event ID as previous read
+      std::cout << "in merger, else prev==ev case." << std::endl;      
       writeRow(dp); // write out as is, then merging using local data
 
       trackHistory->push_back(dp.getTruthRef().vertex.trackID); // the new one to be merged
       localStart = dp.getTruthRef().start_time.numerical_value_in(ns); // required merge info
+      std::cout << "in merger local start time [ns] = " << localStart << std::endl;
       for (int i=0;i<nant;++i) {
 	vec_t wfm(wfmarray.at(i).begin(), wfmarray.at(i).end()); // new wfm
 	add(wfm, i); // add new wfm to previous using localStart and localWfm
@@ -168,6 +184,11 @@ DataPack trackMerger::readRow()
   std::string brname;
   reader.Next();
 
+  // test read
+  std::cout << "read Wfm 0: " << std::endl;
+  for (auto entry : wfmarray.at(0)) std::cout << entry << ", ";
+  std::cout << std::endl;
+  
   for (int i=0;i<nant;++i) {
     brname = "sampled_" + std::to_string(i) + "_V";
     vec_t wfm(wfmarray.at(i).begin(), wfmarray.at(i).end());
@@ -216,6 +237,7 @@ DataPack trackMerger::readRow()
 
 void trackMerger::writeRow(DataPack& dp)
 {
+  //  std::cout << "in merger, write row called." << std::endl;
   // extract from datapack and assign to output branch variables with the correct address
   mytree->SetBranchAddress("truth_nantenna",&nant);
   samplingtimeOut = dp.getTruthRef().sampling_time.numerical_value_in(s); // from quantity<ns> no unit for output
@@ -245,7 +267,7 @@ void trackMerger::writeRow(DataPack& dp)
   mytree->SetBranchAddress("vertex_kinenergy_eV",&kEnergyOut);
   pangleOut  = dp.getTruthRef().vertex.pitchangle.numerical_value_in(deg); // quantity<deg>
   mytree->SetBranchAddress("vertex_pitchangle_deg",&pangleOut);
-  trackHistory  = &dp.getTruthRef().vertex.trackHistory; // vector<int>
+  trackHistory  = &dp.getTruthRef().vertex.trackHistory; // vector<int>*
   mytree->SetBranchAddress("vertex_trackHistory",&trackHistory);
 
   std::string brname;
@@ -282,14 +304,16 @@ void trackMerger::writeRow(DataPack& dp)
   mytree->Fill();
 
   // clear internal
-  hitevIDOut->clear();
-  hittrIDOut->clear();
-  hitxOut->clear();
-  hityOut->clear();
-  hitzOut->clear();
-  hittimeOut->clear();
-  hitedepOut->clear();
-  hitpostthetaOut->clear();
+  if (!hitevIDOut->empty()) {
+    hitevIDOut->clear();
+    hittrIDOut->clear();
+    hitxOut->clear();
+    hityOut->clear();
+    hitzOut->clear();
+    hittimeOut->clear();
+    hitedepOut->clear();
+    hitpostthetaOut->clear();
+  }
 }
 
 

@@ -6,9 +6,9 @@
 // std includes
 #include <string>
 #include <vector>
-#include <array>
 
 // ROOT
+#include "TFile.h"
 #include "TTree.h"
 
 // must have include for pipeline
@@ -23,6 +23,7 @@ class WriterWfmToRoot
         // Configures the module. Could have more config parameters
         // Minimum required are the key labels for input and output 
         // of Event Map data item.
+  //  virtual ~WriterWfmToRoot();
 
         void operator()(DataPack dp); // this is called by the pipeline
         // Writers/Sinks only receive a DataPack and return void as signature.
@@ -35,6 +36,7 @@ class WriterWfmToRoot
       int nantenna; // needed for construction of output file
       TTree* mytree;
       std::vector<vec_t*> purewave; // no unit storage in ROOT file
+  
       // doubles/int for values without unit
       int evID, trID;
       double samplingtime; // from quantity<ns>

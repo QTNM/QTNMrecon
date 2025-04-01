@@ -26,6 +26,7 @@
 #include "Event.hh"
 #include "CLI11.hpp"
 
+
 int main(int argc, char** argv)
 {
       // command line interface
@@ -63,6 +64,7 @@ int main(int argc, char** argv)
   TFile* outfile = new TFile(outfname.data(), "RECREATE");
   TTree* tr = new TTree("sampled","sampled data");
   tr->SetDirectory(outfile);
+
   auto sink = WriterWfmToRoot(samp, tr, nant);
   
   auto pl = yap::Pipeline{} | source | interpolator | sink;
