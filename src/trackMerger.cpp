@@ -142,7 +142,7 @@ void trackMerger::Loop()
       dp.getTruthRef().vertex.trackHistory = *trackHistory; // vector<int>, newly set
 
       for (int i=0;i<nant;++i) {
-	vec_t wfm(wfmarray.at(i).begin(), wfmarray.at(i).end());
+	vec_t wfm(wfmarray.at(i)->begin(), wfmarray.at(i)->end());
 	localWfm.push_back(wfm); // local copy for potential merging
       }
       
@@ -156,7 +156,7 @@ void trackMerger::Loop()
       localStart = dp.getTruthRef().start_time.numerical_value_in(ns); // required merge info
       std::cout << "in merger local start time [ns] = " << localStart << std::endl;
       for (int i=0;i<nant;++i) {
-	vec_t wfm(wfmarray.at(i).begin(), wfmarray.at(i).end()); // new wfm
+	vec_t wfm(wfmarray.at(i)->begin(), wfmarray.at(i)->end()); // new wfm
 	add(wfm, i); // add new wfm to previous using localStart and localWfm
 
 	// assign values to DataPack to be written out separately.
@@ -186,12 +186,12 @@ DataPack trackMerger::readRow()
 
   // test read
   std::cout << "read Wfm 0: " << std::endl;
-  for (auto entry : wfmarray.at(0)) std::cout << entry << ", ";
+  for (auto entry : *wfmarray.at(0)) std::cout << entry << ", ";
   std::cout << std::endl;
   
   for (int i=0;i<nant;++i) {
     brname = "sampled_" + std::to_string(i) + "_V";
-    vec_t wfm(wfmarray.at(i).begin(), wfmarray.at(i).end());
+    vec_t wfm(wfmarray.at(i)->begin(), wfmarray.at(i)->end());
     outdata[brname] = std::make_any<vec_t>(wfm);
   }
   eventmap["internal"] = outdata; // with outdata an Event<std::any>

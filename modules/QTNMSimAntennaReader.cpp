@@ -76,7 +76,13 @@ DataPack QTNMSimAntennaReader::operator()()
     dp.getTruthRef().vertex.kineticenergy = *kine * keV;
     dp.getTruthRef().vertex.pitchangle = *pangle * rad;
     std::cout << "reader Next() done, evt:  " << evcounter << std::endl;
-    std::cout << "content check, antenna id size:  " << aID->size() << std::endl;
+    //    std::cout << "content check, antenna id size:  " << aID->size() << std::endl;
+    // if(dp.getTruthRef().vertex.eventID==1) {
+    //   std::cout << "event 1 check:" << std::endl;
+    //   for (int j=0;j<vvec->size();++j)
+    // 	std::cout << vvec->at(j) << ", ";
+    //   std::cout << std::endl;
+    // }
 
     if (!tvec->empty()) // book truth from trajectory
       dp.getTruthRef().start_time = tvec->front() * ns;

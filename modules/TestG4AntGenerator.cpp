@@ -47,6 +47,10 @@ DataPack TestG4AntGenerator::operator()()
   sig.setFrequency(frequency + 1.0*GHz); // shift by 1GHz, low energy generic f shift
   sig.setDuration(duration/2.0); // half length
   vec_t track2 = sig.generate_pattern(); // waveform 2
+
+  // std::cout << "check waveform 2: " << std::endl;
+  // for (auto val: track2) std::cout << val << ", ";
+  // std::cout << std::endl;
   
   // make signal number 'counter', 4 test cases
   int tID;

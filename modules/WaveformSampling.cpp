@@ -52,13 +52,23 @@ DataPack WaveformSampling::operator()(DataPack dp)
 	ROOT::VecOps::RVec<double> tempv(vvv); // temporary
 	
 	auto selecttvec = tempt[tempant==0]; // like NumPy selection
-	vec_t tt(selecttvec.begin(),selecttvec.end()); // sample_time same for any antenna
+	vec_t tt(selecttvec.begin(),selecttvec.end()); // sample_time same
 	for (int i=0;i<nantenna;++i) {
 	  auto selectvvec = tempv[tempant==i];
 	  vec_t tv(selectvvec.begin(),selectvvec.end());
 	  
 	  vec_t resampled = interpolate(tt, tv);
+	  // if (dp.getTruthRef().vertex.eventID==1) {
+	  //   std::cout << "interpolator check tvals " << std::endl;
+	  //   for (auto val : tt) std::cout << val << ", ";
+	  //   std::cout << std::endl;
+	  //   for (auto val : tv) std::cout << val << ", ";
+	  //   std::cout << std::endl;
+	  //   for (auto val : resampled) std::cout << val << ", ";
+	  //   std::cout << std::endl;
+	  // }
 	  tv.clear();
+
 	  std::string tkey = "sampled_" + std::to_string(i) + "_V";
 	  outdata[tkey] = std::make_any<vec_t>(resampled);
 	}
@@ -144,10 +154,11 @@ vec_t WaveformSampling::interpolate(const vec_t& tvals, const vec_t& vvals)
 {
     vec_t resampled;
     double interval = tvals.back() - tvals.front(); // in [ns]
+    double offset = tvals.front();
     int maxpoints = (int)floor(interval / sampletime.numerical_value_in(ns));
 
     spline ip(tvals, vvals); // interpolator
     for (int i=1;i<=maxpoints;++i)
-        resampled.push_back(ip(i * sampletime.numerical_value_in(ns)));
+        resampled.push_back(ip(offset + i * sampletime.numerical_value_in(ns)));
     return resampled;
 }

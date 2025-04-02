@@ -10,7 +10,7 @@
 #include "TTree.h"
 #include "TTreeReader.h"
 #include "TTreeReaderValue.h"
-#include "TTreeReaderArray.h"
+//#include "TTreeReaderArray.h"
 
 // us
 #include "Event.hh"
@@ -70,7 +70,7 @@ private:
   TTreeReaderValue<std::vector<double>> hity;
   TTreeReaderValue<std::vector<double>> hitz;
   // waveform data
-  std::vector<TTreeReaderArray<double>> wfmarray;
+  std::vector<TTreeReaderValue<std::vector<double>>> wfmarray;
 
   // ROOT file write access
   TTree* mytree;

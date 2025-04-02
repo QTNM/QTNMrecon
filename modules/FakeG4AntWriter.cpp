@@ -9,7 +9,12 @@
 
 FakeG4AntToRoot::FakeG4AntToRoot(std::string inkey, TTree* tr) : 
   inkey(std::move(inkey)),
-  mytree(tr)
+  mytree(tr),
+  antennaID(nullptr),
+  timevec(nullptr),
+  voltagevec(nullptr),
+  KEdummy(nullptr),
+  OMdummy(nullptr)
 {
   // can now point branch at dummy addresses; makes header only
   mytree->Branch("EventID",&evID,"EventID/I");
