@@ -37,7 +37,7 @@ int main(int argc, char** argv)
   quantity<V> amp = 1.0 * V;
   quantity<Hz> srate = 155.0 * GHz;
   quantity<s>  dur = 1.0 * ns;
-  quantity<Hz> freq = 20.0 * GHz;
+  quantity<Hz> freq = 15.0 * GHz;
   quantity<rad> ph = 0.0 * deg;
 
   auto source = TestG4AntGenerator("wave");

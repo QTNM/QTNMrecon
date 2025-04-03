@@ -16,7 +16,7 @@
 class WfmReader
 {
 public:
-  WfmReader(TTreeReader& re, int na, std::string outbox); // constructor; required
+  WfmReader(TTreeReader& re, std::string outbox); // constructor; required
   // input file name and new Key outbox label.
 
   DataPack operator()(); // this is called by the pipeline
@@ -51,10 +51,9 @@ private:
   TTreeReaderValue<std::vector<double>> hity;
   TTreeReaderValue<std::vector<double>> hitz;
   // waveform data
-  std::vector<TTreeReaderArray<double>> wfmarray;
-
+  //  std::vector<TTreeReaderArray<double>> wfmarray;
+  TTreeReaderArray<std::vector<double>> wfmarray;
   // these below serve as string keys to access (read/write) the Event map
   std::string outkey;
-  int nant; // configure at construction
 };
 #endif

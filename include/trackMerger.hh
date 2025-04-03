@@ -10,7 +10,7 @@
 #include "TTree.h"
 #include "TTreeReader.h"
 #include "TTreeReaderValue.h"
-//#include "TTreeReaderArray.h"
+#include "TTreeReaderArray.h"
 
 // us
 #include "Event.hh"
@@ -19,7 +19,7 @@ class trackMerger
 {
   // trackMerger class
   // can't use WfmReader module: too specific for pipeline use
-  // hence read in here. Writing with the writeWfmToRoot module can work.
+  // hence read in here.
   
 public:
   trackMerger(TTreeReader& re, TTree* output, int na);
@@ -36,7 +36,6 @@ private:
   void add(vec_t& other, int whichAntenna); // operation no units in file IO
 
   // local copies for potential merger
-  int nant; // configure at construction
   int prevID;
   int prevTrackID;
   double localStart;
@@ -70,13 +69,14 @@ private:
   TTreeReaderValue<std::vector<double>> hity;
   TTreeReaderValue<std::vector<double>> hitz;
   // waveform data
-  std::vector<TTreeReaderValue<std::vector<double>>> wfmarray;
+  TTreeReaderArray<std::vector<double>> wfmarray;
 
   // ROOT file write access
   TTree* mytree;
-  std::vector<vec_t*> purewave; // no unit storage in ROOT file
+  std::vector<vec_t>* purewave; // no unit storage in ROOT file
   // doubles/int for values without unit
   int evID, trID;
+  int nant; // set by constructor
   double samplingtimeOut; // from quantity<ns>
   double starttimeOut; // from quantity<ns>
   double avomegaOut; // quantity<Hz>
