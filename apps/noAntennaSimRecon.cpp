@@ -76,7 +76,6 @@ int main(int argc, char** argv)
   auto addchirp = AddChirpToTruth(origin); // default antenna number
 
   // transformer (1)
-  int nant = 2;
   auto antresponse = AntennaResponse(origin, resp);
   // configure antennae
   std::vector<VReceiver*> allantenna;
@@ -123,7 +122,7 @@ int main(int argc, char** argv)
   TFile* outfile = new TFile(outfname.data(), "RECREATE");
   TTree* tr = new TTree("recon","reconstructed data");
   tr->SetDirectory(outfile);
-  auto sink = WriterHitDigiToRoot(tr, nant);
+  auto sink = WriterHitDigiToRoot(tr);
   
   auto pl = yap::Pipeline{} | source | addchirp |antresponse | interpolator | addbeat |
     noiseAdder | mixer | digitizer | sink;

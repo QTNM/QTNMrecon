@@ -22,7 +22,7 @@ class trackMerger
   // hence read in here.
   
 public:
-  trackMerger(TTreeReader& re, TTree* output, int na);
+  trackMerger(TTreeReader& re, TTree* output);
   virtual ~trackMerger() = default;
   
   void Loop(); // process file row by row, construct merged data pack
@@ -76,7 +76,7 @@ private:
   std::vector<vec_t>* purewave; // no unit storage in ROOT file
   // doubles/int for values without unit
   int evID, trID;
-  int nant; // set by constructor
+  int nant; // set by DataPack
   double samplingtimeOut; // from quantity<ns>
   double starttimeOut; // from quantity<ns>
   double avomegaOut; // quantity<Hz>

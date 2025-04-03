@@ -10,11 +10,11 @@
 // us
 #include "trackMerger.hh"
 
-trackMerger::trackMerger(TTreeReader& re, TTree* tr, int na) : 
+trackMerger::trackMerger(TTreeReader& re, TTree* tr) : 
   prevID(-1),
   reader(re),
   mytree(tr),
-  nant(na),
+  nant(1),
   trackHistory(nullptr),
   purewave(nullptr),
   hitevIDOut(nullptr),
@@ -49,21 +49,9 @@ trackMerger::trackMerger(TTreeReader& re, TTree* tr, int na) :
   bfield(reader, "truth_bfield_T"),
   wfmarray(reader, "sampled_V")
 {
-  // int nant for n antenna is needed at construction time
-  // std::string brname;
-  // for (int i=0;i<nant;++i) {
-  //   brname = "sampled_" + std::to_string(i) + "_V";
-  //   wfmarray.emplace_back(reader, brname.data());
-  // }
+
   std::cout << "in reader n entries: " << reader.GetEntries() << std::endl;
 
-  // prepare writer structure
-  // N antennae, one for each waveform; need to know at construction for writing
-  // construct scopedata entries
-  // for (int i=0;i<nant;++i) {
-  //   vec_t* p;
-  //   purewave.push_back(p); // vector in purewave initialized
-  // }
   // can now point branch at dummy addresses; makes header only
   mytree->Branch("truth_nantenna",&nant,"truth_nantenna/I");
   mytree->Branch("truth_samplingtime_s",&samplingtimeOut,"truth_samplingtime/D");
@@ -80,10 +68,7 @@ trackMerger::trackMerger(TTreeReader& re, TTree* tr, int na) :
   mytree->Branch("vertex_kinenergy_eV",&kEnergyOut,"vertex_kinenergy/D");
   mytree->Branch("vertex_pitchangle_deg",&pangleOut,"vertex_pitchangle/D");
   mytree->Branch("vertex_trackHistory",&trackHistory); // made in Merger
-  // for (int i=0;i<nant;++i) {
-  //   brname = "sampled_" + std::to_string(i) + "_V"; // unit in name
-  //   mytree->Branch(brname.data(), &purewave.at(i)); // point to vec_t dummy address
-  // }
+
   mytree->Branch("sampled_V", &purewave); // point to vec<vec>* dummy address
   // hit data
   mytree->Branch("hit_eventID", &hitevIDOut); // point to vec<int>* dummy address
@@ -109,36 +94,30 @@ void trackMerger::Loop()
   std::string brname;
   Event_map<std::any> eventmap; // data item for delivery
   Event<std::any> outdata; // to hold all the data items from file
+
   // make a new, empty DataPack to be filled.
-  for (int i=0;i<nant;++i) {
-    brname = "sampled_" + std::to_string(i) + "_V";
-    vec_t empty;
-    localWfm.push_back(empty); // construct empty structure
-    outdata[brname] = std::make_any<vec_t>(localWfm.back());
-  }
   eventmap["internal"] = outdata; // with outdata an Event<std::any>
   DataPack mergedDP(eventmap); // empty but structure in place
-  mergedDP.getTruthRef().vertex.eventID = prevID; // decision flag
+  mergedDP.getTruthRef().vertex.eventID = prevID; // decision flag = -1
   mergedDP.getTruthRef().vertex.trackID = mergedID; // fix at 0 to signal merged wfm
   
   for (int j=0;j<reader.GetEntries();++j) {
     DataPack dp = readRow(); // data row in
     evtag = dp.getTruthRef().vertex.eventID; // decision number
     localSampling = dp.getTruthRef().sampling_time.numerical_value_in(ns); // required merge info
-    std::cout << "in merger, entry read: " << evtag << ", local stime=" << localSampling << std::endl;
+    //    std::cout << "in merger, entry read: " << evtag << ", local stime=" << localSampling << std::endl;
 
     if (prevID != evtag) { // new event ID read from file
       if (mergedDP.getTruthRef().vertex.eventID>0) { // there is a mergedDP waiting
 	std::cout << "in merger, prev!=ev, mergedDP.evID>0 case." << std::endl;      
 	writeRow(mergedDP);
 	// Reset
-	mergedDP.getTruthRef().vertex.eventID = -1; // decision flag
+	mergedDP.getTruthRef().vertex.eventID = -1; // decision flag reset
       }
       std::cout << "in merger, prev!=ev case." << std::endl;      
       // local storage, ready for next iteration
       prevID = evtag;
-      if (!trackHistory->empty())
-	trackHistory->clear();
+      trackHistory->clear();
       localWfm.clear(); // prepare for new waveform 
       prevTrackID = dp.getTruthRef().vertex.trackID;
       trackHistory->push_back(prevTrackID); // minimum single entry
@@ -152,7 +131,8 @@ void trackMerger::Loop()
       writeRow(dp); // write out as is, nothing else to do
     }
     else { // same event ID as previous read
-      std::cout << "in merger, else prev==ev case." << std::endl;      
+      //      std::cout << "in merger, else prev==ev case." << std::endl;      
+      dp.getTruthRef().vertex.trackHistory = *trackHistory; // vector<int>, newly set
       writeRow(dp); // write out as is, then merging using local data
 
       trackHistory->push_back(dp.getTruthRef().vertex.trackID); // the new one to be merged
@@ -188,9 +168,9 @@ DataPack trackMerger::readRow()
   reader.Next();
 
   // test read
-  std::cout << "read Wfm 0: " << std::endl;
-  for (auto entry : wfmarray.At(0)) std::cout << entry << ", ";
-  std::cout << std::endl;
+  // std::cout << "read Wfm 0: " << std::endl;
+  // for (auto entry : wfmarray.At(0)) std::cout << entry << ", ";
+  // std::cout << std::endl;
   
   for (int i=0;i<wfmarray.GetSize();++i) {
     brname = "sampled_" + std::to_string(i) + "_V";
@@ -240,9 +220,8 @@ DataPack trackMerger::readRow()
 
 void trackMerger::writeRow(DataPack& dp)
 {
-  //  std::cout << "in merger, write row called." << std::endl;
   // extract from datapack and assign to output branch variables with the correct address
-  //  nant = dp.getTruthRef().nantenna;
+  nant = dp.getTruthRef().nantenna;
   mytree->SetBranchAddress("truth_nantenna",&nant);
   samplingtimeOut = dp.getTruthRef().sampling_time.numerical_value_in(s); // from quantity<ns> no unit for output
   mytree->SetBranchAddress("truth_samplingtime_s",&samplingtimeOut);
@@ -282,8 +261,6 @@ void trackMerger::writeRow(DataPack& dp)
     brname = "sampled_" + std::to_string(i) + "_V"; // unit in name
     vec_t dummy = std::any_cast<vec_t>(indata[brname]); // construct first
     purewave->push_back(dummy);;
-    //    purewave.at(i) = &dummy; // vec_t*, copy
-    //    mytree->SetBranchAddress(brname.data(), &purewave.at(i));
   }
   mytree->SetBranchAddress("sampled_V", &purewave);
 

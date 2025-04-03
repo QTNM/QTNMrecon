@@ -51,6 +51,7 @@ int main(int argc, char** argv)
   CLI11_PARSE(app, argc, argv);
 
   // keys to set
+  int nant = 2;
   std::string origin = "raw";
   std::string resp = "response";
   std::string samp = "sampled";
@@ -66,11 +67,10 @@ int main(int argc, char** argv)
   auto source = FullAntennaSimReader(re1, re2, origin);
   source.setMaxEventNumber(nevents); // default = all events in file
   source.setSimConstantBField(bfield); // MUST be set
+  source.setAntennaN(nant);
 
   // add truth
   auto addchirp = AddChirpToTruth(origin); // default antenna number
-  int nant = 2;
-  addchirp.setAntennaNumber(nant);
 
   // transformer
   auto interpolator = WaveformSampling(origin,resp,samp);

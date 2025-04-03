@@ -14,6 +14,7 @@ FullAntennaSimReader::FullAntennaSimReader(TTreeReader& re1, TTreeReader& re2, s
     outkey(std::move(out)),
     maxEventNumber(-1), // default -1 for a all events
     evcounter(0),
+    nantenna(1),
     Bfield(-1.0 * T),
     reader1(re1),
     reader2(re2),
@@ -115,6 +116,7 @@ DataPack FullAntennaSimReader::operator()()
       dp.getTruthRef().start_time = tvec->front() * ns;
     else
       dp.getTruthRef().start_time = -1.0 * ns;
+    dp.getTruthRef().nantenna = nantenna; // store input truth
     dp.getTruthRef().bfield = Bfield; // store input truth
     return dp;
 }

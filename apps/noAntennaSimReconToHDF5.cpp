@@ -79,7 +79,6 @@ int main(int argc, char** argv)
   auto addchirp = AddChirpToTruth(origin); // default antenna number
 
   // transformer (1)
-  int nant = 2;
   auto antresponse = AntennaResponse(origin, resp);
   // configure antennae
   std::vector<VReceiver*> allantenna;

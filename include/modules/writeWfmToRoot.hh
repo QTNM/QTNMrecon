@@ -17,7 +17,7 @@
 class WriterWfmToRoot
 {
     public:
-  WriterWfmToRoot(std::string in, TTree* tr, int na); // constructor; required
+  WriterWfmToRoot(std::string in, TTree* tr); // constructor; required
         // Need antenna number as input for setting up output file
         // That truth data is in DataPack but not available at construction.
         // Configures the module. Could have more config parameters

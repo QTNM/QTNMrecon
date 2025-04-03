@@ -53,19 +53,19 @@ int main(int argc, char** argv)
   auto source = QTNMSimAntennaReader(re, origin);
   source.setMaxEventNumber(nevents); // default = all events in file
   source.setSimConstantBField(bfield); // MUST be set
+  source.setAntennaN(nant);
 
   // transformer
   auto interpolator = WaveformSampling(origin,"",samp);
   quantity<ns> stime = 0.008 * ns;
   interpolator.setSampleTime(stime);
-  interpolator.setAntennaN(2); // test case must set this separately.
   
   // data sink: write to Root, take from key
   TFile* outfile = new TFile(outfname.data(), "RECREATE");
   TTree* tr = new TTree("sampled","sampled data");
   tr->SetDirectory(outfile);
 
-  auto sink = WriterWfmToRoot(samp, tr, nant);
+  auto sink = WriterWfmToRoot(samp, tr);
   
   auto pl = yap::Pipeline{} | source | interpolator | sink;
   

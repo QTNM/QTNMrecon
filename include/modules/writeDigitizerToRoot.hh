@@ -17,9 +17,7 @@
 class WriterDigiToRoot
 {
     public:
-        WriterDigiToRoot(TTree* tr, int na); // constructor; required
-        // Need antenna number as input for setting up output file
-        // That truth data is in DataPack but not available at construction.
+        WriterDigiToRoot(TTree* tr); // constructor; required
         // Configures the module. Could have more config parameters
         // Minimum required are the key labels for input and output 
         // of Event Map data item.
@@ -33,10 +31,10 @@ class WriterDigiToRoot
     // include any configuration data members for internal use here.
       int nantenna; // needed for construction of output file
       TTree* mytree;
-      std::vector<vec_t*> scopedata; // no unit storage in ROOT file
-      std::vector<vec_t*> purewave; // no unit storage in ROOT file
+      std::vector<vec_t>* scopedata; // no unit storage in ROOT file
+      std::vector<vec_t>* purewave; // no unit storage in ROOT file
       // doubles/int for values without unit
-      int nant, evID, trID;
+      int evID, trID;
       double snratio;
       double samplingtime; // from quantity<ns>
       double starttime; // from quantity<ns>

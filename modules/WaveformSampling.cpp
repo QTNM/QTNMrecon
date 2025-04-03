@@ -17,7 +17,7 @@ WaveformSampling::WaveformSampling(std::string source, std::string in, std::stri
     inkey(std::move(in)),
     outkey(std::move(out)),
     sampletime(1.0 * ns),
-    localnantenna(1)
+    nantenna(1)
 {}
 
 
@@ -29,11 +29,7 @@ DataPack WaveformSampling::operator()(DataPack dp)
   std::cout << "interpolator called" << std::endl;
 
   // set before: antenna read by add chirp/ kinematic by anntenna response
-  int nantenna;
-  if (dp.getTruthRef().nantenna>0) // set before, normally
-    nantenna = dp.getTruthRef().nantenna;
-  else
-    nantenna = localnantenna; // test case set separately
+  nantenna = dp.getTruthRef().nantenna;
 
   Event<std::any> origindata = dp.getRef()[originkey];
   Event<std::any> outdata; // to hold all the data items

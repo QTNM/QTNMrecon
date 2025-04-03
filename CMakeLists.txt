@@ -71,6 +71,7 @@ modules/writeDigitizerToRoot.cpp
 modules/writeHitDigiToRoot.cpp
 modules/writeHitDigiToHDF5.cpp
 modules/WfmReader.cpp
+modules/WfmMergedReader.cpp
 src/trackMerger.cpp
 modules/printSimReader.cpp)
 target_link_libraries(ReconModules QTNMTools HighFive ${ROOT_LIBRARIES})

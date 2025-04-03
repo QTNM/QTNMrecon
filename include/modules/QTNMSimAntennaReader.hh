@@ -21,12 +21,14 @@ class QTNMSimAntennaReader
 
         // default = -1 for all events
         inline void setMaxEventNumber(int nend) {maxEventNumber = nend;}
+        inline void setAntennaN(int na) {nantenna = na;} // for following modules
         inline void setSimConstantBField(quantity<T> b) {Bfield = b;}
 
     private:
     // include any configuration data members for internal use here.
     int maxEventNumber;
     int evcounter;
+    int nantenna;
     quantity<T> Bfield;
 
     // ROOT file access for member functions

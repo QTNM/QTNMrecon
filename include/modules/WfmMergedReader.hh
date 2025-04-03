@@ -1,6 +1,6 @@
 // Intermediate waveform Reader for a pipeline module
-#ifndef wfmreader_HH
-#define wfmreader_HH 1
+#ifndef wfmMreader_HH
+#define wfmMreader_HH 1
 
 // std includes
 #include <string>
@@ -13,10 +13,10 @@
 // must have include for pipeline
 #include <Event.hh>
 
-class WfmReader
+class WfmMergedReader
 {
 public:
-  WfmReader(TTreeReader& re, std::string outbox); // constructor; required
+  WfmMergedReader(TTreeReader& re, std::string outbox); // constructor; required
   // input file name and new Key outbox label.
 
   DataPack operator()(); // this is called by the pipeline
@@ -51,6 +51,7 @@ private:
   TTreeReaderValue<std::vector<double>> hity;
   TTreeReaderValue<std::vector<double>> hitz;
   // waveform data
+  TTreeReaderValue<std::vector<int>> trackHistory;
   TTreeReaderArray<std::vector<double>> wfmarray;
   // these below serve as string keys to access (read/write) the Event map
   std::string outkey;

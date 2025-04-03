@@ -24,14 +24,13 @@ class WaveformSampling
 
         // getter/setter methods for configuration could live here.
         inline void setSampleTime(quantity<ns> st) {sampletime = st;}
-        inline void setAntennaN(int na) {localnantenna = na;} // for test case only
 
     private:
     // include any configuration data members for internal use here.
         quantity<Hz> average_omega(const vec_t& omvec);
         vec_t interpolate(const vec_t& tvals, const vec_t& vvals);
         quantity<ns> sampletime;
-        int localnantenna;
+        int nantenna;
   
     // these below serve as string keys to access (read/write) the Event map
         std::string originkey;

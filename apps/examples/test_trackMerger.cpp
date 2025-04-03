@@ -28,9 +28,6 @@ int main(int argc, char** argv)
 
   CLI11_PARSE(app, argc, argv);
 
-  // needed at construction time
-  int nant = 2;
-  
   // data source: read from ROOT file, store under key 'raw'
   TFile ff(fname.data(),"READ");
   TTreeReader re("sampled", &ff);
@@ -41,7 +38,7 @@ int main(int argc, char** argv)
   tr->SetDirectory(outfile);
 
   // set up the track merger object
-  auto merge = trackMerger(re, tr, nant);
+  auto merge = trackMerger(re, tr);
 
   // run
   merge.Loop();

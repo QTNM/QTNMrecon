@@ -25,13 +25,11 @@ class AddChirpToTruth
         // Only Readers should expect no input argument and return an event map
         // and Writers only receive an event map and return void as signature.
 
-        // getter/setter methods for configuration could live here.
-        inline void setAntennaNumber(int n) {nantenna = n;} // default set to 1
 
     private:
     // include any configuration data members for internal use here.
     TLinearFitter* lft = nullptr;
-    int nantenna;
+    int nantenna; // from truth data
     quantity<Hz> e2f(quantity<keV> energy, quantity<T> bf); // convert keV to Hz for chirp
 
     // these below serve as string keys to access (read/write) the Event map
