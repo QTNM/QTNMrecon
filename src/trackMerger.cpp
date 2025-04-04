@@ -150,6 +150,7 @@ void trackMerger::Loop()
       mergedDP.getRef()["internal"] = outdata; // with outdata an Event<std::any>
       mergedDP.getTruthRef().vertex.eventID = evtag;
       mergedDP.getTruthRef().vertex.trackHistory = *trackHistory; // vector<int>
+      mergedDP.getTruthRef().nantenna = dp.getTruthRef().nantenna; // copy
     }
   }
   std::cout << "Loop finished." << std::endl;

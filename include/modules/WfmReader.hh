@@ -41,6 +41,7 @@ private:
   TTreeReaderValue<double> posz;
   TTreeReaderValue<double> kEnergy;
   TTreeReaderValue<double> pangle;
+  TTreeReaderValue<std::vector<int>> trackHistory;
   // hit data
   TTreeReaderValue<std::vector<int>> hitevID;
   TTreeReaderValue<std::vector<int>> hittrID;
