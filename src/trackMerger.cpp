@@ -137,7 +137,7 @@ void trackMerger::Loop()
 
       trackHistory->push_back(dp.getTruthRef().vertex.trackID); // the new one to be merged
       localStart = dp.getTruthRef().start_time.numerical_value_in(ns); // required merge info
-      std::cout << "in merger local start time [ns] = " << localStart << std::endl;
+      std::cout << "in merger prev==evid, local start time [ns] = " << localStart << std::endl;
       for (int i=0;i<wfmarray.GetSize();++i) {
 	vec_t wfm(wfmarray.At(i).begin(), wfmarray.At(i).end()); // new wfm
 	add(wfm, i); // add new wfm to previous using localStart and localWfm
@@ -261,6 +261,8 @@ void trackMerger::writeRow(DataPack& dp)
     // store
     brname = "sampled_" + std::to_string(i) + "_V"; // unit in name
     vec_t dummy = std::any_cast<vec_t>(indata[brname]); // construct first
+    // std::cout << "in writerow, evid, trid: " << evID << ", " << trID << std::endl;
+    // std::cout << "in writerow, write size: " << dummy.size() << std::endl;
     purewave->push_back(dummy);;
   }
   mytree->SetBranchAddress("sampled_V", &purewave);
@@ -311,7 +313,7 @@ void trackMerger::add(vec_t& other, int whichAntenna)
   int end_other = other.size() - 1;
   int final_other = idx_start + end_other;
   int diff = final_other - final_idx;
-  if (diff > 0) localWfm.at(whichAntenna).resize(final_idx+diff+2);
+  if (diff > 0) localWfm.at(whichAntenna).resize(final_idx+diff+1);
   // action
   std::transform(other.begin(), other.end(), localWfm.at(whichAntenna).begin()+idx_start,
 		 localWfm.at(whichAntenna).begin()+idx_start, std::plus<double>()); // in-place addition
