@@ -82,6 +82,7 @@ DataPack TestG4AntGenerator::operator()()
     dp.getTruthRef().vertex.eventID = eID; // required for outputs
     dp.getTruthRef().vertex.trackID = tID; // required for outputs
     dp.getTruthRef().nantenna = nantenna; // required for outputs
+    dp.getTruthRef().average_omega = 2.0*myPi*frequency; // artificially set for later
     aID.clear();
     vvec.clear();
     tvec.clear();
@@ -108,6 +109,7 @@ DataPack TestG4AntGenerator::operator()()
     dp.getTruthRef().vertex.eventID = eID; // required for outputs
     dp.getTruthRef().vertex.trackID = tID; // required for outputs
     dp.getTruthRef().nantenna = nantenna; // required for outputs
+    dp.getTruthRef().average_omega = 2.0*myPi*(frequency+1.0*GHz); // artificially set for later
     aID.clear();
     vvec.clear();
     tvec.clear();

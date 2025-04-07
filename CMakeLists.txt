@@ -89,6 +89,8 @@ target_link_libraries(antreconHDF5.exe PUBLIC ReconModules QTNMTools)
 add_executable(noantreconHDF5.exe apps/noAntennaSimReconToHDF5.cpp)
 target_link_libraries(noantreconHDF5.exe PUBLIC ReconModules QTNMTools)
 
+add_executable(testReconMerged.exe apps/examples/test_writeFakeG4.cpp)
+target_link_libraries(testReconMerged.exe PUBLIC ReconModules QTNMTools)
 add_executable(testTrackMerge.exe apps/examples/test_trackMerger.cpp)
 target_link_libraries(testTrackMerge.exe PUBLIC ReconModules QTNMTools)
 add_executable(testG4out.exe apps/examples/test_fakeG4_ToRoot.cpp)

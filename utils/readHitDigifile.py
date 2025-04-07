@@ -99,25 +99,20 @@ fname = "recon.root"
 file = ROOT.TFile(fname)
 tree = file.Get("recon")
 nantenna = 2 # needed since reading requires the vectors already be present
-pvec = ROOT.std.vector('double')()
-svec = ROOT.std.vector('double')()
-pvecs = []
-svecs = []
+pvec = ROOT.std.vector(ROOT.std.vector('double'))() # explicit construction
+svec = ROOT.std.vector(ROOT.std.vector('double'))()
 
-for i in range(nantenna):
-    pvecs.append(pvec)  # now exists, point to its address
-    brname1 = "pure_"+str(i)+"_V"
-    tree.SetBranchAddress(brname1, ROOT.AddressOf(pvecs[i]))
-    svecs.append(svec)  # now exists, point to its address
-    brname2 = "signal_"+str(i)+"_V"
-    tree.SetBranchAddress(brname2, ROOT.AddressOf(svecs[i]))
+brname1 = "pure_V"
+tree.SetBranchAddress(brname1, ROOT.AddressOf(pvec))
+brname2 = "signal_V"
+tree.SetBranchAddress(brname2, ROOT.AddressOf(svec))
 
 # Analysis loop for each entry/row in TTree on file
 for entry in tree:
     datadict = convert_to_data_dict(entry)  # fill all the simple data
     for i in range(nantenna):
         # a single digitizer signal as np.array
-        signalarray = np.asarray(svecs[i])
+        signalarray = np.asarray(svec[i])
 
         # ... do some analysis.
 

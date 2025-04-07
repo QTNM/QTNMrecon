@@ -72,7 +72,9 @@ DataPack WaveformSampling::operator()(DataPack dp)
 	  vec_t omresampled = interpolate(tt, omvec);
 	  outdata["omega"] = std::make_any<vec_t>(omresampled); // for the beat freq
 	}
-	dp.getTruthRef().average_omega = average_omega(omvec);
+	quantity<Hz> avo = average_omega(omvec);
+	if (avo>0.0*Hz) // test sets this earlier, otherwise there is an omvec
+	  dp.getTruthRef().average_omega = avo; // overwrite
       }
     catch(const std::bad_any_cast& e)
       {
@@ -114,7 +116,9 @@ DataPack WaveformSampling::operator()(DataPack dp)
 	  vec_t omresampled = interpolate(tiv, omvec);
 	  outdata["omega"] = std::make_any<vec_t>(omresampled); // for the beat freq
 	}
-	dp.getTruthRef().average_omega = average_omega(omvec);
+	quantity<Hz> avo = average_omega(omvec);
+	if (avo>0.0*Hz)
+	  dp.getTruthRef().average_omega = avo;
       }
     catch(const std::bad_any_cast& e)
       {
