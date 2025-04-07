@@ -33,8 +33,8 @@ WfmReader::WfmReader(TTreeReader& re, std::string out) :
   beatf(reader, "truth_beatf_Hz"),
   chirprate(reader, "truth_chirp_Hz_s"),
   bfield(reader, "truth_bfield_T"),
-  wfmarray(reader, "sampled_V"),
-  trackHistory(reader, "vertex_trackHistory")
+  trackHistory(reader, "vertex_trackHistory"),
+  wfmarray(reader, "sampled_V")
 {
   std::cout << "in reader n entries: " << reader.GetEntries() << std::endl;
 }
@@ -48,9 +48,9 @@ DataPack WfmReader::operator()()
     // std::cout << "reader called" << std::endl;
     std::string brname;
     if (reader.Next()) { // variables filled from file
-      for (int i=0;i<wfmarray.GetSize();++i) {
+      for (int i=0;i<wfmarray->size();++i) {
 	brname = "sampled_" + std::to_string(i) + "_V";
-	vec_t wfm(wfmarray.At(i).begin(), wfmarray.At(i).end()); // wfmarray is TTreeReaderArray
+	vec_t wfm(wfmarray->at(i).begin(), wfmarray->at(i).end());
         outdata[brname] = std::make_any<vec_t>(wfm);
       }
       eventmap[outkey] = outdata; // with outdata an Event<std::any>

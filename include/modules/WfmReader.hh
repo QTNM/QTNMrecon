@@ -8,7 +8,6 @@
 // ROOT
 #include "TTreeReader.h"
 #include "TTreeReaderValue.h"
-#include "TTreeReaderArray.h"
 
 // must have include for pipeline
 #include <Event.hh>
@@ -52,7 +51,7 @@ private:
   TTreeReaderValue<std::vector<double>> hity;
   TTreeReaderValue<std::vector<double>> hitz;
   // waveform data
-  TTreeReaderArray<std::vector<double>> wfmarray;
+  TTreeReaderValue<std::vector<std::vector<double>>> wfmarray;
   // these below serve as string keys to access (read/write) the Event map
   std::string outkey;
 };
