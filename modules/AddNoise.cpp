@@ -17,7 +17,6 @@ AddNoise::AddNoise(std::string in, std::string out, std::string l2out) :
     inkey(std::move(in)),
     outkey(std::move(out)),
     l2out(std::move(l2out)),
-    sample_length(500.0 * us),
     onset_percent(10.0),
     SNr(1.0)
 {}
@@ -36,8 +35,7 @@ DataPack AddNoise::operator()(DataPack dp)
     {
         int nantenna = dp.getTruthRef().nantenna; // use data pack
         quantity<ns> stime = dp.getTruthRef().sampling_time;
-        // trigger onset position
-        int onset = static_cast<int>(onset_percent/100.0 * (sample_length/stime).numerical_value_in(one));
+	quantity<ns> sample_length;
         
         for (int i=0;i<nantenna;++i) {
           std::string ikey = "sampled_" + std::to_string(i) + "_V";
@@ -61,8 +59,7 @@ DataPack AddNoise::operator()(DataPack dp)
           noisegen.setScale(nlevel); // is std.dev of Gaussian = RMS to reach SNR=(A/sqrt2)/RMS
           noisegen.setSampling_rate(1.0/stime.numerical_value_in(s) * Hz); // inverse time!=frequency
 
-          if (sample_length<pure.size()*stime) 
-            std::cout << "WARNING: duration smaller than signal length; partial signal loss." << pure.size()*stime << std::endl;
+	  sample_length = pure.size() * stime; // [ns] automatically
           noisegen.setDuration(sample_length);
 
           // seed is default
@@ -71,6 +68,8 @@ DataPack AddNoise::operator()(DataPack dp)
           for (size_t i=0;i<pure.size();++i) res[i] = pure[i] * V; // vec_t -> waveform_t
           dp.getTruthRef().pure.push_back(pure); // copy to truth for storage; no unit
 
+	  // trigger onset position
+	  int onset = static_cast<int>(onset_percent/100.0 * (sample_length/stime).numerical_value_in(one));
           waveform_t noisy = noisegen.add(res,onset); // use the noise generator
           std::string okey = l2out + std::to_string(i);
 	  std::cout << "store key " << okey << " waveform of size " << noisy.size() << std::endl;
