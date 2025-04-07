@@ -65,9 +65,11 @@ void FakeG4AntToRoot::operator()(DataPack dp)
   vec_t dvvec = std::any_cast<vec_t>(indata["VoltageVec"]); // vec_t
   voltagevec  = &dvvec; // vec_t* copy
   mytree->SetBranchAddress("VoltageVec",&voltagevec);
-  mytree->SetBranchAddress("OmVec",&OMdummy); // empty
-  mytree->SetBranchAddress("KEVec",&KEdummy);
+  OMdummy->push_back(dp.getTruthRef().average_omega.numerical_value_in(Hz)); // single value
+  mytree->SetBranchAddress("OmVec",&OMdummy);
+  mytree->SetBranchAddress("KEVec",&KEdummy); // empty
 
   // all output collected, write it
   mytree->Fill();
+  OMdummy->clear();
 }

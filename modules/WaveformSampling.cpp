@@ -68,7 +68,7 @@ DataPack WaveformSampling::operator()(DataPack dp)
 	  std::string tkey = "sampled_" + std::to_string(i) + "_V";
 	  outdata[tkey] = std::make_any<vec_t>(resampled);
 	}
-	if (!omvec.empty()) {
+	if (omvec.size()>1) { // test case has single entry
 	  vec_t omresampled = interpolate(tt, omvec);
 	  outdata["omega"] = std::make_any<vec_t>(omresampled); // for the beat freq
 	}
@@ -112,7 +112,7 @@ DataPack WaveformSampling::operator()(DataPack dp)
 	  outdata[okey] = std::make_any<vec_t>(resampled); // for later transformation and deletion
 	  dp.getRef()[inkey].erase(ikey); // used; not needed anymore
 	}
-	if (!omvec.empty()) {
+	if (omvec.size()>1) { // test case has single entry
 	  vec_t omresampled = interpolate(tiv, omvec);
 	  outdata["omega"] = std::make_any<vec_t>(omresampled); // for the beat freq
 	}
@@ -140,12 +140,13 @@ DataPack WaveformSampling::operator()(DataPack dp)
 
 quantity<Hz> WaveformSampling::average_omega(const vec_t& omvec)
 {
-  if (!omvec.empty()) {
+  if (omvec.size()>1) { // test case has single entry
     double omsum = 0.0;
     for (auto entry : omvec) omsum += entry;
     quantity<Hz> res = omsum/omvec.size() * Hz;
     return res;
   }
+  else if (omvec.size()==1) return omvec.front() * Hz;
   else return 0.0*Hz;
 }
 

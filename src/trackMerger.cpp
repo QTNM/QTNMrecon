@@ -9,6 +9,7 @@
 
 // us
 #include "trackMerger.hh"
+#include <mp-units/ostream.h> // for cout stream
 
 trackMerger::trackMerger(TTreeReader& re, TTree* tr) : 
   prevID(-1),
@@ -127,6 +128,7 @@ void trackMerger::Loop()
 	vec_t wfm(wfmarray.At(i).begin(), wfmarray.At(i).end()); // wfmarray is ttreereaderarray
 	localWfm.push_back(wfm); // local copy for potential merging
       }
+      mergedDP.getTruthRef().average_omega = dp.getTruthRef().average_omega; // initial copy
       
       writeRow(dp); // write out as is, nothing else to do
     }
