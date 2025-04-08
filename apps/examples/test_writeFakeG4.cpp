@@ -60,16 +60,17 @@ int main(int argc, char** argv)
 
   // mixer, step (4), waveform in from l2 key, out in l2 key
   auto mixer = Mixer(noisy, mixed, l2noise, l2mix);
-  quantity<Hz> tfreq = 100.0 * MHz;
+  quantity<Hz> tfreq = 5.0 * GHz;
   mixer.setTargetFrequency(tfreq);
+  mixer.setFilterCutFrequency(tfreq);
 
   // digitizer, step (5), waveform from l2 key
   auto digitizer = Digitize(mixed, l2mix);
-  quantity<Hz> dsampling = 1.0 * GHz;
+  quantity<Hz> dsampling = 10.0 * GHz;
   quantity<V> vert = 1.0 * V;
   digitizer.setDigiSamplingRate(dsampling);
   digitizer.setVerticalRange(vert);
-  digitizer.setGainFactor(10.0);
+  digitizer.setGainFactor(1.0);
   digitizer.setBitNumber(12);
 
   // data sink: write to Root, take from key

@@ -93,6 +93,7 @@ int main(int argc, char** argv)
   auto mixer = Mixer(noisy, mixed, l2noise, l2mix);
   quantity<Hz> tfreq = 100.0 * MHz;
   mixer.setTargetFrequency(tfreq);
+  mixer.setFilterCutFrequency(10*tfreq);
 
   // digitizer, step (5), waveform from l2 key
   auto digitizer = Digitize(mixed, l2mix);

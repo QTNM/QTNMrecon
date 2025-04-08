@@ -36,7 +36,7 @@ int main(int argc, char** argv)
   // data source: sine signal generator, store under key 'wave'
   quantity<V> amp = 1.0 * V;
   quantity<Hz> srate = 155.0 * GHz;
-  quantity<s>  dur = 1.0 * ns;
+  quantity<s>  dur = 100.0 * ns;
   quantity<Hz> freq = 15.0 * GHz;
   quantity<rad> ph = 0.0 * deg;
 

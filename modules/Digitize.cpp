@@ -40,15 +40,15 @@ DataPack Digitize::operator()(DataPack dp)
         int nantenna = dp.getTruthRef().nantenna; // use data pack
         dp.getExperimentRef().gain = gain; // store for output
         dp.getExperimentRef().digi_sampling_rate = digisampling; // store for output
-	std::cout << "in digitizer " << digisampling << " digital sampling rate." << std::endl;
+	//	std::cout << "in digitizer " << digisampling << " digital sampling rate." << std::endl;
         // cast the containers
         for (int i=0;i<nantenna;++i) {
             std::string ikey = l2in + std::to_string(i);
             auto sig = std::any_cast<waveform_t>(indata[ikey]);
-	    std::cout << "digi input got " << sig.size() << " signal size." << std::endl;
+	    //	    std::cout << "digi input got " << sig.size() << " signal size." << std::endl;
             // new sampling with digi sampling
 	    waveform_t resampled = interpolate(sig, stime); // N points per osc sampling
-	    std::cout << "digi interpolate gives " << resampled.size() << " resampled size." << std::endl;
+	    //	    std::cout << "digi interpolate gives " << resampled.size() << " resampled size." << std::endl;
             // digitize
             waveform_t dsig = adc.digitize(resampled); // use the digitizer
 	    std::cout << "digitize gives " << dsig.size() << " dsig size." << std::endl;

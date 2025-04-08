@@ -29,7 +29,7 @@ DataPack AddNoise::operator()(DataPack dp)
     }
     Event<std::any> indata = dp.getRef()[inkey];
     Event<std::any> outdata; // to hold all the data items
-    std::cout << "in add noise module." << std::endl;
+    //    std::cout << "in add noise module." << std::endl;
     // get hold of relevant data, transform and store in outdata
     try
     {
@@ -40,7 +40,7 @@ DataPack AddNoise::operator()(DataPack dp)
         for (int i=0;i<nantenna;++i) {
           std::string ikey = "sampled_" + std::to_string(i) + "_V";
           auto pure = std::any_cast<vec_t>(indata[ikey]);
-          std::cout << "retrieve key " << ikey << " waveform of size " << pure.size() << std::endl;
+	  //          std::cout << "retrieve key " << ikey << " waveform of size " << pure.size() << std::endl;
 
           // set up the noise generator
 	  double maxel, minel;
@@ -55,12 +55,13 @@ DataPack AddNoise::operator()(DataPack dp)
           // noise level
 	  double amp = 0.5*(maxel - minel);
           quantity<V> nlevel = amp / std::numbers::sqrt2 / SNr * V; // A/sqrt(2) * noise/sig ratio
-	  std::cout << "amplitude in V: " << amp << " noise level in V " << nlevel << std::endl;
+	  //	  std::cout << "amplitude in V: " << amp << " noise level in V " << nlevel << std::endl;
           noisegen.setScale(nlevel); // is std.dev of Gaussian = RMS to reach SNR=(A/sqrt2)/RMS
           noisegen.setSampling_rate(1.0/stime.numerical_value_in(s) * Hz); // inverse time!=frequency
 
 	  sample_length = pure.size() * stime; // [ns] automatically
           noisegen.setDuration(sample_length);
+	  //	  std::cout << "add Noise - duration " << sample_length << std::endl;
 
           // seed is default
           // need values with unit from now on
@@ -69,7 +70,7 @@ DataPack AddNoise::operator()(DataPack dp)
           dp.getTruthRef().pure.push_back(pure); // copy to truth for storage; no unit
 
 	  // trigger onset position
-	  int onset = static_cast<int>(onset_percent/100.0 * (sample_length/stime).numerical_value_in(one));
+	  int onset = static_cast<int>(onset_percent/100.0 * pure.size());
           waveform_t noisy = noisegen.add(res,onset); // use the noise generator
           std::string okey = l2out + std::to_string(i);
 	  std::cout << "store key " << okey << " waveform of size " << noisy.size() << std::endl;

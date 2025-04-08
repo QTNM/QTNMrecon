@@ -61,10 +61,9 @@ waveform_t WhiteNoiseGenerator::generate()
 
 waveform_t WhiteNoiseGenerator::add(waveform_t& sig, size_t pos)
 {
-    // changes signal but leave state unchanged for repeat requests
-    // avoiding repeated addition operations. Reset by any configuration 
-    // setter call.
-    if (tsig.empty()) generate();
+    // always generate
+    generate();
+
     // add other to existing tsig at position pos, 
     // up to at most end of tsig, irrespective of the length of other
     size_t j = 0;
