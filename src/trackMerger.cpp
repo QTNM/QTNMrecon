@@ -130,6 +130,14 @@ void trackMerger::Loop()
       }
       mergedDP.getTruthRef().average_omega = dp.getTruthRef().average_omega; // initial copy
       mergedDP.getTruthRef().sampling_time = dp.getTruthRef().sampling_time; // initial copy
+      mergedDP.getTruthRef().bfield = dp.getTruthRef().bfield; // initial copy
+      mergedDP.getTruthRef().beat_frequency = dp.getTruthRef().beat_frequency; // initial copy
+      mergedDP.getTruthRef().chirp_rate = dp.getTruthRef().chirp_rate; // initial copy
+      mergedDP.getTruthRef().vertex.posx = dp.getTruthRef().vertex.posx; // initial copy
+      mergedDP.getTruthRef().vertex.posy = dp.getTruthRef().vertex.posy; // initial copy
+      mergedDP.getTruthRef().vertex.posz = dp.getTruthRef().vertex.posz; // initial copy
+      mergedDP.getTruthRef().vertex.kineticenergy = dp.getTruthRef().vertex.kineticenergy; // initial copy
+      mergedDP.getTruthRef().vertex.pitchangle = dp.getTruthRef().vertex.pitchangle; // initial copy
       
       writeRow(dp); // write out as is, nothing else to do
     }
