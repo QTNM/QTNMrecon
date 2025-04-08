@@ -129,6 +129,7 @@ void trackMerger::Loop()
 	localWfm.push_back(wfm); // local copy for potential merging
       }
       mergedDP.getTruthRef().average_omega = dp.getTruthRef().average_omega; // initial copy
+      mergedDP.getTruthRef().sampling_time = dp.getTruthRef().sampling_time; // initial copy
       
       writeRow(dp); // write out as is, nothing else to do
     }
