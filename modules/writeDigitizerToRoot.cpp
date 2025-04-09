@@ -71,8 +71,7 @@ void WriterDigiToRoot::operator()(DataPack dp)
   pangle  = dp.getTruthRef().vertex.pitchangle.numerical_value_in(deg); // quantity<deg>
   mytree->SetBranchAddress("vertex_pitchangle_deg",&pangle);
   trackHistory  = &dp.getTruthRef().vertex.trackHistory; // vector<int>*
-  if (!trackHistory->empty()) // not a nullptr
-    mytree->SetBranchAddress("vertex_trackHistory",&trackHistory);
+  mytree->SetBranchAddress("vertex_trackHistory",&trackHistory);
   // experiment
   gain  = dp.getExperimentRef().gain;
   mytree->SetBranchAddress("digi_gain",&gain);
