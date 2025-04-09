@@ -16,7 +16,7 @@ i.e. a reconstruction pipeline code.
 There are currently 5 apps in the apps folder and examples on how
 to use the pipeline in the apps/examples folder. One app reconstructs QTNMSim output with antenna
 waveforms from the simulation, one reconstructs the purely kinematic output data from the separate
-QTNMSim branch. Each comes with either ROOT output of HDF5 file output. The final app shows the
+QTNMSim branch. Each comes with either ROOT output or HDF5 file output. The final app shows the
 operation of the track merger in a complete reconstruction app.
 
 The tools are considered fairly complete, and they would be used in modules which
