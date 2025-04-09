@@ -41,6 +41,7 @@ waveform_t DownConverter::mix(waveform_t& signal)
                     [this](quantity<V> x, double y){return x*y;});
 
     // filter
+    //    std::cout << "in demod:mix - filter gets temp size " << temp.size() << std::endl;
     waveform_t res = bw.LPassFilter(temp); // cut frequency set in configuration of down converter
 
     return res;

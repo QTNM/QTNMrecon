@@ -11,7 +11,7 @@
 
 OmegaBeatToTruth::OmegaBeatToTruth(std::string in, std::string out) : 
   inkey(std::move(in)),
-  outkey(std::move(out))
+  outkey(std::move(out)) // not used beyond testing
 {}
 
 DataPack OmegaBeatToTruth::operator()(DataPack dp)
@@ -22,6 +22,10 @@ DataPack OmegaBeatToTruth::operator()(DataPack dp)
         return dp; // not found, return unchanged map, no processing
     }
     Event<std::any> indata = dp.getRef()[inkey]; // access L1 dictionary
+    if (! indata.count("omega")) { 
+        std::cout << "Omega vector not in dictionary!" << std::endl;
+        return dp; // not found, return unchanged map, no processing
+    }
     Event<std::any> outdata;
     // yields a L2 unordered map called Event<std::any> with the 
     // help of the inkey label.
@@ -32,7 +36,7 @@ DataPack OmegaBeatToTruth::operator()(DataPack dp)
     try
     {
         // get hold of truth data from sim
-        auto omvec = std::any_cast<std::vector<double>>(indata["omega"]); // sampled in wfmsampling
+        auto omvec = std::any_cast<vec_t>(indata["omega"]); // sampled in wfmsampling
         // convert to waveform_t with unit, cheat to enable use of dft()
         waveform_t res;
         for (auto entry : omvec) res.push_back(entry/1.e9/(2.0*myPi) * V); // omega/2pi as double->quantity<V>
@@ -41,15 +45,14 @@ DataPack OmegaBeatToTruth::operator()(DataPack dp)
         auto idx = std::distance(res.begin(), loc); // index of max
 	std::cout << "loc from distance; " << idx << std::endl;
         std::cout << "frequency peak at " << freq.at(idx) << std::endl; // use index on freq vector
-        dp.getTruthRef().beat_frequency = freq.at(idx);
-	// store output
-	outdata["omfft"] = std::any_cast<waveform_t>(res);   // q<V>, again cheated unit for use of dft()
-	outdata["omfreq"] = std::any_cast<std::vector<quantity<Hz>>>(freq); // q<Hz>
+        dp.getTruthRef().beat_frequency = freq.at(idx); // truth output
+	// outdata["omfft"] = std::any_cast<waveform_t>(res);   // q<V>, again cheated unit for use of dft()
+	// outdata["omfreq"] = std::any_cast<std::vector<quantity<Hz>>>(freq); // q<Hz>
     }
     catch(const std::bad_any_cast& e)
     {
       std::cerr << "OmegaBeatToTruth: " << e.what() << '\n';
     }
-    dp.getRef()[outkey] = outdata;
+    //    dp.getRef()[outkey] = outdata; // not used beyond testing
     return dp;
 }

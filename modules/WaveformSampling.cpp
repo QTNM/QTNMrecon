@@ -16,7 +16,8 @@ WaveformSampling::WaveformSampling(std::string source, std::string in, std::stri
     originkey(std::move(source)),
     inkey(std::move(in)),
     outkey(std::move(out)),
-    sampletime(1.0 * ns)
+    sampletime(1.0 * ns),
+    nantenna(1)
 {}
 
 
@@ -28,7 +29,7 @@ DataPack WaveformSampling::operator()(DataPack dp)
   std::cout << "interpolator called" << std::endl;
 
   // set before: antenna read by add chirp/ kinematic by anntenna response
-  int nantenna = dp.getTruthRef().nantenna;
+  nantenna = dp.getTruthRef().nantenna;
 
   Event<std::any> origindata = dp.getRef()[originkey];
   Event<std::any> outdata; // to hold all the data items
@@ -46,24 +47,34 @@ DataPack WaveformSampling::operator()(DataPack dp)
 	ROOT::VecOps::RVec<double> tempt(tiv); // temporary
 	ROOT::VecOps::RVec<double> tempv(vvv); // temporary
 	
+	auto selecttvec = tempt[tempant==0]; // like NumPy selection
+	vec_t tt(selecttvec.begin(),selecttvec.end()); // sample_time same
 	for (int i=0;i<nantenna;++i) {
-	  auto selecttvec = tempt[tempant==i]; // like NumPy selection
 	  auto selectvvec = tempv[tempant==i];
-	  vec_t tt(selecttvec.begin(),selecttvec.end()); // copy from RVec
 	  vec_t tv(selectvvec.begin(),selectvvec.end());
 	  
 	  vec_t resampled = interpolate(tt, tv);
-	  tt.clear();
+	  // if (dp.getTruthRef().vertex.eventID==1) {
+	  //   std::cout << "interpolator check tvals " << std::endl;
+	  //   for (auto val : tt) std::cout << val << ", ";
+	  //   std::cout << std::endl;
+	  //   for (auto val : tv) std::cout << val << ", ";
+	  //   std::cout << std::endl;
+	  //   for (auto val : resampled) std::cout << val << ", ";
+	  //   std::cout << std::endl;
+	  // }
 	  tv.clear();
-	  std::cout << "interpolator signal done, antenna " << i << std::endl;
-	  std::string tkey = "sampled_" + std::to_string(i) + "_[V]";
+
+	  std::string tkey = "sampled_" + std::to_string(i) + "_V";
 	  outdata[tkey] = std::make_any<vec_t>(resampled);
 	}
-	auto selecttvec = tempt[tempant==0]; // like NumPy selection
-	vec_t tt(selecttvec.begin(),selecttvec.end()); // sample_time same for any antenna
-	vec_t omresampled = interpolate(tt, omvec);
-	outdata["omega"] = std::make_any<vec_t>(omresampled); // for the beat freq
-	dp.getTruthRef().average_omega = average_omega(omvec);
+	if (omvec.size()>1) { // test case has single entry
+	  vec_t omresampled = interpolate(tt, omvec);
+	  outdata["omega"] = std::make_any<vec_t>(omresampled); // for the beat freq
+	}
+	quantity<Hz> avo = average_omega(omvec);
+	if (avo>0.0*Hz) // test sets this earlier, otherwise there is an omvec
+	  dp.getTruthRef().average_omega = avo; // overwrite
       }
     catch(const std::bad_any_cast& e)
       {
@@ -95,17 +106,19 @@ DataPack WaveformSampling::operator()(DataPack dp)
 	  std::string ikey = "VoltageVec_" + std::to_string(i) + "_[V]";
 	  auto tv = std::any_cast<vec_t>(indata[ikey]);
 	  // sample by interpolation
-	  std::cout << "before interpolation, got v vec size: " << tv.size() 
-              << " time vec size " << tiv.size()<< std::endl;
 	  vec_t resampled = interpolate(tiv, tv);
 	  // store result
-	  std::string okey = "sampled_" + std::to_string(i) + "_[V]";
+	  std::string okey = "sampled_" + std::to_string(i) + "_V";
 	  outdata[okey] = std::make_any<vec_t>(resampled); // for later transformation and deletion
 	  dp.getRef()[inkey].erase(ikey); // used; not needed anymore
 	}
-	dp.getTruthRef().average_omega = average_omega(omvec);
-	vec_t omresampled = interpolate(tiv, omvec);
-	outdata["omega"] = std::make_any<vec_t>(omresampled); // for the beat freq
+	if (omvec.size()>1) { // test case has single entry
+	  vec_t omresampled = interpolate(tiv, omvec);
+	  outdata["omega"] = std::make_any<vec_t>(omresampled); // for the beat freq
+	}
+	quantity<Hz> avo = average_omega(omvec);
+	if (avo>0.0*Hz)
+	  dp.getTruthRef().average_omega = avo;
       }
     catch(const std::bad_any_cast& e)
       {
@@ -127,10 +140,14 @@ DataPack WaveformSampling::operator()(DataPack dp)
 
 quantity<Hz> WaveformSampling::average_omega(const vec_t& omvec)
 {
-  double omsum = 0.0;
-  for (auto entry : omvec) omsum += entry;
-  quantity<Hz> res = omsum/omvec.size() * Hz;
-  return res;
+  if (omvec.size()>1) { // test case has single entry
+    double omsum = 0.0;
+    for (auto entry : omvec) omsum += entry;
+    quantity<Hz> res = omsum/omvec.size() * Hz;
+    return res;
+  }
+  else if (omvec.size()==1) return omvec.front() * Hz;
+  else return 0.0*Hz;
 }
 
 
@@ -138,10 +155,11 @@ vec_t WaveformSampling::interpolate(const vec_t& tvals, const vec_t& vvals)
 {
     vec_t resampled;
     double interval = tvals.back() - tvals.front(); // in [ns]
+    double offset = tvals.front();
     int maxpoints = (int)floor(interval / sampletime.numerical_value_in(ns));
 
     spline ip(tvals, vvals); // interpolator
     for (int i=1;i<=maxpoints;++i)
-        resampled.push_back(ip(i * sampletime.numerical_value_in(ns)));
+        resampled.push_back(ip(offset + i * sampletime.numerical_value_in(ns)));
     return resampled;
 }

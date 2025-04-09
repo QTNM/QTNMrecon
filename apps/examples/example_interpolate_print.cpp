@@ -69,9 +69,9 @@ void printInterpolator::operator()(DataPack dp)
       // from interpolator
       std::cout << "Sampling time " << dp.getTruthRef().sampling_time << std::endl;
         // can also cast the container
-        auto vvv1 = std::any_cast<std::vector<double>>(indata1["sampled_0_[V]"]);
+        auto vvv1 = std::any_cast<std::vector<double>>(indata1["sampled_0_V"]);
         std::cout << "Sampled antenna 1 size = " << vvv1.size() << std::endl;
-        auto vvv2 = std::any_cast<std::vector<double>>(indata1["sampled_1_[V]"]);
+        auto vvv2 = std::any_cast<std::vector<double>>(indata1["sampled_1_V"]);
         std::cout << "Sampled antenna 2 size = " << vvv2.size() << std::endl;
     }
     catch (const std::bad_any_cast& e)
@@ -90,6 +90,7 @@ int main(int argc, char** argv)
       // command line interface
   CLI::App app{"Example Recon Pipeline"};
   int nevents = -1;
+  int nant = 2;
   quantity<T> bfield = 0.7 * T; // constant sim b-field value [T]
   std::string fname = "qtnm.root";
 
@@ -104,11 +105,10 @@ int main(int argc, char** argv)
   auto source = QTNMSimAntennaReader(re, "raw");
   source.setMaxEventNumber(nevents); // default = all events in file
   source.setSimConstantBField(bfield); // MUST be set
+  source.setAntennaN(nant);
   
   // add truth
   auto addchirp = AddChirpToTruth("raw");
-  int nant = 2;
-  addchirp.setAntennaNumber(nant);
 
   // transformer, here interpolation
   auto interpolator = WaveformSampling("raw","","sampled");

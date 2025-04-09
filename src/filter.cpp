@@ -128,8 +128,10 @@ waveform_t Butterworth::LPassFilter(const waveform_t &record)
             }
             recalc = false; // coefficients calculated
         }
-        else 
-            return result;       // empty; no filtering
+        else {
+	  std::cout << "WARNING Filter: cut-off larger than Nyquist, return empty." << std::endl;
+	  return result;       // empty; no filtering
+	}
     }
     if (!record.empty()) {
         for (waveform_value xdata : record) {

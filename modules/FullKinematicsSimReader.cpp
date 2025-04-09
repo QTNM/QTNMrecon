@@ -122,7 +122,11 @@ DataPack FullKinematicsSimReader::operator()()
         }
         reader2.Restart(); // for each trajectory, have to loop over hits, then reset hits reader.
     }
-
+    if (!tvec->empty()) // book truth from trajectory
+      dp.getTruthRef().start_time = tvec->front() * ns;
+    else
+      dp.getTruthRef().start_time = -1.0 * ns;
+    dp.getTruthRef().nantenna = 1; // fine here; overwritten by AntennaResponse
     dp.getTruthRef().bfield = Bfield; // store input truth
     return dp;
 }

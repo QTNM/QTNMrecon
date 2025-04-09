@@ -60,7 +60,7 @@ waveform_t SineGenerator::generate()
         tsig.clear();
         int entries = static_cast<int>((duration * sampling_rate).numerical_value_in(one));
         for (int i=0;i<entries;++i) {
-            quantity<s> tval = i / sampling_rate;
+	  quantity<s> tval = i / sampling_rate.numerical_value_in(Hz) * s;
             tsig.push_back(amplitude * sin(2*myPi * (frequency * tval).numerical_value_in(one) + 
                                             phase.numerical_value_in(rad)));
         }

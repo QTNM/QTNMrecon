@@ -64,13 +64,20 @@ modules/WaveformSampling.cpp
 modules/AddNoise.cpp
 modules/Mixer.cpp
 modules/Digitize.cpp
+modules/TestG4AntGenerator.cpp
+modules/FakeG4AntWriter.cpp
+modules/writeWfmToRoot.cpp
 modules/writeDigitizerToRoot.cpp
 modules/writeHitDigiToRoot.cpp
 modules/writeHitDigiToHDF5.cpp
+modules/WfmReader.cpp
+src/trackMerger.cpp
 modules/printSimReader.cpp)
 target_link_libraries(ReconModules QTNMTools HighFive ${ROOT_LIBRARIES})
 
 # Build apps and examples
+add_executable(reconmerger.exe apps/reconAntWithMerger.cpp)
+target_link_libraries(reconmerger.exe PUBLIC ReconModules QTNMTools)
 add_executable(antrecon.exe apps/antennaSimRecon.cpp)
 target_link_libraries(antrecon.exe PUBLIC ReconModules QTNMTools)
 add_executable(noantrecon.exe apps/noAntennaSimRecon.cpp)
@@ -80,6 +87,18 @@ target_link_libraries(antreconHDF5.exe PUBLIC ReconModules QTNMTools)
 add_executable(noantreconHDF5.exe apps/noAntennaSimReconToHDF5.cpp)
 target_link_libraries(noantreconHDF5.exe PUBLIC ReconModules QTNMTools)
 
+add_executable(minantrecon.exe apps/examples/minimalFirstStepRecon.cpp)
+target_link_libraries(minantrecon.exe PUBLIC ReconModules QTNMTools)
+add_executable(minnoantrecon.exe apps/examples/minimalNoAntennaRecon.cpp)
+target_link_libraries(minnoantrecon.exe PUBLIC ReconModules QTNMTools)
+add_executable(testReconMerged.exe apps/examples/test_writeFakeG4.cpp)
+target_link_libraries(testReconMerged.exe PUBLIC ReconModules QTNMTools)
+add_executable(testTrackMerge.exe apps/examples/test_trackMerger.cpp)
+target_link_libraries(testTrackMerge.exe PUBLIC ReconModules QTNMTools)
+add_executable(testG4out.exe apps/examples/test_fakeG4_ToRoot.cpp)
+target_link_libraries(testG4out.exe PUBLIC ReconModules QTNMTools)
+add_executable(testG4toWfm.exe apps/examples/test_readFakeG4ToWfm.cpp)
+target_link_libraries(testG4toWfm.exe PUBLIC ReconModules QTNMTools)
 add_executable(exwrhdf5.exe apps/examples/example_write_hdf5.cpp)
 target_link_libraries(exwrhdf5.exe PUBLIC ReconModules QTNMTools)
 add_executable(exhdwrite.exe apps/examples/example_hitdigi_write.cpp)
@@ -96,8 +115,6 @@ add_executable(exsc.exe apps/examples/example_sine_csv.cpp)
 target_link_libraries(exsc.exe PUBLIC ReconModules QTNMTools)
 add_executable(exrip.exe apps/examples/example_interpolate_print.cpp)
 target_link_libraries(exrip.exe PUBLIC ReconModules QTNMTools)
-add_executable(exintwrite.exe apps/examples/example_interpolate_csv.cpp)
-target_link_libraries(exintwrite.exe PUBLIC ReconModules QTNMTools)
 add_executable(exnoant.exe apps/examples/example_noAnt_read.cpp)
 target_link_libraries(exnoant.exe PUBLIC ReconModules QTNMTools)
 add_executable(noantwrite.exe apps/examples/example_noAnt_write.cpp)

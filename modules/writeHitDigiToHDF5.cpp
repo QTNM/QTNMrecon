@@ -4,11 +4,10 @@
 // std
 #include <iostream>
 #include <string>
-#include <algorithm>
 
 // us
 #include "writeHitDigiToHDF5.hh"
-#include "types.hh"
+
 
 WriterHitDigiToHDF5::WriterHitDigiToHDF5(HighFive::Group& gr) : 
   simgroup(gr)
@@ -70,7 +69,12 @@ void WriterHitDigiToHDF5::operator()(DataPack dp)
   recordgr.createAttribute("truth_avomega_Hz", dp.getTruthRef().average_omega.numerical_value_in(Hz));
   recordgr.createAttribute("truth_beatf_Hz", dp.getTruthRef().beat_frequency.numerical_value_in(Hz));
   recordgr.createAttribute("truth_chirp_Hz_s", dp.getTruthRef().chirp_rate.numerical_value_in(Hz/s));
+  recordgr.createAttribute("truth_starttime_s", dp.getTruthRef().start_time.numerical_value_in(s));
 
+  if (! dp.getTruthRef().vertex.trackHistory.empty())
+    for (int val : dp.getTruthRef().vertex.trackHistory) trackHistory.push_back(val);
+  recordgr.createDataSet("vertex_trackHistory",trackHistory); // vector<int>
+    
   if (! dp.hitsRef().empty()) { // there are hits to store
     // extract hit data
     for (hit_t hit : dp.hitsRef()) { // get hit struct from vector<hit_t>
@@ -92,6 +96,7 @@ void WriterHitDigiToHDF5::operator()(DataPack dp)
     hitgr.createDataSet("hit_posttheta_deg",hitposttheta); // vector<double>
 
     // clear internal
+    trackHistory.clear();
     hittrID.clear();
     hitx.clear();
     hity.clear();

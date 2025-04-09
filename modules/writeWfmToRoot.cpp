@@ -1,17 +1,17 @@
-// Root Digitizer Writer module implementation
-// writing a single value; expand for specific outputs.
+// Root waveform Writer module implementation
 
 // std
 #include <iostream>
 
 // us
-#include "writeHitDigiToRoot.hh"
-#include "types.hh"
+#include "writeWfmToRoot.hh"
 
-WriterHitDigiToRoot::WriterHitDigiToRoot(TTree* tr) : 
+
+WriterWfmToRoot::WriterWfmToRoot(std::string inkey, TTree* tr) : 
+  inkey(std::move(inkey)),
   mytree(tr),
   nantenna(1),
-  trackHistory(nullptr),
+  purewave(nullptr),
   hitevID(nullptr),
   hittrID(nullptr),
   hitx(nullptr),
@@ -19,13 +19,10 @@ WriterHitDigiToRoot::WriterHitDigiToRoot(TTree* tr) :
   hitz(nullptr),
   hitedep(nullptr),
   hittime(nullptr),
-  hitposttheta(nullptr),
-  purewave(nullptr),
-  scopedata(nullptr)
+  hitposttheta(nullptr)
 {
   // can now point branch at dummy addresses; makes header only
   mytree->Branch("truth_nantenna",&nantenna,"truth_nantenna/I");
-  mytree->Branch("truth_snratio",&snratio,"truth_snratio/D");
   mytree->Branch("truth_samplingtime_s",&samplingtime,"truth_samplingtime/D");
   mytree->Branch("truth_starttime_s",&starttime,"truth_starttime/D");
   mytree->Branch("truth_avomega_Hz",&avomega,"truth_avomega/D");
@@ -39,14 +36,8 @@ WriterHitDigiToRoot::WriterHitDigiToRoot(TTree* tr) :
   mytree->Branch("vertex_posz_m",&posz,"vertex_posz/D");
   mytree->Branch("vertex_kinenergy_eV",&kEnergy,"vertex_kinenergy/D");
   mytree->Branch("vertex_pitchangle_deg",&pangle,"vertex_pitchangle/D");
-  mytree->Branch("vertex_trackHistory",&trackHistory);
-  mytree->Branch("digi_gain",&gain,"digi_gain/D");
-  mytree->Branch("digi_tfrequency_Hz",&tfrequency,"digi_tfrequency/D");
-  mytree->Branch("digi_samplingrate_Hz",&digisamplingrate,"digi_samplingrate/D");
 
-  mytree->Branch("pure_V", &purewave); // vec<vec>* dummy address
-  mytree->Branch("signal_V", &scopedata); // vec<vec>* dummy address
-
+  mytree->Branch("sampled_V", &purewave); // vec<vec>* dummy address
   // hit data
   mytree->Branch("hit_eventID", &hitevID); // point to vec<int>* dummy address
   mytree->Branch("hit_trackID", &hittrID); // point to vec<int>* dummy address
@@ -57,16 +48,18 @@ WriterHitDigiToRoot::WriterHitDigiToRoot(TTree* tr) :
   mytree->Branch("hit_edep_eV", &hitedep); // point to vec<double>* dummy address
   mytree->Branch("hit_posttheta_deg", &hitposttheta); // point to vec<double>* dummy address
 
+  std::cout << "Wfm writer constructed" << std::endl;
+
 }
 
 
-void WriterHitDigiToRoot::operator()(DataPack dp)
+void WriterWfmToRoot::operator()(DataPack dp)
 {
+  std::cout << "Wfm writer called." << std::endl;
+  
   // extract from datapack and assign to output branch variables with the correct address
-  nantenna    = dp.getTruthRef().nantenna;
+  nantenna = dp.getTruthRef().nantenna;
   mytree->SetBranchAddress("truth_nantenna",&nantenna);
-  snratio     = dp.getTruthRef().snratio;
-  mytree->SetBranchAddress("truth_snratio",&snratio);
   samplingtime = dp.getTruthRef().sampling_time.numerical_value_in(s); // from quantity<ns> no unit for output
   mytree->SetBranchAddress("truth_samplingtime_s",&samplingtime);
   starttime = dp.getTruthRef().start_time.numerical_value_in(s); // from quantity<ns> no unit for output
@@ -94,25 +87,17 @@ void WriterHitDigiToRoot::operator()(DataPack dp)
   mytree->SetBranchAddress("vertex_kinenergy_eV",&kEnergy);
   pangle  = dp.getTruthRef().vertex.pitchangle.numerical_value_in(deg); // quantity<deg>
   mytree->SetBranchAddress("vertex_pitchangle_deg",&pangle);
-  trackHistory  = &dp.getTruthRef().vertex.trackHistory; // vector<int>*
-  mytree->SetBranchAddress("vertex_trackHistory",&trackHistory);
-  // experiment
-  gain  = dp.getExperimentRef().gain;
-  mytree->SetBranchAddress("digi_gain",&gain);
-  tfrequency   = dp.getExperimentRef().target_frequency.numerical_value_in(Hz); // quantity<Hz>
-  mytree->SetBranchAddress("digi_tfrequency_Hz",&tfrequency);
-  digisamplingrate = dp.getExperimentRef().digi_sampling_rate.numerical_value_in(Hz); // quantity<Hz>
-  mytree->SetBranchAddress("digi_samplingrate_Hz",&digisamplingrate);
 
+  Event<std::any> indata = dp.getRef()[inkey];
+  std::string brname;
   purewave->clear();
-  scopedata->clear();
   for (int i=0;i<nantenna;++i) {
     // store
-    scopedata->push_back(dp.getExperimentRef().signals.at(i)); // vec_t
-    purewave->push_back(dp.getTruthRef().pure.at(i)); // vec_t, copy
+    brname = "sampled_" + std::to_string(i) + "_V"; // unit in name
+    vec_t dummy = std::any_cast<vec_t>(indata[brname]); // construct first
+    purewave->push_back(dummy); // vec_t, copy
   }
-  mytree->SetBranchAddress("pure_V", &purewave); // point to vec<vec>* real address
-  mytree->SetBranchAddress("signal_V", &scopedata); // point to vec<vec>* real address
+  mytree->SetBranchAddress("sampled_V", &purewave); // point to vec<vec>* real address
 
   if (! dp.hitsRef().empty()) { // there are hits to store
     // extract hit data

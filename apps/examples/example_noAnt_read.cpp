@@ -73,9 +73,9 @@ void printInterpolator::operator()(DataPack dp)
       // from interpolator
       std::cout << "Sampling " << dp.getTruthRef().sampling_time << std::endl;
         // can also cast the container
-        auto vvv1 = std::any_cast<std::vector<double>>(indata1["sampled_0_[V]"]);
+        auto vvv1 = std::any_cast<std::vector<double>>(indata1["sampled_0_V"]);
         std::cout << "Sampled antenna 1 size = " << vvv1.size() << std::endl;
-        auto vvv2 = std::any_cast<std::vector<double>>(indata1["sampled_1_[V]"]);
+        auto vvv2 = std::any_cast<std::vector<double>>(indata1["sampled_1_V"]);
         std::cout << "Sampled antenna 2 size = " << vvv2.size() << std::endl;
     }
     catch (const std::bad_any_cast& e)

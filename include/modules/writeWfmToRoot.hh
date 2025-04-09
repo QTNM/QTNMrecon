@@ -1,23 +1,25 @@
-// ROOT Digitizer writer for a pipeline module
+// ROOT waveform writer for a pipeline module
 
-#ifndef writerRootDigi_HH
-#define writerRootDigi_HH 1
+#ifndef writerWfm_HH
+#define writerWfm_HH 1
 
 // std includes
 #include <string>
 #include <vector>
-#include <array>
 
 // ROOT
+#include "TFile.h"
 #include "TTree.h"
 
 // must have include for pipeline
 #include <Event.hh>
 
-class WriterDigiToRoot
+class WriterWfmToRoot
 {
     public:
-        WriterDigiToRoot(TTree* tr); // constructor; required
+  WriterWfmToRoot(std::string in, TTree* tr); // constructor; required
+        // Need antenna number as input for setting up output file
+        // That truth data is in DataPack but not available at construction.
         // Configures the module. Could have more config parameters
         // Minimum required are the key labels for input and output 
         // of Event Map data item.
@@ -29,29 +31,34 @@ class WriterDigiToRoot
 
     private:
     // include any configuration data members for internal use here.
+      std::string inkey;
       int nantenna; // needed for construction of output file
       TTree* mytree;
-      std::vector<vec_t>* scopedata; // no unit storage in ROOT file
       std::vector<vec_t>* purewave; // no unit storage in ROOT file
+  
       // doubles/int for values without unit
       int evID, trID;
-      double snratio;
       double samplingtime; // from quantity<ns>
       double starttime; // from quantity<ns>
       double avomega; // quantity<Hz>
       double beatf; // quantity<Hz>
       double chirprate; // quantity<Hz/s>
+      double bfield; // quantity<T>
       // vertex
       double posx; // quantity<m>
       double posy; // quantity<m>
       double posz; // quantity<m>
       double kEnergy; // quantity<eV>
       double pangle; // quantity<deg>
-      std::vector<int>* trackHistory;
-      // experiment
-      double gain;
-      double tfrequency; // quantity<Hz>
-      double digisamplingrate; // quantity<Hz>
 
+      // hit data
+      std::vector<int>* hitevID;
+      std::vector<int>* hittrID;
+      std::vector<double>* hitx;
+      std::vector<double>* hity;
+      std::vector<double>* hitz;
+      std::vector<double>* hitedep;
+      std::vector<double>* hittime;
+      std::vector<double>* hitposttheta;
 };
 #endif

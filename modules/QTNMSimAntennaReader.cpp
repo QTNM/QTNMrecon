@@ -15,6 +15,7 @@ QTNMSimAntennaReader::QTNMSimAntennaReader(TTreeReader& re, std::string out) :
     outkey(std::move(out)),
     maxEventNumber(-1), // default -1 for a all events
     evcounter(0),
+    nantenna(1),
     Bfield(-1.0 * T),
     reader(re),
     eventID(reader, "EventID"), // needs reader by reference
@@ -76,7 +77,19 @@ DataPack QTNMSimAntennaReader::operator()()
     dp.getTruthRef().vertex.kineticenergy = *kine * keV;
     dp.getTruthRef().vertex.pitchangle = *pangle * rad;
     std::cout << "reader Next() done, evt:  " << evcounter << std::endl;
+    //    std::cout << "content check, antenna id size:  " << aID->size() << std::endl;
+    // if(dp.getTruthRef().vertex.eventID==1) {
+    //   std::cout << "event 1 check:" << std::endl;
+    //   for (int j=0;j<vvec->size();++j)
+    // 	std::cout << vvec->at(j) << ", ";
+    //   std::cout << std::endl;
+    // }
 
+    if (!tvec->empty()) // book truth from trajectory
+      dp.getTruthRef().start_time = tvec->front() * ns;
+    else
+      dp.getTruthRef().start_time = -1.0 * ns;
+    dp.getTruthRef().nantenna = nantenna; // store input truth
     dp.getTruthRef().bfield = Bfield; // store input truth
     return dp;
 }

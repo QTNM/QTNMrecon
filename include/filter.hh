@@ -1,13 +1,12 @@
 // Filter for QTNM tools
+#ifndef QT_FILTER_H
+#define QT_FILTER_H
 
 // std
 
 // us
 #include "types.hh"
 #include "dsp.hh"
-
-#ifndef QT_FILTER_H
-#define QT_FILTER_H
 
 
 class Butterworth

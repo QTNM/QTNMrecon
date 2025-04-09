@@ -33,7 +33,6 @@
 
 #include "CLI11.hpp"
 #include <Event.hh>
-#include "types.hh"
 #include <mp-units/format.h>
 #include <mp-units/ostream.h>
 
@@ -54,6 +53,7 @@ int main(int argc, char** argv)
   CLI11_PARSE(app, argc, argv);
 
   // keys to set
+  int nant = 2;
   std::string origin = "raw";
   std::string samp = "sampled";
   std::string noisy = "noisy";
@@ -68,11 +68,10 @@ int main(int argc, char** argv)
   auto source = FullAntennaSimReader(re1, re2, origin);
   source.setMaxEventNumber(nevents); // default = all events in file
   source.setSimConstantBField(bfield); // MUST be set
+  source.setAntennaN(nant);
 
   // add truth
   auto addchirp = AddChirpToTruth(origin); // default antenna number
-  int nant = 2;
-  addchirp.setAntennaNumber(nant);
   
   // transformer (2)
   auto interpolator = WaveformSampling(origin,"",samp);
@@ -85,13 +84,13 @@ int main(int argc, char** argv)
   // add noise, step (3), fill more truth with units
   auto noiseAdder = AddNoise(samp, noisy, l2noise);
   noiseAdder.setSignalToNoise(1.0);
-  noiseAdder.setSampleLength(100.0 * us);
   noiseAdder.setOnsetPercent(10.0);
 
   // mixer, step (4), waveform in from l2 key, out in l2 key
   auto mixer = Mixer(noisy, mixed, l2noise, l2mix);
   quantity<Hz> tfreq = 100.0 * MHz;
   mixer.setTargetFrequency(tfreq);
+  mixer.setFilterCutFrequency(10*tfreq);
 
   // digitizer, step (5), waveform from l2 key
   auto digitizer = Digitize(mixed, l2mix);

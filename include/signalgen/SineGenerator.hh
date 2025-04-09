@@ -1,12 +1,12 @@
 // QTNM signal generator sine generator
+#ifndef QT_SINEGEN_H
+#define QT_SINEGEN_H
 
 // std
 
 // us
 #include "VSignal.hh"
 
-#ifndef QT_SINEGEN_H
-#define QT_SINEGEN_H
 
 class SineGenerator : VSignal
 {

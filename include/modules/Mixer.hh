@@ -24,11 +24,13 @@ class Mixer
 
         // getter/setter methods for configuration could live here.
         inline void setTargetFrequency(quantity<Hz> tf) {targetFrequency = tf;}
+        inline void setFilterCutFrequency(quantity<Hz> cf) {cutFrequency = cf;}
 
     private:
     // include any configuration data members for internal use here.
         DownConverter demod;
         quantity<Hz> targetFrequency;
+        quantity<Hz> cutFrequency;
 
     // these below serve as string keys to access (read/write) the Event map
         std::string inkey;

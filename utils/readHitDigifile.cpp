@@ -102,15 +102,8 @@ int main(int argc, char** argv)
     TTreeReaderValue<std::vector<double>> hitposttheta(reader, "hit_posttheta_deg");
 
     // signals
-    std::string brname;
-    std::vector<TTreeReaderArray<double>> purewave;
-    std::vector<TTreeReaderArray<double>> scopedata;
-    for (int i=0;i<nantenna;++i) { // there are nantenna branches on file
-      brname = "pure_" + std::to_string(i) + "_V";
-      purewave.emplace_back(reader, brname.data()); // move construct in place, not a copy
-      brname = "signal_" + std::to_string(i) + "_V";
-      scopedata.emplace_back(reader, brname.data());
-    }
+    TTreeReaderArray<std::vector<double>> purewave(reader, "pure_V");
+    TTreeReaderArray<std::vector<double>> scopedata(reader, "signal_V");;
 
     // event loop and organize hits to vec<hit_t>
     while (reader.Next()) {
@@ -146,11 +139,11 @@ int main(int argc, char** argv)
       }
         // got all data, can analyse
         // trial prints to check reading
-	// NOTE: TTreeReaderArrays are in scopedata, not vector<double>
-	std::cout << "got TTreeReaderArray from antenna 0 of length " << scopedata.at(0).GetSize() << std::endl;
-	std::cout << "got TTreeReaderArray from antenna 1 of length " << scopedata.at(1).GetSize() << std::endl;
+	// NOTE: scopedata is a TTreeReaderArray
+	std::cout << "got TTreeReaderArray from antenna 0 of length " << scopedata.At(0).size() << std::endl;
+	std::cout << "got TTreeReaderArray from antenna 1 of length " << scopedata.At(1).size() << std::endl;
 	// signal in vector<double> instead, convert:
-	std::vector<double> signal(scopedata.at(0).begin(),scopedata.at(0).end());
+	std::vector<double> signal(scopedata.At(0).begin(),scopedata.At(0).end());
 	std::cout << "got signal from antenna 0 in vector " << signal.size() << std::endl;
 	
         std::cout << "also n hits " << hits.size() << std::endl;

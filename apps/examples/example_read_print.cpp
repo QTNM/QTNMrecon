@@ -29,6 +29,7 @@ int main(int argc, char** argv)
       // command line interface
   CLI::App app{"Example Recon Pipeline"};
   int nevents = -1;
+  int nant = 2;
   quantity<T> bfield = 0.7 * T; // constant sim b-field value [T]
   std::string fname = "qtnm.root";
 
@@ -43,11 +44,10 @@ int main(int argc, char** argv)
   auto source = QTNMSimAntennaReader(re, "raw");
   source.setMaxEventNumber(nevents); // default = all events in file
   source.setSimConstantBField(bfield); // MUST be set
+  source.setAntennaN(nant);
 
   // add truth
   auto addchirp = AddChirpToTruth("raw");
-  int nant = 2;
-  addchirp.setAntennaNumber(nant);
 
   // data sink: simply print to screen, take from key 'raw'
   auto sink   = printSimReader("raw");

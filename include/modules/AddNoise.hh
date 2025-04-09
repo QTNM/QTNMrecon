@@ -26,13 +26,11 @@ class AddNoise
 
         // getter/setter methods for configuration could live here.
         inline void setSignalToNoise(double snr) {SNr = snr;}
-        inline void setSampleLength(quantity<s> sl) {sample_length = sl;}
         inline void setOnsetPercent(double tr) {onset_percent = tr;}
 
     private:
     // include any configuration data members for internal use here.
         WhiteNoiseGenerator noisegen; // default constructor
-        quantity<s> sample_length;
         double SNr;
         double onset_percent;
 

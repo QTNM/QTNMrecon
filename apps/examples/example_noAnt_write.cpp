@@ -76,7 +76,6 @@ int main(int argc, char** argv)
   auto addchirp = AddChirpToTruth(origin); // default antenna number
 
   // transformer (1)
-  int nant = 2;
   auto antresponse = AntennaResponse(origin, resp);
   // configure antennae
   std::vector<VReceiver*> allantenna;
@@ -102,13 +101,13 @@ int main(int argc, char** argv)
   // add noise, step (3), fill more truth with units
   auto noiseAdder = AddNoise(samp, noisy, l2noise);
   noiseAdder.setSignalToNoise(1.0);
-  noiseAdder.setSampleLength(100.0 * us);
   noiseAdder.setOnsetPercent(10.0);
 
   // mixer, step (4), waveform in from l2 key, out in l2 key
   auto mixer = Mixer(noisy, mixed, l2noise, l2mix);
   quantity<Hz> tfreq = 50.0 * MHz;
   mixer.setTargetFrequency(tfreq);
+  mixer.setFilterCutFrequency(10*tfreq);
 
   // digitizer, step (5), waveform from l2 key
   auto digitizer = Digitize(mixed, l2mix);
@@ -123,7 +122,7 @@ int main(int argc, char** argv)
   TFile* outfile = new TFile(outfname.data(), "RECREATE");
   TTree* tr = new TTree("recon","reconstructed data");
   tr->SetDirectory(outfile);
-  auto sink = WriterDigiToRoot(tr, nant);
+  auto sink = WriterDigiToRoot(tr);
   
   auto pl = yap::Pipeline{} | source | addchirp |antresponse | interpolator | addbeat |
     noiseAdder | mixer | digitizer | sink;

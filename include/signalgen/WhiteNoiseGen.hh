@@ -1,12 +1,12 @@
 // QTNM noise generator white noise generator
+#ifndef QT_WNOISEGEN_H
+#define QT_WNOISEGEN_H
 
 // std
 
 // us
 #include "VSignal.hh"
 
-#ifndef QT_WNOISEGEN_H
-#define QT_WNOISEGEN_H
 
 class WhiteNoiseGenerator : VSignal
 {

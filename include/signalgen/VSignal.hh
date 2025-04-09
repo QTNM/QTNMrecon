@@ -1,10 +1,10 @@
 // QTNM signal generator abstract interface class
+#ifndef QT_VSIGNAL_H
+#define QT_VSIGNAL_H
 
 // us
 #include "types.hh"
 
-#ifndef QT_VSIGNAL_H
-#define QT_VSIGNAL_H
 
 class VSignal
 {

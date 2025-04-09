@@ -30,7 +30,8 @@ class WaveformSampling
         quantity<Hz> average_omega(const vec_t& omvec);
         vec_t interpolate(const vec_t& tvals, const vec_t& vvals);
         quantity<ns> sampletime;
-
+        int nantenna;
+  
     // these below serve as string keys to access (read/write) the Event map
         std::string originkey;
         std::string inkey;
