@@ -62,6 +62,7 @@ modules/OmegaBeatToTruth.cpp
 modules/AntennaResponse.cpp
 modules/WaveformSampling.cpp 
 modules/AddNoise.cpp
+modules/Amplifier.cpp
 modules/Mixer.cpp
 modules/Digitize.cpp
 modules/TestG4AntGenerator.cpp
