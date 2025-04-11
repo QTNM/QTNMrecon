@@ -49,7 +49,7 @@ int main(int argc, char** argv)
   std::string mixed = "mixer";
   std::string l2noise = "noisy_";
   std::string l2amp = "amped_";
-std::string l2mix = "mixed_";
+  std::string l2mix = "mixed_";
   
   // data source: read from ROOT file, store under key 'raw'
   TFile ff(fname.data(),"READ");

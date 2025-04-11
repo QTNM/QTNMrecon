@@ -28,6 +28,7 @@
 #include "trackMerger.hh"
 #include "modules/WfmReader.hh"
 #include "modules/AddNoise.hh"
+#include "modules/Amplifier.hh"
 #include "modules/Mixer.hh"
 #include "modules/Digitize.hh"
 #include "modules/writeHitDigiToRoot.hh"
@@ -61,8 +62,10 @@ int main(int argc, char** argv)
   std::string samp = "sampled";
   std::string intermediate = "wave";
   std::string noisy = "noisy";
+  std::string amped = "amplified";
   std::string mixed = "mixer";
   std::string l2noise = "noisy_";
+  std::string l2amp = "amped_";
   std::string l2mix = "mixed_";
 
   // -------------
@@ -140,15 +143,21 @@ int main(int argc, char** argv)
   noiseAdder.setSignalToNoise(10.0);
   noiseAdder.setOnsetPercent(10.0);
 
-  // mixer, step (4), waveform in from l2 key, out in l2 key
-  auto mixer = Mixer(noisy, mixed, l2noise, l2mix);
+  // amplifier, step (4), waveform in from l2 key, out in l2 key
+  auto amplifier = Amplifier(noisy, amped, l2noise, l2amp);
+  quantity<Hz> bwidth = 200.0 * MHz; // +-100MHz
+  amplifier.setBandPassWidthOnTruth(bwidth);
+  amplifier.setGainFactor(1.0);
+
+  // mixer, step (5), waveform in from l2 key, out in l2 key
+  auto mixer = Mixer(amped, mixed, l2amp, l2mix);
   quantity<Hz> tfreq = 100.0 * MHz;
   //  quantity<Hz> tfreq = 5.0 * GHz; // test case setting; 100 MHz normal
   mixer.setTargetFrequency(tfreq);
   mixer.setFilterCutFrequency(10*tfreq);
   //  mixer.setFilterCutFrequency(tfreq); // test case setting; 10 x tfreq normal
 
-  // digitizer, step (5), waveform from l2 key
+  // digitizer, step (6), waveform from l2 key
   auto digitizer = Digitize(mixed, l2mix);
   //  quantity<Hz> dsampling = 10.0 * GHz; // test case setting
   quantity<Hz> dsampling = 1.0 * GHz;
