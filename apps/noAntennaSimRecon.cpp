@@ -30,6 +30,7 @@ using namespace ROOT::Math;
 #include "modules/WaveformSampling.hh"
 #include "modules/OmegaBeatToTruth.hh"
 #include "modules/AddNoise.hh"
+#include "modules/Amplifier.hh"
 #include "modules/Mixer.hh"
 #include "modules/Digitize.hh"
 #include "modules/writeHitDigiToRoot.hh"
@@ -60,8 +61,10 @@ int main(int argc, char** argv)
   std::string resp = "response";
   std::string samp = "sampled";
   std::string noisy = "noisy";
+  std::string amped = "amplified";
   std::string mixed = "mixer";
   std::string l2noise = "noisy_";
+  std::string l2amp = "amped_";
   std::string l2mix = "mixed_";
 
   // data source: read from ROOT file, store under key 'raw'
@@ -103,13 +106,19 @@ int main(int argc, char** argv)
   noiseAdder.setSignalToNoise(1.0);
   noiseAdder.setOnsetPercent(10.0);
 
-  // mixer, step (4), waveform in from l2 key, out in l2 key
-  auto mixer = Mixer(noisy, mixed, l2noise, l2mix);
+  // amplifier, step (4), waveform in from l2 key, out in l2 key
+  auto amplifier = Amplifier(noisy, amped, l2noise, l2amp);
+  quantity<Hz> bwidth = 200.0 * MHz; // +-100MHz
+  amplifier.setBandPassWidthOnTruth(bwidth);
+  amplifier.setGainFactor(1.0);
+
+  // mixer, step (5), waveform in from l2 key, out in l2 key
+  auto mixer = Mixer(amped, mixed, l2amp, l2mix);
   quantity<Hz> tfreq = 100.0 * MHz;
   mixer.setTargetFrequency(tfreq);
   mixer.setFilterCutFrequency(10*tfreq);
 
-  // digitizer, step (5), waveform from l2 key
+  // digitizer, step (6), waveform from l2 key
   auto digitizer = Digitize(mixed, l2mix);
   quantity<Hz> dsampling = 1.0 * GHz;
   quantity<V> vert = 1.0 * V;

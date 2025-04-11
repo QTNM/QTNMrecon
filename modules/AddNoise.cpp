@@ -59,7 +59,9 @@ DataPack AddNoise::operator()(DataPack dp)
           noisegen.setScale(nlevel); // is std.dev of Gaussian = RMS to reach SNR=(A/sqrt2)/RMS
           noisegen.setSampling_rate(1.0/stime.numerical_value_in(s) * Hz); // inverse time!=frequency
 
-	  sample_length = pure.size() * stime; // [ns] automatically
+	  // trigger onset position
+	  int onset = static_cast<int>(onset_percent/100.0 * pure.size());
+	  sample_length = pure.size() * stime + 2*onset * stime; // [ns], extend sample by 2*onset
           noisegen.setDuration(sample_length);
 	  //	  std::cout << "add Noise - duration " << sample_length << std::endl;
 
@@ -69,8 +71,6 @@ DataPack AddNoise::operator()(DataPack dp)
           for (size_t i=0;i<pure.size();++i) res[i] = pure[i] * V; // vec_t -> waveform_t
           dp.getTruthRef().pure.push_back(pure); // copy to truth for storage; no unit
 
-	  // trigger onset position
-	  int onset = static_cast<int>(onset_percent/100.0 * pure.size());
           waveform_t noisy = noisegen.add(res,onset); // use the noise generator
           std::string okey = l2out + std::to_string(i);
 	  std::cout << "store key " << okey << " waveform of size " << noisy.size() << std::endl;
