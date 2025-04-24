@@ -44,6 +44,7 @@ class QTNMSimAntennaReader
     TTreeReaderValue<std::vector<double>> kevec;
     TTreeReaderValue<std::vector<double>> omvec;
     TTreeReaderValue<std::vector<double>> tvec;
+    TTreeReaderValue<std::vector<double>> stvec;
     TTreeReaderValue<std::vector<double>> vvec;
 
     // these below serve as string keys to access (read/write) the Event map

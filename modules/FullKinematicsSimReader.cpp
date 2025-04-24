@@ -33,7 +33,7 @@ FullKinematicsSimReader::FullKinematicsSimReader(TTreeReader& re1, TTreeReader& 
     posz(reader1, "Posz"),
     kine(reader1, "KinEnergy"),
     pangle(reader1, "PitchAngle"),
-    tvec(reader1, "TimeVec"),
+    tvec(reader1, "SourceTime"),
     kevec(reader1, "KEVec"),
     omvec(reader1, "OmVec"),
     pxvec(reader1, "PosxVec"),
@@ -70,7 +70,7 @@ DataPack FullKinematicsSimReader::operator()()
     // collect all Signal info from file, reader holds event iterator
     
     if (reader1.Next()) { // variables filled from file
-        outdata["TimeVec"] = std::make_any<std::vector<double>>(tvec->begin(),tvec->end());
+        outdata["SourceTime"] = std::make_any<std::vector<double>>(tvec->begin(),tvec->end());
         outdata["OmVec"] = std::make_any<std::vector<double>>(omvec->begin(),omvec->end());
         outdata["KEVec"] = std::make_any<std::vector<double>>(kevec->begin(),kevec->end());
         outdata["pxVec"] = std::make_any<std::vector<double>>(pxvec->begin(),pxvec->end());

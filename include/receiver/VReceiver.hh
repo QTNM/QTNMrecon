@@ -26,6 +26,7 @@ public:
   // specific characteristics of a signal are set in that derived
   // class but the operation to generate is common to all hence
   // this interface
+  virtual vec_t antenna_local_time(Event<std::any>& event) = 0;
   
 
 protected:

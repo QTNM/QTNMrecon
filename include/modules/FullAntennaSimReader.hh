@@ -56,6 +56,7 @@ class FullAntennaSimReader
     TTreeReaderValue<std::vector<int>> aID;
     TTreeReaderValue<std::vector<double>> kevec;
     TTreeReaderValue<std::vector<double>> omvec;
+    TTreeReaderValue<std::vector<double>> stvec;
     TTreeReaderValue<std::vector<double>> tvec;
     TTreeReaderValue<std::vector<double>> vvec;
 

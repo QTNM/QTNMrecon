@@ -29,6 +29,7 @@ QTNMSimAntennaReader::QTNMSimAntennaReader(TTreeReader& re, std::string out) :
     kevec(reader, "KEVec"),
     omvec(reader, "OmVec"),
     tvec(reader, "TimeVec"),
+    stvec(reader, "SourceTime"),
     vvec(reader, "VoltageVec")
 {
     std::cout << "in reader n entries: " << reader.GetEntries() << std::endl;
@@ -58,6 +59,7 @@ DataPack QTNMSimAntennaReader::operator()()
         outdata["AntennaID"] = std::make_any<std::vector<int>>(aID->begin(),aID->end());
         outdata["TimeVec"] = std::make_any<std::vector<double>>(tvec->begin(),tvec->end());
         outdata["VoltageVec"] = std::make_any<std::vector<double>>(vvec->begin(),vvec->end());
+        outdata["SourceTime"] = std::make_any<std::vector<double>>(stvec->begin(),stvec->end());
         outdata["OmVec"] = std::make_any<std::vector<double>>(omvec->begin(),omvec->end());
         outdata["KEVec"] = std::make_any<std::vector<double>>(kevec->begin(),kevec->end());
         eventmap[outkey] = outdata; // with outdata an Event<std::any>
@@ -85,8 +87,8 @@ DataPack QTNMSimAntennaReader::operator()()
     //   std::cout << std::endl;
     // }
 
-    if (!tvec->empty()) // book truth from trajectory
-      dp.getTruthRef().start_time = tvec->front() * ns;
+    if (!stvec->empty()) // book truth from trajectory
+      dp.getTruthRef().start_time = stvec->front() * ns;
     else
       dp.getTruthRef().start_time = -1.0 * ns;
     dp.getTruthRef().nantenna = nantenna; // store input truth
