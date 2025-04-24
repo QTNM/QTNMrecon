@@ -33,6 +33,7 @@ class FakeG4AntToRoot
 
   std::vector<int>* antennaID; // interleaved like G4 output
   vec_t* timevec; // may change in QTNMSim to non-interleaved vector
+  vec_t* sourcetime;
   vec_t* voltagevec;
   vec_t* KEdummy; // empty for consistency with reader 
   vec_t* OMdummy; // empty

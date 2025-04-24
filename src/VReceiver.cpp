@@ -54,3 +54,27 @@ std::vector<XYZVector> VReceiver::calculate_Efield(Event<std::any>& event, XYZPo
 
   return fields_at_point;
 }
+
+vec_t VReceiver::antenna_time(Event<std::any>& event, XYZPoint& eval_point)
+{
+  vec_t local_time;
+  try
+    {
+      auto px = std::any_cast<std::vector<double>>(event["pxVec"]); // position
+      auto py = std::any_cast<std::vector<double>>(event["pyVec"]);
+      auto pz = std::any_cast<std::vector<double>>(event["pzVec"]);
+      auto ts = std::any_cast<std::vector<double>>(event["SourceTime"]); // source time in [ns]
+      
+      for (size_t i=0; i<px.size();++i) { // check units
+	XYZPoint  pos(px[i],py[i],pz[i]);
+	double delay = (eval_point - pos).R() / c_m_per_ns;
+	local_time.push_back(ts[i] + delay);
+      }
+    }
+  catch (const std::bad_any_cast& e)
+    {
+      std::cerr << e.what() << std::endl;
+    }
+  
+  return local_time;
+}

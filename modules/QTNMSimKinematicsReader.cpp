@@ -22,7 +22,7 @@ QTNMSimKinematicsReader::QTNMSimKinematicsReader(TTreeReader& re, std::string ou
     posz(reader, "Posz"),
     kine(reader, "KinEnergy"),
     pangle(reader, "PitchAngle"),
-    tvec(reader, "TimeVec"),
+    tvec(reader, "SourceTime"),
     omvec(reader, "OmVec"),
     kevec(reader, "KEVec"),
     pxvec(reader, "PosxVec"),
@@ -59,7 +59,7 @@ DataPack QTNMSimKinematicsReader::operator()()
     // collect all Signal info from file, reader holds event iterator
     
     if (reader.Next()) { // variables filled from file
-        outdata["TimeVec"] = std::make_any<std::vector<double>>(tvec->begin(),tvec->end());
+        outdata["SourceTime"] = std::make_any<std::vector<double>>(tvec->begin(),tvec->end());
         outdata["OmVec"] = std::make_any<std::vector<double>>(omvec->begin(),omvec->end());
         outdata["KEVec"] = std::make_any<std::vector<double>>(kevec->begin(),kevec->end());
         outdata["pxVec"] = std::make_any<std::vector<double>>(pxvec->begin(),pxvec->end());

@@ -39,6 +39,7 @@ FullAntennaSimReader::FullAntennaSimReader(TTreeReader& re1, TTreeReader& re2, s
     aID(reader1, "AntennaID"),
     omvec(reader1, "OmVec"),
     kevec(reader1, "KEVec"),
+    stvec(reader1, "SourceTime"),
     tvec(reader1, "TimeVec"),
     vvec(reader1, "VoltageVec")
 {
@@ -69,6 +70,7 @@ DataPack FullAntennaSimReader::operator()()
         outdata["AntennaID"] = std::make_any<std::vector<int>>(aID->begin(),aID->end());
         outdata["TimeVec"] = std::make_any<std::vector<double>>(tvec->begin(),tvec->end());
         outdata["VoltageVec"] = std::make_any<std::vector<double>>(vvec->begin(),vvec->end());
+        outdata["SourceTime"] = std::make_any<std::vector<double>>(stvec->begin(),stvec->end());
         outdata["OmVec"] = std::make_any<std::vector<double>>(omvec->begin(),omvec->end());
         outdata["KEVec"] = std::make_any<std::vector<double>>(kevec->begin(),kevec->end());
         eventmap[outkey] = outdata; // with outdata an Event<std::any>
@@ -112,8 +114,8 @@ DataPack FullAntennaSimReader::operator()()
         }
         reader2.Restart(); // for each trajectory, have to loop over hits, then reset hits reader.
     }
-    if (!tvec->empty()) // book truth from trajectory
-      dp.getTruthRef().start_time = tvec->front() * ns;
+    if (!stvec->empty()) // book truth from trajectory
+      dp.getTruthRef().start_time = stvec->front() * ns;
     else
       dp.getTruthRef().start_time = -1.0 * ns;
     dp.getTruthRef().nantenna = nantenna; // store input truth

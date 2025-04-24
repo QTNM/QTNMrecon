@@ -7,7 +7,6 @@
 
 // us
 #include "Event.hh"
-#include "types.hh"
 
 // ROOT
 #include "Math/Vector3D.h" // XYZVector
@@ -27,6 +26,7 @@ public:
   // specific characteristics of a signal are set in that derived
   // class but the operation to generate is common to all hence
   // this interface
+  virtual vec_t antenna_local_time(Event<std::any>& event) = 0;
   
 
 protected:
@@ -36,6 +36,8 @@ protected:
   // Input the source kinematics. Second is receiver location.
   // Important to clear the event map from source data since not needed afterwards.
   std::vector<XYZVector> calculate_Efield(Event<std::any>& event, XYZPoint& eval_point);
+  vec_t antenna_time(Event<std::any>& event, XYZPoint& eval_point);
+  static constexpr double c_m_per_ns = c_SI * 1.0e-9; // m/ns
   static constexpr double eps0_SI = 8.854187819e-12; // [F/m]
   
 };
