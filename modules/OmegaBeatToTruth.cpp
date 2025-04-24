@@ -48,6 +48,7 @@ DataPack OmegaBeatToTruth::operator()(DataPack dp)
         dp.getTruthRef().beat_frequency = freq.at(idx); // truth output
 	// outdata["omfft"] = std::any_cast<waveform_t>(res);   // q<V>, again cheated unit for use of dft()
 	// outdata["omfreq"] = std::any_cast<std::vector<quantity<Hz>>>(freq); // q<Hz>
+	dp.getRef()[inkey].erase("omega"); // used hence remove from source
     }
     catch(const std::bad_any_cast& e)
     {

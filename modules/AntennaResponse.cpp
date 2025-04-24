@@ -24,8 +24,9 @@ DataPack AntennaResponse::operator()(DataPack dp)
     int counter = 0;
     for (auto* antenna : receiver) {
         std::string tkey = "VoltageVec_" + std::to_string(counter) + "_[V]";
-	    std::cout << "in antenna resp, made key: " << tkey << std::endl;
         outdata[tkey] = std::make_any<vec_t>(antenna->voltage_response(indata));
+        std::string tkey = "TimeVec_" + std::to_string(counter) + "_ns";
+        outdata[tkey] = std::make_any<vec_t>(antenna->antenna_local_time(indata));
         counter++;
     }
     // clear obsolete data

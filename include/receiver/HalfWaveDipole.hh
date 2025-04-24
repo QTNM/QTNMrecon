@@ -6,7 +6,6 @@
 #include <vector>
 
 // us
-#include "types.hh"
 #include "VReceiver.hh"
 
 // ROOT
@@ -27,7 +26,7 @@ public:
   // specific characteristics of a signal are set in that derived
   // class but the operation to generate is common to all hence
   // this interface
-  
+  inline vec_t antenna_local_time(Event<std::any>& event) {return antenna_time(event, antPos);}
 
 private:
   XYZPoint  antPos;    // input geometry
