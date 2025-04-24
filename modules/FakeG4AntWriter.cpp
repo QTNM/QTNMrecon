@@ -12,6 +12,7 @@ FakeG4AntToRoot::FakeG4AntToRoot(std::string inkey, TTree* tr) :
   mytree(tr),
   antennaID(nullptr),
   timevec(nullptr),
+  sourcetime(nullptr),
   voltagevec(nullptr),
   KEdummy(nullptr),
   OMdummy(nullptr)
@@ -27,6 +28,7 @@ FakeG4AntToRoot::FakeG4AntToRoot(std::string inkey, TTree* tr) :
 
   mytree->Branch("AntennaID", &antennaID); // point to vec_t dummy address
   mytree->Branch("TimeVec", &timevec); // point to vec_t dummy address
+  mytree->Branch("SourceTime", &sourcetime); // point to vec_t dummy address
   mytree->Branch("VoltageVec", &voltagevec); // point to vec_t dummy address
   mytree->Branch("OmVec", &KEdummy); // point to vec_t dummy address
   mytree->Branch("KEVec", &OMdummy); // point to vec_t dummy address
@@ -62,6 +64,9 @@ void FakeG4AntToRoot::operator()(DataPack dp)
   vec_t dtvec = std::any_cast<vec_t>(indata["TimeVec"]); // vec_t
   timevec     = &dtvec; // vec_t* copy
   mytree->SetBranchAddress("TimeVec",&timevec);
+  vec_t dts = std::any_cast<vec_t>(indata["SourceTime"]); // vec_t
+  sourcetime     = &dts; // vec_t* copy
+  mytree->SetBranchAddress("SourceTime",&sourcetime);
   vec_t dvvec = std::any_cast<vec_t>(indata["VoltageVec"]); // vec_t
   voltagevec  = &dvvec; // vec_t* copy
   mytree->SetBranchAddress("VoltageVec",&voltagevec);

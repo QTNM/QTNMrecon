@@ -57,7 +57,7 @@ DataPack TestG4AntGenerator::operator()()
   int nsamples = duration.numerical_value_in(ns) / sampleinterval;
   timeshift = (int)(nsamples / 4.0); // initial shift, quarter in
   std::vector<int> aID;
-  vec_t vvec, tvec;
+  vec_t vvec, tvec, ts;
 
   // prepare fake Geant4 output data
   Event_map<std::any> eventmap; // data item for delivery
@@ -72,10 +72,12 @@ DataPack TestG4AntGenerator::operator()()
 	vvec.push_back(basesig.at(j));
 	tvec.push_back(j * sampleinterval); // [ns]
       }
+      ts.push_back(j*sampleinterval); // [ns]
     }
     outdata["AntennaID"] = std::make_any<std::vector<int>>(aID);
     outdata["VoltageVec"] = std::make_any<vec_t>(vvec);
     outdata["TimeVec"] = std::make_any<vec_t>(tvec);
+    outdata["SourceTime"] = std::make_any<vec_t>(ts);
     
     eventmap[outkey] = outdata;
     DataPack dp(eventmap);
@@ -86,6 +88,7 @@ DataPack TestG4AntGenerator::operator()()
     aID.clear();
     vvec.clear();
     tvec.clear();
+    ts.clear();
 
     return dp;
   }
@@ -99,10 +102,12 @@ DataPack TestG4AntGenerator::operator()()
 	vvec.push_back(track2.at(j));
 	tvec.push_back(timeshift*sampleinterval + j * sampleinterval); // [ns]
       } // offset tvec by timeshift
+      ts.push_back(j*sampleinterval); // [ns]
     }
     outdata["AntennaID"] = std::make_any<std::vector<int>>(aID);
     outdata["VoltageVec"] = std::make_any<vec_t>(vvec);
     outdata["TimeVec"] = std::make_any<vec_t>(tvec);
+    outdata["SourceTime"] = std::make_any<vec_t>(ts);
 
     eventmap[outkey] = outdata;
     DataPack dp(eventmap);
@@ -113,6 +118,7 @@ DataPack TestG4AntGenerator::operator()()
     aID.clear();
     vvec.clear();
     tvec.clear();
+    ts.clear();
 
     return dp;
   }
