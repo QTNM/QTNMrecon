@@ -22,41 +22,51 @@
 
 #pragma once
 
-#include <mp-units/bits/external/fixed_string.h>
-#include <mp-units/bits/external/type_traits.h>
 #include <mp-units/bits/ratio.h>
-#include <mp-units/bits/symbol_text.h>
+#include <mp-units/compat_macros.h>
+#include <mp-units/ext/fixed_string.h>
+#include <mp-units/ext/type_traits.h>
+#include <mp-units/framework/symbol_text.h>
 
-namespace mp_units {
+#ifndef MP_UNITS_IN_MODULE_INTERFACE
+#ifdef MP_UNITS_IMPORT_STD
+import std;
+#else
+#include <cstdint>
+#if __cpp_lib_text_encoding
+#include <text_encoding>
+#endif  // __cpp_lib_text_encoding
+#endif  // MP_UNITS_IMPORT_STD
+#endif  // MP_UNITS_IN_MODULE_INTERFACE
 
-namespace detail {
+namespace mp_units::detail {
 
 template<std::intmax_t Value>
   requires(0 <= Value) && (Value < 10)
-inline constexpr basic_fixed_string superscript_number = u8"";
+constexpr basic_fixed_string superscript_number = u8"";
 
 template<>
-inline constexpr basic_fixed_string superscript_number<0> = u8"\u2070";
+MP_UNITS_INLINE constexpr basic_fixed_string superscript_number<0> = u8"⁰" /* U+2070 SUPERSCRIPT ZERO */;
 template<>
-inline constexpr basic_fixed_string superscript_number<1> = u8"\u00b9";
+MP_UNITS_INLINE constexpr basic_fixed_string superscript_number<1> = u8"¹" /* U+00B9 SUPERSCRIPT ONE */;
 template<>
-inline constexpr basic_fixed_string superscript_number<2> = u8"\u00b2";
+MP_UNITS_INLINE constexpr basic_fixed_string superscript_number<2> = u8"²" /* U+00B2 SUPERSCRIPT TWO */;
 template<>
-inline constexpr basic_fixed_string superscript_number<3> = u8"\u00b3";
+MP_UNITS_INLINE constexpr basic_fixed_string superscript_number<3> = u8"³" /* U+00B3 SUPERSCRIPT THREE */;
 template<>
-inline constexpr basic_fixed_string superscript_number<4> = u8"\u2074";
+MP_UNITS_INLINE constexpr basic_fixed_string superscript_number<4> = u8"⁴" /* U+2074 SUPERSCRIPT FOUR */;
 template<>
-inline constexpr basic_fixed_string superscript_number<5> = u8"\u2075";
+MP_UNITS_INLINE constexpr basic_fixed_string superscript_number<5> = u8"⁵" /* U+2075 SUPERSCRIPT FIVE */;
 template<>
-inline constexpr basic_fixed_string superscript_number<6> = u8"\u2076";
+MP_UNITS_INLINE constexpr basic_fixed_string superscript_number<6> = u8"⁶" /* U+2076 SUPERSCRIPT SIX */;
 template<>
-inline constexpr basic_fixed_string superscript_number<7> = u8"\u2077";
+MP_UNITS_INLINE constexpr basic_fixed_string superscript_number<7> = u8"⁷" /* U+2077 SUPERSCRIPT SEVEN */;
 template<>
-inline constexpr basic_fixed_string superscript_number<8> = u8"\u2078";
+MP_UNITS_INLINE constexpr basic_fixed_string superscript_number<8> = u8"⁸" /* U+2078 SUPERSCRIPT EIGHT */;
 template<>
-inline constexpr basic_fixed_string superscript_number<9> = u8"\u2079";
+MP_UNITS_INLINE constexpr basic_fixed_string superscript_number<9> = u8"⁹" /* U+2079 SUPERSCRIPT NINE */;
 
-inline constexpr symbol_text superscript_minus(u8"\u207b", "-");
+inline constexpr symbol_text superscript_minus(u8"⁻" /* U+207B SUPERSCRIPT MINUS */, "-");
 
 inline constexpr symbol_text superscript_prefix(u8"", "^");
 
@@ -88,48 +98,43 @@ template<std::intmax_t Value>
     return regular<Value / 10>() + regular<Value % 10>();
 }
 
-}  // namespace detail
-
-MP_UNITS_EXPORT enum class text_encoding : std::int8_t {
-  unicode,  // µs; m³;  L²MT⁻³
-  ascii,    // us; m^3; L^2MT^-3
-  default_encoding = unicode
-};
-
-namespace detail {
-
 template<typename CharT, std::size_t N, std::size_t M, std::output_iterator<CharT> Out>
-constexpr Out copy(const symbol_text<N, M>& txt, text_encoding encoding, Out out)
+constexpr Out copy(const symbol_text<N, M>& txt, character_set char_set, Out out)
 {
-  if (encoding == text_encoding::unicode) {
+  if (char_set == character_set::utf8) {
     if constexpr (is_same_v<CharT, char8_t>)
-      return copy(txt.unicode(), out).out;
+      return ::mp_units::detail::copy(txt.utf8().begin(), txt.utf8().end(), out);
     else if constexpr (is_same_v<CharT, char>) {
-      for (char8_t ch : txt.unicode()) *out++ = static_cast<char>(ch);
+#if __cpp_lib_text_encoding
+      if (std::text_encoding::literal().mib() != std::text_encoding::id::UTF8)
+        // fallback to portable mode
+        return ::mp_units::detail::copy(txt.portable().begin(), txt.portable().end(), out);
+#endif
+      for (const char8_t ch : txt.utf8()) *out++ = static_cast<char>(ch);
       return out;
     } else
-      throw std::invalid_argument("Unicode text can't be copied to CharT output");
+      MP_UNITS_THROW(std::invalid_argument("UTF-8 text can't be copied to CharT output"));
   } else {
     if constexpr (is_same_v<CharT, char>)
-      return copy(txt.ascii(), out).out;
+      return ::mp_units::detail::copy(txt.portable().begin(), txt.portable().end(), out);
     else
-      throw std::invalid_argument("ASCII text can't be copied to CharT output");
+      MP_UNITS_THROW(std::invalid_argument("Portable text can't be copied to CharT output"));
   }
 }
 
 template<typename CharT, std::size_t N, std::size_t M, std::output_iterator<CharT> Out>
-constexpr Out copy_symbol(const symbol_text<N, M>& txt, text_encoding encoding, bool negative_power, Out out)
+constexpr Out copy_symbol(const symbol_text<N, M>& txt, character_set char_set, bool negative_power, Out out)
 {
-  out = copy<CharT>(txt, encoding, out);
+  out = copy<CharT>(txt, char_set, out);
   if (negative_power) {
     constexpr auto exp = superscript<-1>();
-    out = copy<CharT>(exp, encoding, out);
+    out = copy<CharT>(exp, char_set, out);
   }
   return out;
 }
 
 template<typename CharT, int Num, int... Den, std::output_iterator<CharT> Out>
-constexpr Out copy_symbol_exponent(text_encoding encoding, bool negative_power, Out out)
+constexpr Out copy_symbol_exponent(character_set char_set, bool negative_power, Out out)
 {
   constexpr ratio r{Num, Den...};
   if constexpr (r.den != 1) {
@@ -137,24 +142,21 @@ constexpr Out copy_symbol_exponent(text_encoding encoding, bool negative_power, 
     if (negative_power) {
       constexpr auto txt =
         symbol_text("^-(") + regular<r.num>() + symbol_text("/") + regular<r.den>() + symbol_text(")");
-      return copy<CharT>(txt, encoding, out);
-    } else {
-      constexpr auto txt =
-        symbol_text("^(") + regular<r.num>() + symbol_text("/") + regular<r.den>() + symbol_text(")");
-      return copy<CharT>(txt, encoding, out);
+      return copy<CharT>(txt, char_set, out);
     }
+    constexpr auto txt = symbol_text("^(") + regular<r.num>() + symbol_text("/") + regular<r.den>() + symbol_text(")");
+    return copy<CharT>(txt, char_set, out);
   } else if constexpr (r.num != 1) {
     // add exponent part
     if (negative_power) {
       constexpr auto txt = superscript<-r.num>();
-      return copy<CharT>(txt, encoding, out);
-    } else {
-      constexpr auto txt = superscript<r.num>();
-      return copy<CharT>(txt, encoding, out);
+      return copy<CharT>(txt, char_set, out);
     }
+    constexpr auto txt = superscript<r.num>();
+    return copy<CharT>(txt, char_set, out);
+  } else {
+    return out;
   }
 }
 
-}  // namespace detail
-
-}  // namespace mp_units
+}  // namespace mp_units::detail

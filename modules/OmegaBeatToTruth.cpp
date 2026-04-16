@@ -6,7 +6,6 @@
 
 // us
 #include "OmegaBeatToTruth.hh"
-#include <mp-units/ostream.h> // for cout stream
 
 
 OmegaBeatToTruth::OmegaBeatToTruth(std::string in, std::string out) : 

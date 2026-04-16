@@ -10,7 +10,6 @@
 
 // us
 #include "AddNoise.hh"
-#include <mp-units/ostream.h> // for cout stream
 
 
 AddNoise::AddNoise(std::string in, std::string out, std::string l2out) : 

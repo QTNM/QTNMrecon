@@ -3,8 +3,6 @@
 // us
 #include "SineGenerator.hh"
 #include <mp-units/math.h>
-#include <mp-units/format.h>
-#include <mp-units/ostream.h>
 
 // std
 #include <cmath>

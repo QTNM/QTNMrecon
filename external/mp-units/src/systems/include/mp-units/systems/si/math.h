@@ -22,22 +22,28 @@
 
 #pragma once
 
+#include <mp-units/bits/requires_hosted.h>
+//
 #include <mp-units/bits/module_macros.h>
 #include <mp-units/systems/isq/space_and_time.h>
 #include <mp-units/systems/si/units.h>
 
 #ifndef MP_UNITS_IN_MODULE_INTERFACE
-#include <mp-units/bits/value_cast.h>
-#include <mp-units/customization_points.h>
-#include <mp-units/quantity.h>
-#include <mp-units/unit.h>
+#include <mp-units/framework/customization_points.h>
+#include <mp-units/framework/quantity.h>
+#include <mp-units/framework/unit.h>
+#include <mp-units/framework/value_cast.h>
+#ifdef MP_UNITS_IMPORT_STD
+import std;
+#else
 #include <cmath>
+#endif
 #endif
 
 
 MP_UNITS_EXPORT
 namespace mp_units::si {
-template<ReferenceOf<isq::angular_measure> auto R, typename Rep>
+template<ReferenceOf<MP_UNITS_IS_VALUE_WORKAROUND(isq::angular_measure)> auto R, typename Rep>
   requires requires(Rep v) { sin(v); } || requires(Rep v) { std::sin(v); }
 [[nodiscard]] inline QuantityOf<dimensionless> auto sin(const quantity<R, Rep>& q) noexcept
 {
@@ -51,7 +57,7 @@ template<ReferenceOf<isq::angular_measure> auto R, typename Rep>
     return quantity{sin(q.numerical_value_in(radian)), one};
 }
 
-template<ReferenceOf<isq::angular_measure> auto R, typename Rep>
+template<ReferenceOf<MP_UNITS_IS_VALUE_WORKAROUND(isq::angular_measure)> auto R, typename Rep>
   requires requires(Rep v) { cos(v); } || requires(Rep v) { std::cos(v); }
 [[nodiscard]] inline QuantityOf<dimensionless> auto cos(const quantity<R, Rep>& q) noexcept
 {
@@ -65,7 +71,7 @@ template<ReferenceOf<isq::angular_measure> auto R, typename Rep>
     return quantity{cos(q.numerical_value_in(radian)), one};
 }
 
-template<ReferenceOf<isq::angular_measure> auto R, typename Rep>
+template<ReferenceOf<MP_UNITS_IS_VALUE_WORKAROUND(isq::angular_measure)> auto R, typename Rep>
   requires requires(Rep v) { tan(v); } || requires(Rep v) { std::tan(v); }
 [[nodiscard]] inline QuantityOf<dimensionless> auto tan(const quantity<R, Rep>& q) noexcept
 {
@@ -81,7 +87,8 @@ template<ReferenceOf<isq::angular_measure> auto R, typename Rep>
 
 template<ReferenceOf<dimensionless> auto R, typename Rep>
   requires requires(Rep v) { asin(v); } || requires(Rep v) { std::asin(v); }
-[[nodiscard]] inline QuantityOf<isq::angular_measure> auto asin(const quantity<R, Rep>& q) noexcept
+[[nodiscard]] inline QuantityOf<MP_UNITS_IS_VALUE_WORKAROUND(isq::angular_measure)> auto asin(
+  const quantity<R, Rep>& q) noexcept
 {
   using std::asin;
   if constexpr (!treat_as_floating_point<Rep>) {
@@ -95,7 +102,8 @@ template<ReferenceOf<dimensionless> auto R, typename Rep>
 
 template<ReferenceOf<dimensionless> auto R, typename Rep>
   requires requires(Rep v) { acos(v); } || requires(Rep v) { std::acos(v); }
-[[nodiscard]] inline QuantityOf<isq::angular_measure> auto acos(const quantity<R, Rep>& q) noexcept
+[[nodiscard]] inline QuantityOf<MP_UNITS_IS_VALUE_WORKAROUND(isq::angular_measure)> auto acos(
+  const quantity<R, Rep>& q) noexcept
 {
   using std::acos;
   if constexpr (!treat_as_floating_point<Rep>) {
@@ -109,7 +117,8 @@ template<ReferenceOf<dimensionless> auto R, typename Rep>
 
 template<ReferenceOf<dimensionless> auto R, typename Rep>
   requires requires(Rep v) { atan(v); } || requires(Rep v) { std::atan(v); }
-[[nodiscard]] inline QuantityOf<isq::angular_measure> auto atan(const quantity<R, Rep>& q) noexcept
+[[nodiscard]] inline QuantityOf<MP_UNITS_IS_VALUE_WORKAROUND(isq::angular_measure)> auto atan(
+  const quantity<R, Rep>& q) noexcept
 {
   using std::atan;
   if constexpr (!treat_as_floating_point<Rep>) {
@@ -123,13 +132,13 @@ template<ReferenceOf<dimensionless> auto R, typename Rep>
 
 template<auto R1, typename Rep1, auto R2, typename Rep2>
   requires requires(Rep1 v1, Rep2 v2) {
-    common_reference(R1, R2);
+    get_common_reference(R1, R2);
     requires requires { atan2(v1, v2); } || requires { std::atan2(v1, v2); };
   }
-[[nodiscard]] inline QuantityOf<isq::angular_measure> auto atan2(const quantity<R1, Rep1>& y,
-                                                                 const quantity<R2, Rep2>& x) noexcept
+[[nodiscard]] inline QuantityOf<MP_UNITS_IS_VALUE_WORKAROUND(isq::angular_measure)> auto atan2(
+  const quantity<R1, Rep1>& y, const quantity<R2, Rep2>& x) noexcept
 {
-  constexpr auto ref = common_reference(R1, R2);
+  constexpr auto ref = get_common_reference(R1, R2);
   constexpr auto unit = get_unit(ref);
   using std::atan2;
   if constexpr (!treat_as_floating_point<Rep1> || !treat_as_floating_point<Rep2>) {

@@ -9,7 +9,6 @@
 
 // us
 #include "trackMerger.hh"
-#include <mp-units/ostream.h> // for cout stream
 
 trackMerger::trackMerger(TTreeReader& re, TTree* tr) : 
   prevID(-1),

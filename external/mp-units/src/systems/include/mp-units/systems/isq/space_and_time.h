@@ -23,11 +23,14 @@
 #pragma once
 
 #include <mp-units/bits/module_macros.h>
+
+// IWYU pragma: begin_exports
 #include <mp-units/systems/isq/si_quantities.h>
 
 #ifndef MP_UNITS_IN_MODULE_INTERFACE
-#include <mp-units/quantity_spec.h>
+#include <mp-units/framework/quantity_spec.h>
 #endif
+// IWYU pragma: end_exports
 
 MP_UNITS_EXPORT
 namespace mp_units::isq {
@@ -39,18 +42,18 @@ QUANTITY_SPEC(thickness, width);
 QUANTITY_SPEC(diameter, width);
 QUANTITY_SPEC(distance, path_length);
 QUANTITY_SPEC(radial_distance, distance);
-QUANTITY_SPEC(position_vector, length, quantity_character::vector);
 QUANTITY_SPEC(displacement, length, quantity_character::vector);
+QUANTITY_SPEC(position_vector, displacement);
 QUANTITY_SPEC(radius_of_curvature, radius);
 QUANTITY_SPEC(curvature, inverse(radius_of_curvature));
 QUANTITY_SPEC(volume, pow<3>(length));
 QUANTITY_SPEC(rotational_displacement, angular_measure, path_length / radius);
 inline constexpr auto angular_displacement = rotational_displacement;
 QUANTITY_SPEC(phase_angle, angular_measure);
-QUANTITY_SPEC(speed, length / time);                         // differs from ISO 80000
-QUANTITY_SPEC(velocity, speed, position_vector / duration);  // vector  // differs from ISO 80000
-QUANTITY_SPEC(acceleration, velocity / duration);            // vector
-QUANTITY_SPEC(acceleration_of_free_fall, acceleration);      // not in ISO 80000
+QUANTITY_SPEC(speed, length / time);                      // differs from ISO 80000
+QUANTITY_SPEC(velocity, speed, displacement / duration);  // vector  // differs from ISO 80000
+QUANTITY_SPEC(acceleration, velocity / duration);         // vector
+QUANTITY_SPEC(acceleration_of_free_fall, acceleration);   // not in ISO 80000
 QUANTITY_SPEC(angular_velocity, angular_displacement / duration, quantity_character::vector);
 QUANTITY_SPEC(angular_acceleration, angular_velocity / duration);
 QUANTITY_SPEC(time_constant, duration);
@@ -63,10 +66,8 @@ inline constexpr auto wavenumber = repetency;
 QUANTITY_SPEC(wave_vector, repetency, quantity_character::vector);
 QUANTITY_SPEC(angular_repetency, inverse(wavelength));
 inline constexpr auto angular_wavenumber = angular_repetency;
-QUANTITY_SPEC(phase_velocity, angular_frequency / angular_repetency);
-inline constexpr auto phase_speed = phase_velocity;
-QUANTITY_SPEC(group_velocity, angular_frequency / angular_repetency);
-inline constexpr auto group_speed = group_velocity;
+QUANTITY_SPEC(phase_speed, angular_frequency / angular_repetency);
+QUANTITY_SPEC(group_speed, angular_frequency / angular_repetency);
 QUANTITY_SPEC(damping_coefficient, inverse(time_constant));
 QUANTITY_SPEC(logarithmic_decrement, dimensionless, damping_coefficient* period_duration);
 QUANTITY_SPEC(attenuation, inverse(distance));

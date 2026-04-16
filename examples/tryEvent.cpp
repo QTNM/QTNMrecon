@@ -5,8 +5,7 @@
 // us
 #include "Event.hh"
 #include "types.hh"
-#include <mp-units/ostream.h> // for cout stream
-#include <mp-units/systems/hep/hep.h>
+#include <mp-units/systems/hep.h>
 
 using namespace mp_units::hep::unit_symbols; // also HEP units
 

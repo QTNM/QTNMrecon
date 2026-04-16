@@ -8,7 +8,6 @@
 
 // us
 #include "Mixer.hh"
-#include <mp-units/ostream.h> // for cout stream
 
 
 Mixer::Mixer(std::string in, std::string out, std::string l2in, std::string l2out) : 
