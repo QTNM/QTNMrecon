@@ -7,8 +7,6 @@
 #include <iostream>
 // us
 #include <mp-units/math.h>
-#include <mp-units/format.h>
-#include <mp-units/ostream.h>
 
 #include "LIA.hh"
 

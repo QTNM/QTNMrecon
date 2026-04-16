@@ -5,7 +5,6 @@
 #include <algorithm>
 
 // us
-#include <mp-units/ostream.h> // for cout stream
 #include "digitizer.hh"
 
 Digitizer::Digitizer() : 

@@ -22,15 +22,19 @@
 
 #pragma once
 
-#include <gsl/gsl-lite.hpp>
-#include <mp-units/bits/external/hacks.h>
+#define MP_UNITS_IN_GMF
+
+#include <mp-units/bits/hacks.h>
 #include <mp-units/compat_macros.h>
+#include <mp-units/ext/contracts.h>
+
+#ifndef MP_UNITS_IMPORT_STD
 #include <array>
-#include <cmath>
 #include <compare>
 #include <concepts>
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <functional>
 #include <initializer_list>
 #include <iterator>
@@ -38,15 +42,28 @@
 #include <numbers>
 #include <numeric>
 #include <optional>
-#include <random>
 #include <ranges>
-#include <sstream>
-#include <string>
 #include <string_view>
 #include <tuple>
 #include <type_traits>
 #include <utility>
-
 #if __cpp_lib_text_encoding
 #include <text_encoding>
 #endif
+#endif
+
+#if MP_UNITS_HOSTED
+#include <mp-units/ext/format.h>
+#ifndef MP_UNITS_IMPORT_STD
+#include <chrono>
+#include <cmath>
+#include <complex>
+#include <locale>
+#include <ostream>
+#include <random>
+#include <sstream>
+#include <string>
+#endif
+#endif
+
+#undef MP_UNITS_IN_GMF

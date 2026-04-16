@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.25)
 
 function(check_libcxx_in_use variable)
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -28,8 +28,14 @@ function(check_libcxx_in_use variable)
         list(APPEND CMAKE_MESSAGE_INDENT "  ")
 
         include(CheckCXXSymbolExists)
-        check_cxx_symbol_exists(_LIBCPP_VERSION "ciso646" ${variable})
+
+        # Ensure CMAKE_REQUIRED_FLAGS includes the current compiler flags
+        set(CMAKE_REQUIRED_FLAGS "${CMAKE_CXX_FLAGS}")
+
+        check_cxx_symbol_exists(_LIBCPP_VERSION "version" ${variable})
         set(${variable} ${${variable}} PARENT_SCOPE)
+
+        unset(CMAKE_REQUIRED_FLAGS)
 
         list(POP_BACK CMAKE_MESSAGE_INDENT)
         if(${variable})

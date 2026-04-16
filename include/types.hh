@@ -4,9 +4,9 @@
 #define QT_TYPES_H
 
 // mp-units
-#include <mp-units/systems/si/si.h>
-#include <mp-units/systems/isq/isq.h>
-#include <mp-units/systems/hep/hep.h>
+#include <mp-units/systems/si.h>
+#include <mp-units/systems/isq.h>
+#include <mp-units/systems/hep.h>
 
 // std
 #include <complex>

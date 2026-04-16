@@ -25,24 +25,26 @@
 #include <mp-units/bits/module_macros.h>
 
 #ifndef MP_UNITS_IN_MODULE_INTERFACE
-#include <mp-units/dimension.h>
-#include <mp-units/quantity_spec.h>
-#include <mp-units/unit.h>
+#include <mp-units/framework/dimension.h>
+#include <mp-units/framework/quantity_spec.h>
+#include <mp-units/framework/unit.h>
 #endif
 
 MP_UNITS_EXPORT
-namespace mp_units::angular {
+namespace mp_units {
+
+namespace angular {
 
 // clang-format off
-inline constexpr struct dim_angle : base_dimension<"A"> {} dim_angle;
+inline constexpr struct dim_angle final : base_dimension<"A"> {} dim_angle;
 QUANTITY_SPEC(angle, dim_angle);
 QUANTITY_SPEC(solid_angle, pow<2>(angle));
 
-inline constexpr struct radian : named_unit<"rad", kind_of<angle>> {} radian;
-inline constexpr struct revolution : named_unit<"rev", mag<2> * mag_pi * radian> {} revolution;
-inline constexpr struct degree : named_unit<symbol_text{u8"°", "deg"}, mag<ratio{1, 360}> * revolution> {} degree;
-inline constexpr struct gradian : named_unit<symbol_text{u8"ᵍ", "grad"}, mag<ratio{1, 400}> * revolution> {} gradian;
-inline constexpr struct steradian : named_unit<"sr", square(radian)> {} steradian;
+inline constexpr struct radian final : named_unit<"rad", kind_of<angle>> {} radian;
+inline constexpr struct revolution final : named_unit<"rev", mag<2> * mag<π> * radian> {} revolution;
+inline constexpr struct degree final : named_unit<symbol_text{u8"°", "deg"}, mag_ratio<1, 360> * revolution> {} degree;
+inline constexpr struct gradian final : named_unit<symbol_text{u8"ᵍ", "grad"}, mag_ratio<1, 400> * revolution> {} gradian;
+inline constexpr struct steradian final : named_unit<"sr", square(radian)> {} steradian;
 // clang-format on
 
 namespace unit_symbols {
@@ -57,4 +59,11 @@ inline constexpr auto deg2 = square(degree);
 
 }  // namespace unit_symbols
 
-}  // namespace mp_units::angular
+}  // namespace angular
+
+template<>
+MP_UNITS_INLINE constexpr bool space_before_unit_symbol<angular::degree> = false;
+template<>
+MP_UNITS_INLINE constexpr bool space_before_unit_symbol<angular::gradian> = false;
+
+}  // namespace mp_units

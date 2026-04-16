@@ -9,7 +9,6 @@
 
 // us
 #include "Amplifier.hh"
-#include <mp-units/ostream.h> // for cout stream
 
 
 Amplifier::Amplifier(std::string in, std::string out, std::string l2in, std::string l2out) : 

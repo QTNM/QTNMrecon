@@ -6,7 +6,6 @@
 
 // us
 #include "printSimReader.hh"
-#include <mp-units/ostream.h> // for cout stream
 
 printSimReader::printSimReader(std::string in) : 
     inkey(std::move(in)) {}

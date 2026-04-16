@@ -5,7 +5,6 @@
 
 // us
 #include "AddChirpToTruth.hh"
-#include <mp-units/ostream.h> // for cout stream
 
 
 AddChirpToTruth::AddChirpToTruth(std::string in) : 
