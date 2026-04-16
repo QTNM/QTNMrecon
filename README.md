@@ -4,11 +4,11 @@ Proposal for a reconstruction pipeline for QTNM.
 
 Build depends on ROOT: easiest build environment at Warwick, source from cvmfs.
 
-source /cvmfs/sft.cern.ch/lcg/views/LCG_105/x86_64-el9-gcc13-opt/setup.sh
+source /cvmfs/sft.cern.ch/lcg/views/LCG_109a/x86_64-el9-gcc15-opt/setup.sh
 
-which delivers ROOT version 6.30, built with C++20. The header-only dependencies also depend on C++20
-with a modern compiler, i.e. GCC13 is a minimum. Some parts compile on Apple-clang version 15 and GCC12 but
-all together fail eventually. Only GCC13 covers all dependencies.
+which delivers ROOT version 6.38, built with C++23. The header-only dependencies also depend on C++20
+with a modern compiler, here GCC15,, with GCC13 a minimum requirment. Some parts compile on Apple-clang version 15
+and GCC12 but all together fail eventually. Only GCC13 covers all dependencies.
 
 There are two small libraries to be built, the tools and the modules. Each is required to build an app,
 i.e. a reconstruction pipeline code.
@@ -38,8 +38,7 @@ https://github.com/mpusz/mp-units
 
 which is being included in this pipeline reconstruction since our tools mostly represent
 physics objects and good unit handling is beneficial. It just needs getting used to when reading and using code.
-Note also that the fmt and gsl external dependencies originate entirely from mp-units and should disappear as
-compilers cover more and more of C++20 concepts.
+Note also the gsl, version 1.1 here, external dependency of mp-units in version 2.5.
 
 The pipeline 'yapp' also builds heavily on C++20, from here:
 
