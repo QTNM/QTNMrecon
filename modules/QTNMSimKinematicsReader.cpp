@@ -14,6 +14,7 @@ QTNMSimKinematicsReader::QTNMSimKinematicsReader(TTreeReader& re, std::string ou
     maxEventNumber(-1), // default -1 for a all events
     evcounter(0),
     Bfield(-1.0 * T),
+    minDuration(10.0 * ns), // default minimum Wfm duration
     reader(re),
     eventID(reader, "EventID"),
     trackID(reader, "TrackID"),
@@ -88,10 +89,16 @@ DataPack QTNMSimKinematicsReader::operator()()
     dp.getTruthRef().vertex.pitchangle = *pangle * rad;
     std::cout << "reader Next() done, evt:  " << evcounter << std::endl;
 
-    if (!tvec->empty()) // book truth from trajectory
+    if (!tvec->empty()) { // book truth from trajectory
       dp.getTruthRef().start_time = tvec->front() * ns;
-    else
+      quantity<ns> endtime = tvec->back() * ns; // check on config Wfm duration
+      if ((endtime-dp.getTruthRef().start_time) <= minDuration)
+	dp.getTruthRef().tooShort = true; // Wfm too short for work
+    }
+    else {
       dp.getTruthRef().start_time = -1.0 * ns;
+      dp.getTruthRef().tooShort = true; // empty Wfm is too short
+    }
     dp.getTruthRef().nantenna = 1; // fine here; overwritten by AntennaResponse
     dp.getTruthRef().bfield = Bfield; // store input truth
     return dp;

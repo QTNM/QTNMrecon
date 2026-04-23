@@ -17,6 +17,7 @@ QTNMSimAntennaReader::QTNMSimAntennaReader(TTreeReader& re, std::string out) :
     evcounter(0),
     nantenna(1),
     Bfield(-1.0 * T),
+    minDuration(10.0 * ns), // default minimum Wfm duration
     reader(re),
     eventID(reader, "EventID"), // needs reader by reference
     trackID(reader, "TrackID"),
@@ -87,10 +88,16 @@ DataPack QTNMSimAntennaReader::operator()()
     //   std::cout << std::endl;
     // }
 
-    if (!stvec->empty()) // book truth from trajectory
+    if (!stvec->empty()) { // book truth from trajectory
       dp.getTruthRef().start_time = stvec->front() * ns;
-    else
+      quantity<ns> endtime = stvec->back() * ns; // check on config Wfm duration
+      if ((endtime-dp.getTruthRef().start_time) <= minDuration)
+	dp.getTruthRef().tooShort = true; // Wfm too short for work
+    }
+    else {
       dp.getTruthRef().start_time = -1.0 * ns;
+      dp.getTruthRef().tooShort = true; // empty Wfm is too short
+    }
     dp.getTruthRef().nantenna = nantenna; // store input truth
     dp.getTruthRef().bfield = Bfield; // store input truth
     return dp;

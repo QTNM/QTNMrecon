@@ -22,12 +22,14 @@ class QTNMSimKinematicsReader
         // default = -1 for all events
         inline void setMaxEventNumber(int nend) {maxEventNumber = nend;}
         inline void setSimConstantBField(quantity<T> b) {Bfield = b;}
+        inline void setMinWfmDuration(quantity<ns> d) {minDuration = d;}
 
     private:
     // include any configuration data members for internal use here.
     int maxEventNumber;
     int evcounter;
     quantity<T> Bfield;
+    quantity<ns> minDuration;
 
     // ROOT file access for member functions
     TTreeReader& reader;
