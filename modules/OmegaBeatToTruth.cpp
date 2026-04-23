@@ -25,6 +25,12 @@ DataPack OmegaBeatToTruth::operator()(DataPack dp)
         std::cout << "Omega vector not in dictionary!" << std::endl;
         return dp; // not found, return unchanged map, no processing
     }
+    // block Wfms too short for processing
+    if (dp.getTruthRef().tooShort) {
+      std::cout << "Waveform too short to process: flag set by reader." << std::endl;
+      return dp;
+    }
+    
     Event<std::any> outdata;
     // yields a L2 unordered map called Event<std::any> with the 
     // help of the inkey label.

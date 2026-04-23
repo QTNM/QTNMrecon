@@ -28,6 +28,12 @@ DataPack WaveformSampling::operator()(DataPack dp)
   }
   std::cout << "interpolator called" << std::endl;
 
+  // block Wfms too short for processing
+  if (dp.getTruthRef().tooShort) {
+    std::cout << "Waveform too short to process: flag set by reader." << std::endl;
+    return dp;
+  }
+    
   // set before: antenna read by add chirp/ kinematic by anntenna response
   nantenna = dp.getTruthRef().nantenna;
 

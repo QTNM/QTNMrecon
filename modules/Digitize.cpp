@@ -25,6 +25,12 @@ DataPack Digitize::operator()(DataPack dp)
     if (! dp.getRef().count(inkey)) { 
         throw std::logic_error("input key not in dictionary!");
     }
+    // block Wfms too short for processing
+    if (dp.getTruthRef().tooShort) {
+      std::cout << "Waveform too short to process: flag set by reader." << std::endl;
+      return dp;
+    }
+    
     Event<std::any> indata = dp.getRef()[inkey];
     quantity<ns> stime = dp.getTruthRef().sampling_time;
 

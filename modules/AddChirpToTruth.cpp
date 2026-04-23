@@ -25,7 +25,12 @@ DataPack AddChirpToTruth::operator()(DataPack dp)
         std::cout << "KE vector not in dictionary!" << std::endl;
         return dp; // not found, return unchanged map, no processing
     }
-
+    // block Wfms too short for processing
+    if (dp.getTruthRef().tooShort) {
+      std::cout << "Waveform too short to process: flag set by reader." << std::endl;
+      return dp;
+    }
+    
     // use KEvec data vector for fitting
     nantenna = dp.getTruthRef().nantenna; // got that from reader
     lft = new TLinearFitter(1,"pol1",""); // line fit, intend to use robust version
