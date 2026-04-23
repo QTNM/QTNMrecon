@@ -34,6 +34,7 @@ template <typename T> using Event_map = std::unordered_map<std::string, Event<T>
 struct truth_t {
   int nantenna; // from sampling or antenna response
   double snratio; // from adding noise
+  bool tooShort;
   quantity<T> bfield;
   quantity<ns> sampling_time; // from sampling
   quantity<ns> start_time;    // from time vector for each trackID
@@ -100,6 +101,7 @@ public:
 
 private:
   inline void init() { // define quantity<> at construction
+    truthPack.tooShort = false; // Wfm flag default
     truthPack.bfield = 0.0 * T;
     truthPack.sampling_time = 0.0 * ns;
     truthPack.start_time = 0.0 * ns;
