@@ -16,6 +16,7 @@ FullAntennaSimReader::FullAntennaSimReader(TTreeReader& re1, TTreeReader& re2, s
     evcounter(0),
     nantenna(1),
     Bfield(-1.0 * T),
+    minDuration(10.0 * ns), // default minimum Wfm duration
     reader1(re1),
     reader2(re2),
     eventID(reader1, "EventID"), // needs reader by reference
