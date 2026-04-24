@@ -79,7 +79,7 @@ int main(int argc, char** argv)
   source1.setMaxEventNumber(nevents); // default = all events in file
   source1.setSimConstantBField(bfield); // MUST be set
   source1.setAntennaN(nant);
-  source.setMinWfmDuration(minduration);
+  source1.setMinWfmDuration(minduration);
 
   // add truth
   auto addchirp = AddChirpToTruth(origin); // default antenna number
