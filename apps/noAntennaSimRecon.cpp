@@ -45,6 +45,7 @@ int main(int argc, char** argv)
   CLI::App app{"Example Recon Pipeline"};
   int nevents = -1;
   quantity<T> bfield = 0.7 * T; // constant sim b-field value [T]
+  quantity<ns> minduration = 100.0 * ns;
   std::string fname = "qtnm.root";
   std::string outfname = "recon.root";
 
@@ -72,6 +73,7 @@ int main(int argc, char** argv)
   auto source = FullKinematicsSimReader(re1, re2, origin);
   source.setMaxEventNumber(nevents); // default = all events in file
   source.setSimConstantBField(bfield); // MUST be set
+  source.setMinWfmDuration(minduration);
 
   // add truth
   auto addchirp = AddChirpToTruth(origin); // default antenna number
