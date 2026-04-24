@@ -47,13 +47,9 @@ src/ChirpGenerator.cpp
 src/WhiteNoiseGen.cpp)
 
 # module library
-add_library(ReconModules SHARED modules/QTNMSimAntennaReader.cpp 
+add_library(ReconModules SHARED 
 modules/FullKinematicsSimReader.cpp
 modules/FullAntennaSimReader.cpp
-modules/QTNMSimKinematicsReader.cpp 
-modules/xCsvWriter.cpp 
-modules/x2CsvWriter.cpp 
-modules/digiCsvWriter.cpp 
 modules/SineSigGenerator.cpp 
 modules/AddChirpToTruth.cpp
 modules/OmegaBeatToTruth.cpp
@@ -63,15 +59,11 @@ modules/AddNoise.cpp
 modules/Amplifier.cpp
 modules/Mixer.cpp
 modules/Digitize.cpp
-modules/TestG4AntGenerator.cpp
-modules/FakeG4AntWriter.cpp
 modules/writeWfmToRoot.cpp
-modules/writeDigitizerToRoot.cpp
 modules/writeHitDigiToRoot.cpp
 modules/writeHitDigiToHDF5.cpp
 modules/WfmReader.cpp
-src/trackMerger.cpp
-modules/printSimReader.cpp)
+src/trackMerger.cpp)
 target_link_libraries(ReconModules QTNMTools HighFive ${ROOT_LIBRARIES})
 
 # Build apps and examples
@@ -94,30 +86,6 @@ add_executable(testReconMerged.exe apps/examples/test_writeFakeG4.cpp)
 target_link_libraries(testReconMerged.exe PUBLIC ReconModules QTNMTools)
 add_executable(testTrackMerge.exe apps/examples/test_trackMerger.cpp)
 target_link_libraries(testTrackMerge.exe PUBLIC ReconModules QTNMTools)
-add_executable(testG4out.exe apps/examples/test_fakeG4_ToRoot.cpp)
-target_link_libraries(testG4out.exe PUBLIC ReconModules QTNMTools)
-add_executable(testG4toWfm.exe apps/examples/test_readFakeG4ToWfm.cpp)
-target_link_libraries(testG4toWfm.exe PUBLIC ReconModules QTNMTools)
-add_executable(exwrhdf5.exe apps/examples/example_write_hdf5.cpp)
-target_link_libraries(exwrhdf5.exe PUBLIC ReconModules QTNMTools)
-add_executable(exhdwrite.exe apps/examples/example_hitdigi_write.cpp)
-target_link_libraries(exhdwrite.exe PUBLIC ReconModules QTNMTools)
-add_executable(exhdprint.exe apps/examples/example_hitdigi_print.cpp)
-target_link_libraries(exhdprint.exe PUBLIC ReconModules QTNMTools)
-add_executable(exdw.exe apps/examples/example_digi_write.cpp)
-target_link_libraries(exdw.exe PUBLIC ReconModules QTNMTools)
-add_executable(exdp.exe apps/examples/example_digi_print.cpp)
-target_link_libraries(exdp.exe PUBLIC ReconModules QTNMTools)
-add_executable(exrp.exe apps/examples/example_read_print.cpp)
-target_link_libraries(exrp.exe PUBLIC ReconModules QTNMTools)
-add_executable(exsc.exe apps/examples/example_sine_csv.cpp)
-target_link_libraries(exsc.exe PUBLIC ReconModules QTNMTools)
-add_executable(exrip.exe apps/examples/example_interpolate_print.cpp)
-target_link_libraries(exrip.exe PUBLIC ReconModules QTNMTools)
-add_executable(exnoant.exe apps/examples/example_noAnt_read.cpp)
-target_link_libraries(exnoant.exe PUBLIC ReconModules QTNMTools)
-add_executable(noantwrite.exe apps/examples/example_noAnt_write.cpp)
-target_link_libraries(noantwrite.exe PUBLIC ReconModules QTNMTools)
 
 # Build testing executables separately for file output
 add_executable(testbw examples/bwfiltertest.cpp)
