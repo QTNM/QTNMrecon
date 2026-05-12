@@ -32,19 +32,16 @@ DataPack AddChirpToTruth::operator()(DataPack dp)
     }
     
     // use KEvec data vector for fitting
-    nantenna = dp.getTruthRef().nantenna; // got that from reader
     lft = new TLinearFitter(1,"pol1",""); // line fit, intend to use robust version
     lft->StoreData(false);
     try
     {
-        auto temptiv = std::any_cast<std::vector<double>>(indata["TimeVec"]); // [ns] from file
+        auto temptiv = std::any_cast<vec_t>(indata["SourceTime"]); // [ns] from file
         // get hold of truth data from sim
-        vec_t timev; // deconstruct timevec for both input cases with nantenna
-        // antenna input stream: interleaved values per antenna / kinematic: contiguous values(i.e. +1)
-        for (int i=0;i<temptiv.size();i+=nantenna) timev.push_back(temptiv[i]); // select
         auto ov = std::any_cast<vec_t>(indata["KEVec"]); // KE vector in keV
+	std::cout << "ST size: " << temptiv.size() << " KEV size: " << ov.size() << std::endl;
 
-        lft->AssignData(ov.size(), 1, timev.data(), ov.data());
+        lft->AssignData(ov.size(), 1, temptiv.data(), ov.data());
         lft->EvalRobust(0.8); // allow 20% outlier data
         double tslope = lft->GetParameter(1); // fit result for chirp rate [keV/ns]
         double tinter = lft->GetParameter(0); // fit result for intercept [keV]

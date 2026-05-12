@@ -82,7 +82,7 @@ DataPack Amplifier::operator()(DataPack dp)
     }
   catch(const std::bad_any_cast& e)
     {
-      std::cerr << "Mixer: " << e.what() << '\n';
+      std::cerr << "Amplifier: " << e.what() << '\n';
     }
   dp.getRef()[outkey] = outdata;
   return dp;
