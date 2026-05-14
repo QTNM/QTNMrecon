@@ -13,6 +13,7 @@ FullKinematicsSimReader::FullKinematicsSimReader(TTreeReader& re1, TTreeReader& 
     maxEventNumber(-1), // default -1 for a all events
     evcounter(0),
     Bfield(-1.0 * T),
+    minDuration(10.0 * ns), // default minimum Wfm duration
     reader1(re1),
     reader2(re2),
     eventID(reader1, "EventID"),
@@ -118,14 +119,21 @@ DataPack FullKinematicsSimReader::operator()()
                 // store the filled hit_t
                 dp.hitsRef().push_back(dp.getHit());
                 std::cout << "found hit evt/track:  " << *hitevID << ", " << *hittrID << std::endl;
+                std::cout << "found hit track at time:  " << *hittrID << ", " << *tstamp*ns << std::endl;
             }
         }
         reader2.Restart(); // for each trajectory, have to loop over hits, then reset hits reader.
     }
-    if (!tvec->empty()) // book truth from trajectory
+    if (!tvec->empty()) { // book truth from trajectory
       dp.getTruthRef().start_time = tvec->front() * ns;
-    else
+      quantity<ns> endtime = tvec->back() * ns; // check on config Wfm duration
+      if ((endtime-dp.getTruthRef().start_time) <= minDuration)
+	dp.getTruthRef().tooShort = true; // Wfm too short for work
+    }
+    else {
       dp.getTruthRef().start_time = -1.0 * ns;
+      dp.getTruthRef().tooShort = true; // empty Wfm is too short
+    }
     dp.getTruthRef().nantenna = 1; // fine here; overwritten by AntennaResponse
     dp.getTruthRef().bfield = Bfield; // store input truth
     return dp;

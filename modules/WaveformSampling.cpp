@@ -24,10 +24,17 @@ WaveformSampling::WaveformSampling(std::string source, std::string in, std::stri
 DataPack WaveformSampling::operator()(DataPack dp)
 {
   if (! dp.getRef().count(originkey)) { 
-    throw std::logic_error("origin key not in dictionary!");
+    std::cout << "origin key not in dictionary! Waveform Sampling" << std::endl;
+    return dp;
   }
   std::cout << "interpolator called" << std::endl;
 
+  // block Wfms too short for processing
+  if (dp.getTruthRef().tooShort) {
+    std::cout << "Waveform too short to process: waveform sampling." << std::endl;
+    return dp;
+  }
+    
   // set before: antenna read by add chirp/ kinematic by anntenna response
   nantenna = dp.getTruthRef().nantenna;
 

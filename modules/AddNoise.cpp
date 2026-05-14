@@ -24,8 +24,15 @@ AddNoise::AddNoise(std::string in, std::string out, std::string l2out) :
 DataPack AddNoise::operator()(DataPack dp)
 {
     if (! dp.getRef().count(inkey)) { 
-        throw std::logic_error("input key not in dictionary!");
+      std::cout << "input key not in dictionary! Add Noise" << std::endl;
+      return dp;
     }
+    // block Wfms too short for processing
+    if (dp.getTruthRef().tooShort) {
+      std::cout << "Waveform too short to process: Add Noise." << std::endl;
+      return dp;
+    }
+    
     Event<std::any> indata = dp.getRef()[inkey];
     Event<std::any> outdata; // to hold all the data items
     //    std::cout << "in add noise module." << std::endl;

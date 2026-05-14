@@ -106,10 +106,17 @@ void WriterHitDigiToRoot::operator()(DataPack dp)
 
   purewave->clear();
   scopedata->clear();
+  vec_t empty;
   for (int i=0;i<nantenna;++i) {
-    // store
-    scopedata->push_back(dp.getExperimentRef().signals.at(i)); // vec_t
-    purewave->push_back(dp.getTruthRef().pure.at(i)); // vec_t, copy
+    if (dp.getTruthRef().tooShort) { // instantiate pointer
+      scopedata->push_back(empty); // even if empty, for writing.
+      purewave->push_back(empty);
+    }
+    else {
+      // store
+      scopedata->push_back(dp.getExperimentRef().signals.at(i)); // vec_t
+      purewave->push_back(dp.getTruthRef().pure.at(i)); // vec_t, copy
+    }
   }
   mytree->SetBranchAddress("pure_V", &purewave); // point to vec<vec>* real address
   mytree->SetBranchAddress("signal_V", &scopedata); // point to vec<vec>* real address

@@ -2,6 +2,7 @@
 
 // std
 #include <iostream>
+#include <algorithm>
 
 // us
 #include "AddChirpToTruth.hh"
@@ -15,7 +16,7 @@ DataPack AddChirpToTruth::operator()(DataPack dp)
 {
     // example getting hold of requested input data for processing
     if (! dp.getRef().count(inkey)) { 
-        std::cout << "input key not in dictionary!" << std::endl;
+        std::cout << "input key not in dictionary! Add Chirp" << std::endl;
         return dp; // not found, return unchanged map, no processing
     }
     Event<std::any> indata = dp.getRef()[inkey]; // access L1 dictionary
@@ -25,21 +26,24 @@ DataPack AddChirpToTruth::operator()(DataPack dp)
         std::cout << "KE vector not in dictionary!" << std::endl;
         return dp; // not found, return unchanged map, no processing
     }
-
+    // block Wfms too short for processing
+    if (dp.getTruthRef().tooShort) {
+      std::cout << "Waveform too short to process: flag set by reader." << std::endl;
+      return dp;
+    }
+    
     // use KEvec data vector for fitting
-    nantenna = dp.getTruthRef().nantenna; // got that from reader
     lft = new TLinearFitter(1,"pol1",""); // line fit, intend to use robust version
     lft->StoreData(false);
     try
     {
-        auto temptiv = std::any_cast<std::vector<double>>(indata["TimeVec"]); // [ns] from file
         // get hold of truth data from sim
-        vec_t timev; // deconstruct timevec for both input cases with nantenna
-        // antenna input stream: interleaved values per antenna / kinematic: contiguous values(i.e. +1)
-        for (int i=0;i<temptiv.size();i+=nantenna) timev.push_back(temptiv[i]); // select
+        auto temptiv = std::any_cast<vec_t>(indata["SourceTime"]); // [ns] from file
         auto ov = std::any_cast<vec_t>(indata["KEVec"]); // KE vector in keV
+	// std::cout << "ST size: " << temptiv.size() << " KEV size: " << ov.size() << std::endl;
 
-        lft->AssignData(ov.size(), 1, timev.data(), ov.data());
+	int npoints = std::min((int)ov.size(), 10000); // don't fit too many points for a line
+        lft->AssignData(npoints, 1, temptiv.data(), ov.data());
         lft->EvalRobust(0.8); // allow 20% outlier data
         double tslope = lft->GetParameter(1); // fit result for chirp rate [keV/ns]
         double tinter = lft->GetParameter(0); // fit result for intercept [keV]

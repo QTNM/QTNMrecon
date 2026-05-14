@@ -26,8 +26,15 @@ Amplifier::Amplifier(std::string in, std::string out, std::string l2in, std::str
 DataPack Amplifier::operator()(DataPack dp)
 {
   if (! dp.getRef().count(inkey)) { 
-    throw std::logic_error("input key not in dictionary!");
+    std::cout << "input key not in dictionary! Amplifier" << std::endl;
+    return dp;
   }
+  // block Wfms too short for processing
+  if (dp.getTruthRef().tooShort) {
+    std::cout << "Waveform too short to process: Amplifier." << std::endl;
+    return dp;
+  }
+    
   Event<std::any> indata = dp.getRef()[inkey];
   Event<std::any> outdata; // to hold all the data items
 
@@ -76,7 +83,7 @@ DataPack Amplifier::operator()(DataPack dp)
     }
   catch(const std::bad_any_cast& e)
     {
-      std::cerr << "Mixer: " << e.what() << '\n';
+      std::cerr << "Amplifier: " << e.what() << '\n';
     }
   dp.getRef()[outkey] = outdata;
   return dp;

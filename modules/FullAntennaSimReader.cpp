@@ -16,6 +16,7 @@ FullAntennaSimReader::FullAntennaSimReader(TTreeReader& re1, TTreeReader& re2, s
     evcounter(0),
     nantenna(1),
     Bfield(-1.0 * T),
+    minDuration(10.0 * ns), // default minimum Wfm duration
     reader1(re1),
     reader2(re2),
     eventID(reader1, "EventID"), // needs reader by reference
@@ -114,10 +115,16 @@ DataPack FullAntennaSimReader::operator()()
         }
         reader2.Restart(); // for each trajectory, have to loop over hits, then reset hits reader.
     }
-    if (!stvec->empty()) // book truth from trajectory
+    if (!stvec->empty()) { // book truth from trajectory
       dp.getTruthRef().start_time = stvec->front() * ns;
-    else
+      quantity<ns> endtime = stvec->back() * ns; // check on config Wfm duration
+      if ((endtime-dp.getTruthRef().start_time) <= minDuration)
+	dp.getTruthRef().tooShort = true; // Wfm too short for work
+    }
+    else {
       dp.getTruthRef().start_time = -1.0 * ns;
+      dp.getTruthRef().tooShort = true; // empty Wfm is too short
+    }
     dp.getTruthRef().nantenna = nantenna; // store input truth
     dp.getTruthRef().bfield = Bfield; // store input truth
     return dp;

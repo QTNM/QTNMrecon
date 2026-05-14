@@ -42,6 +42,7 @@ int main(int argc, char** argv)
   CLI::App app{"Example Recon Pipeline"};
   int nevents = -1;
   quantity<T> bfield = 0.7 * T; // constant sim b-field value [T]
+  quantity<ns> minduration = 100.0 * ns;
   std::string fname = "qtnm.root";
   std::string outfname = "recon.hdf5";
 
@@ -70,6 +71,7 @@ int main(int argc, char** argv)
   source.setMaxEventNumber(nevents); // default = all events in file
   source.setSimConstantBField(bfield); // MUST be set
   source.setAntennaN(nant);
+  source.setMinWfmDuration(minduration);
 
   // add truth
   auto addchirp = AddChirpToTruth(origin); // default antenna number
@@ -115,7 +117,7 @@ int main(int argc, char** argv)
   auto sink = WriterHitDigiToHDF5(group);
   
   auto pl = yap::Pipeline{} | source | addchirp | interpolator | addbeat |
-    noiseAdder | mixer | digitizer | sink;
+    noiseAdder | amplifier | mixer | digitizer | sink;
   
   pl.consume();
   

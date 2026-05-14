@@ -47,10 +47,12 @@ DataPack WfmReader::operator()()
     // collect all trajectory info from file, reader holds event iterator
     // std::cout << "reader called" << std::endl;
     std::string brname;
+    bool emptyFlag = false;
     if (reader.Next()) { // variables filled from file
       for (int i=0;i<wfmarray->size();++i) {
 	brname = "sampled_" + std::to_string(i) + "_V";
 	vec_t wfm(wfmarray->at(i).begin(), wfmarray->at(i).end());
+	if (wfm.empty()) emptyFlag = true; // if one empty = all empty
         outdata[brname] = std::make_any<vec_t>(wfm);
       }
       eventmap[outkey] = outdata; // with outdata an Event<std::any>
@@ -86,6 +88,7 @@ DataPack WfmReader::operator()()
 	dp.hitsRef().push_back(dp.getHit());
       }
     }
+    dp.getTruthRef().tooShort = emptyFlag; // store input truth
     dp.getTruthRef().nantenna = *nantenna; // store input truth
     dp.getTruthRef().chirp_rate = *chirprate * Hz/s; // store input truth
     dp.getTruthRef().beat_frequency = *beatf * Hz; // store input truth

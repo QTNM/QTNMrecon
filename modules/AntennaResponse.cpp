@@ -17,8 +17,15 @@ AntennaResponse::AntennaResponse(std::string in, std::string out) :
 DataPack AntennaResponse::operator()(DataPack dp)
 {
     if (! dp.getRef().count(inkey)) { 
-        throw std::logic_error("input key not in dictionary!");
+      std::cout << "input key not in dictionary! Antenna Response" << std::endl;
+      return dp; // carry on in pipeline
     }
+    // block Wfms too short for processing
+    if (dp.getTruthRef().tooShort) {
+      std::cout << "Waveform too short to process: Antenna Response." << std::endl;
+      return dp;
+    }
+    
     Event<std::any> indata = dp.getRef()[inkey];
     Event<std::any> outdata; // to hold all the data items
     int counter = 0;
