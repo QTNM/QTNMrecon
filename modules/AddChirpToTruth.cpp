@@ -16,7 +16,7 @@ DataPack AddChirpToTruth::operator()(DataPack dp)
 {
     // example getting hold of requested input data for processing
     if (! dp.getRef().count(inkey)) { 
-        std::cout << "input key not in dictionary!" << std::endl;
+        std::cout << "input key not in dictionary! Add Chirp" << std::endl;
         return dp; // not found, return unchanged map, no processing
     }
     Event<std::any> indata = dp.getRef()[inkey]; // access L1 dictionary

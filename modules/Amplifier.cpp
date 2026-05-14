@@ -26,7 +26,8 @@ Amplifier::Amplifier(std::string in, std::string out, std::string l2in, std::str
 DataPack Amplifier::operator()(DataPack dp)
 {
   if (! dp.getRef().count(inkey)) { 
-    throw std::logic_error("input key not in dictionary!");
+    std::cout << "input key not in dictionary! Amplifier" << std::endl;
+    return dp;
   }
   // block Wfms too short for processing
   if (dp.getTruthRef().tooShort) {

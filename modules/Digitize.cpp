@@ -23,7 +23,8 @@ Digitize::Digitize(std::string in, std::string l2in) :
 DataPack Digitize::operator()(DataPack dp)
 {
     if (! dp.getRef().count(inkey)) { 
-        throw std::logic_error("input key not in dictionary!");
+      std::cout << "input key not in dictionary! Digitizer" << std::endl;
+      return dp;
     }
     // block Wfms too short for processing
     if (dp.getTruthRef().tooShort) {

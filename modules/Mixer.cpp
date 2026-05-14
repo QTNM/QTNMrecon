@@ -23,7 +23,8 @@ Mixer::Mixer(std::string in, std::string out, std::string l2in, std::string l2ou
 DataPack Mixer::operator()(DataPack dp)
 {
     if (! dp.getRef().count(inkey)) { 
-        throw std::logic_error("input key not in dictionary!");
+      std::cout << "input key not in dictionary! Mixer" << std::endl;
+      return dp;
     }
     // block Wfms too short for processing
     if (dp.getTruthRef().tooShort) {
