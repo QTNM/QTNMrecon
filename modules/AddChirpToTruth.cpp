@@ -2,6 +2,7 @@
 
 // std
 #include <iostream>
+#include <algorithm>
 
 // us
 #include "AddChirpToTruth.hh"
@@ -36,12 +37,13 @@ DataPack AddChirpToTruth::operator()(DataPack dp)
     lft->StoreData(false);
     try
     {
-        auto temptiv = std::any_cast<vec_t>(indata["SourceTime"]); // [ns] from file
         // get hold of truth data from sim
+        auto temptiv = std::any_cast<vec_t>(indata["SourceTime"]); // [ns] from file
         auto ov = std::any_cast<vec_t>(indata["KEVec"]); // KE vector in keV
-	std::cout << "ST size: " << temptiv.size() << " KEV size: " << ov.size() << std::endl;
+	// std::cout << "ST size: " << temptiv.size() << " KEV size: " << ov.size() << std::endl;
 
-        lft->AssignData(ov.size(), 1, temptiv.data(), ov.data());
+	int npoints = std::min((int)ov.size(), 10000); // don't fit too many points for a line
+        lft->AssignData(npoints, 1, temptiv.data(), ov.data());
         lft->EvalRobust(0.8); // allow 20% outlier data
         double tslope = lft->GetParameter(1); // fit result for chirp rate [keV/ns]
         double tinter = lft->GetParameter(0); // fit result for intercept [keV]

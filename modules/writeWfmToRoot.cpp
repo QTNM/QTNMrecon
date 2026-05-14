@@ -92,10 +92,18 @@ void WriterWfmToRoot::operator()(DataPack dp)
   std::string brname;
   purewave->clear();
   for (int i=0;i<nantenna;++i) {
-    // store
-    brname = "sampled_" + std::to_string(i) + "_V"; // unit in name
-    vec_t dummy = std::any_cast<vec_t>(indata[brname]); // construct first
-    purewave->push_back(dummy); // vec_t, copy
+    try
+      {
+	// store
+	brname = "sampled_" + std::to_string(i) + "_V"; // unit in name
+	vec_t dummy = std::any_cast<vec_t>(indata[brname]); // construct first
+	purewave->push_back(dummy); // vec_t, copy
+      }
+    catch(const std::bad_any_cast& e) // fails if key absent
+      {
+	vec_t empty;
+	purewave->push_back(empty);
+      }
   }
   mytree->SetBranchAddress("sampled_V", &purewave); // point to vec<vec>* real address
 

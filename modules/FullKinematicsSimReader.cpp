@@ -119,6 +119,7 @@ DataPack FullKinematicsSimReader::operator()()
                 // store the filled hit_t
                 dp.hitsRef().push_back(dp.getHit());
                 std::cout << "found hit evt/track:  " << *hitevID << ", " << *hittrID << std::endl;
+                std::cout << "found hit track at time:  " << *hittrID << ", " << *tstamp*ns << std::endl;
             }
         }
         reader2.Restart(); // for each trajectory, have to loop over hits, then reset hits reader.
