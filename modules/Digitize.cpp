@@ -27,7 +27,7 @@ DataPack Digitize::operator()(DataPack dp)
     }
     // block Wfms too short for processing
     if (dp.getTruthRef().tooShort) {
-      std::cout << "Waveform too short to process: flag set by reader." << std::endl;
+      std::cout << "Waveform too short to process: Digitize." << std::endl;
       return dp;
     }
     

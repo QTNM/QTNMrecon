@@ -134,7 +134,7 @@ int main(int argc, char** argv)
   auto sink = WriterHitDigiToRoot(tr);
   
   auto pl = yap::Pipeline{} | source | addchirp |antresponse | interpolator | addbeat |
-    noiseAdder | mixer | digitizer | sink;
+    noiseAdder | amplifier | mixer | digitizer | sink;
   
   pl.consume();
   

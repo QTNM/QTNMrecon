@@ -137,7 +137,7 @@ int main(int argc, char** argv)
   auto sink = WriterHitDigiToHDF5(group);
   
   auto pl = yap::Pipeline{} | source | addchirp |antresponse | interpolator | addbeat |
-    noiseAdder | mixer | digitizer | sink;
+    noiseAdder | amplifier | mixer | digitizer | sink;
   
   pl.consume();
   

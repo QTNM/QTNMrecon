@@ -50,6 +50,7 @@ void WriterHitDigiToHDF5::operator()(DataPack dp)
   std::cout << "in HDF5 writer: made group with evID " << evID << std::endl;
 
   // enable compression
+  vec_t empty;
   HighFive::DataSetCreateProps props;
   props.add(HighFive::Chunking(std::vector<hsize_t>{1000})); // adjust size for IO speed
   props.add(HighFive::Deflate(6));
@@ -57,8 +58,14 @@ void WriterHitDigiToHDF5::operator()(DataPack dp)
   HighFive::Group recordgr  = eventgr.createGroup("record_"+std::to_string(trID));
   for (int antid=0;antid<nant;++antid) {
     HighFive::Group channelgr  = recordgr.createGroup("channel_"+std::to_string(antid));
-    channelgr.createDataSet("signal_V", dp.getExperimentRef().signals.at(antid), props); // compressed
-    channelgr.createDataSet("truthwfm_V", dp.getTruthRef().pure.at(antid), props); // compressed
+    if (dp.getTruthRef().tooShort) {
+      channelgr.createDataSet("signal_V", empty, props); // empty vector
+      channelgr.createDataSet("truthwfm_V", empty, props); // empty vector
+    }
+    else {
+      channelgr.createDataSet("signal_V", dp.getExperimentRef().signals.at(antid), props); // compressed
+      channelgr.createDataSet("truthwfm_V", dp.getTruthRef().pure.at(antid), props); // compressed
+    }
   }
   // electron-specific attributes
   recordgr.createAttribute("vertex_posx_m", dp.getTruthRef().vertex.posx.numerical_value_in(m));

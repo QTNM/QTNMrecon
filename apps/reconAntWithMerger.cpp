@@ -173,7 +173,7 @@ int main(int argc, char** argv)
   tr3->SetDirectory(out3file);
   auto sink3 = WriterHitDigiToRoot(tr3);
   
-  auto pl2 = yap::Pipeline{} | source3 | noiseAdder | mixer | digitizer | sink3;
+  auto pl2 = yap::Pipeline{} | source3 | noiseAdder | amplifier | mixer | digitizer | sink3;
   
   pl2.consume();
 
