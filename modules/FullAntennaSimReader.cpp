@@ -95,25 +95,26 @@ DataPack FullAntennaSimReader::operator()()
     // check on hits, separately from trajectory reader
     // the hit reader may or may not hold data.
     if (reader2.GetEntries() > 0) { // if there is any hit at all, check with trajectory
-        while (reader2.Next()) { // get first entry, fill all data items
-            if (*hitevID == *eventID) { // only if this trajectory has a hit
-                dp.getHitRef().eventID   = *hitevID;
-                dp.getHitRef().trackID   = *hittrID;
-                dp.getHitRef().edeposit  = *edep * keV;
-                dp.getHitRef().timestamp = *tstamp * ns;
-                dp.getHitRef().kepre = *prek * keV;
-                dp.getHitRef().kepost = *postk * keV;
-                dp.getHitRef().anglepre = *preth * rad;
-                dp.getHitRef().anglepost = *postth * rad;
-                dp.getHitRef().locx = *locx * mm;
-                dp.getHitRef().locy = *locy * mm;
-                dp.getHitRef().locz = *locz * mm;
-                // store the filled hit_t
-                dp.hitsRef().push_back(dp.getHit());
-                std::cout << "found hit evt/track:  " << *hitevID << ", " << *hittrID << std::endl;
-            }
-        }
-        reader2.Restart(); // for each trajectory, have to loop over hits, then reset hits reader.
+      while (reader2.Next()) { // get first entry, fill all data items
+	if (*hitevID == *eventID && *hittrID == *trackID) { // only if this trajectory has a hit
+	  hit_t myhit;
+	  myhit.eventID   = *hitevID;
+	  myhit.trackID   = *hittrID;
+	  myhit.edeposit  = *edep * keV;
+	  myhit.timestamp = *tstamp * ns;
+	  myhit.kepre = *prek * keV;
+	  myhit.kepost = *postk * keV;
+	  myhit.anglepre = *preth * rad;
+	  myhit.anglepost = *postth * rad;
+	  myhit.locx = *locx * mm;
+	  myhit.locy = *locy * mm;
+	  myhit.locz = *locz * mm;
+	  // store the filled hit_t
+	  dp.hitsRef().push_back(myhit);
+	  std::cout << "found hit evt/track:  " << myhit.eventID << ", " << myhit.trackID << std::endl;
+	}
+      }
+      reader2.Restart(); // for each trajectory, have to loop over hits, then reset hits reader.
     }
     if (!stvec->empty()) { // book truth from trajectory
       dp.getTruthRef().start_time = stvec->front() * ns;

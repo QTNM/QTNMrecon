@@ -206,16 +206,17 @@ DataPack trackMerger::readRow()
   // the hit reader may or may not hold data.
   if (! hitevID->empty()) {
     for (unsigned int j=0;j<hitevID->size();++j) {
-      dp.getHitRef().eventID   = hitevID->at(j);
-      dp.getHitRef().trackID   = hittrID->at(j);
-      dp.getHitRef().edeposit  = hitedep->at(j) * eV;
-      dp.getHitRef().timestamp = hittime->at(j) * ns;
-      dp.getHitRef().anglepost = hitposttheta->at(j) * deg;
-      dp.getHitRef().locx = hitx->at(j) * m;
-      dp.getHitRef().locy = hity->at(j) * m;
-      dp.getHitRef().locz = hitz->at(j) * m;
+      hit_t myhit;
+      myhit.eventID   = hitevID->at(j);
+      myhit.trackID   = hittrID->at(j);
+      myhit.edeposit  = hitedep->at(j) * eV;
+      myhit.timestamp = hittime->at(j) * ns;
+      myhit.anglepost = hitposttheta->at(j) * deg;
+      myhit.locx = hitx->at(j) * m;
+      myhit.locy = hity->at(j) * m;
+      myhit.locz = hitz->at(j) * m;
       // store the filled hit_t
-      dp.hitsRef().push_back(dp.getHit());
+      dp.hitsRef().push_back(myhit);
     }
   }
   dp.getTruthRef().nantenna = *nantenna; // store input truth

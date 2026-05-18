@@ -53,7 +53,7 @@ def convert_to_data_dict(event):
     datadict = {}
     truth = truth_t()
     vertex = vertex_t()
-    hit = hit_t()
+
     measured = digitizer_t()
 
     # copy all data from event
@@ -76,6 +76,7 @@ def convert_to_data_dict(event):
     hits = []
     nhits = event.hit_eventID.size()  # is vector.size()
     for h in range(nhits):
+        hit = hit_t()
         hit.event_ID = event.hit_eventID[h]
         hit.track_ID = event.hit_trackID[h]
         hit.locx_m = event.hit_locx_m[h]
