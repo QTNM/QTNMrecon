@@ -78,7 +78,6 @@ private:
   Event_map<std::any> mymap; // defined at construction
   truth_t truthPack; // undefined at construction; bag with structure
   experiment_t expPack; // undefined at construction; fill structure
-  //  hit_t hitPack; // undefined at construction; fill structure
   std::vector<hit_t> hits; // for multiple hits per event
   
 public:
@@ -95,8 +94,6 @@ public:
   inline Event_map<std::any>& getRef() {return mymap;} // access
   inline truth_t& getTruthRef() {return truthPack;} // access
   inline experiment_t& getExperimentRef() {return expPack;} // access
-  //  inline hit_t& getHitRef() {return hitPack;} // access
-  //  inline hit_t getHit() {return hitPack;} // access
   inline std::vector<hit_t>& hitsRef() {return hits;} // access
 
 private:
@@ -113,14 +110,6 @@ private:
     truthPack.vertex.posz = 0.0 * m;
     truthPack.vertex.kineticenergy = 0.0 * eV;
     truthPack.vertex.pitchangle = 0.0 * deg;
-    // hitPack.locx = 0.0 * m;
-    // hitPack.locy = 0.0 * m;
-    // hitPack.locz = 0.0 * m;
-    // hitPack.timestamp = 0.0 * ns;
-    // hitPack.edeposit = 0.0 * eV;
-    // hitPack.kepre = 0.0 * eV;
-    // hitPack.kepost = 0.0 * eV;
-    // hitPack.anglepre = 0.0 * deg;
     expPack.target_frequency = 0.0 * Hz;
     expPack.digi_sampling_rate = 0.0 * Hz;
   }

@@ -63,7 +63,6 @@ int main(int argc, char** argv)
 
     // bring some order to values
     std::vector<hit_t> hits;
-    hit_t hit;
     truth_t truth;
     vertex_t vertex;
     digitizer_t measured;
@@ -127,6 +126,7 @@ int main(int argc, char** argv)
       // hits
       hits.clear();
       for (int j=0;j<hitevID->size();++j) {
+	hit_t hit;
 	hit.event_ID = hitevID->at(j);
 	hit.track_ID = hittrID->at(j);
 	hit.locx_m  = hitx->at(j);
