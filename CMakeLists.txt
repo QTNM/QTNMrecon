@@ -52,7 +52,6 @@ modules/FullKinematicsSimReader.cpp
 modules/FullAntennaSimReader.cpp
 modules/SineSigGenerator.cpp 
 modules/AddChirpToTruth.cpp
-modules/OmegaBeatToTruth.cpp
 modules/AntennaResponse.cpp
 modules/WaveformSampling.cpp 
 modules/AddNoise.cpp

@@ -15,7 +15,6 @@ FullAntennaSimReader::FullAntennaSimReader(TTreeReader& re1, TTreeReader& re2, s
     maxEventNumber(-1), // default -1 for a all events
     evcounter(0),
     nantenna(1),
-    Bfield(-1.0 * T),
     minDuration(10.0 * ns), // default minimum Wfm duration
     reader1(re1),
     reader2(re2),
@@ -57,11 +56,6 @@ DataPack FullAntennaSimReader::operator()()
         throw yap::GeneratorExit{};
     evcounter++;
 
-    if (Bfield < 0 * T) {
-        std::cout << "WARNING: Bfield is required input to pipeline. Exit" << std::endl;
-        throw yap::GeneratorExit{};
-    }
-
     Event_map<std::any> eventmap; // data item for delivery
     Event<std::any> outdata; // to hold all the data items from file
 
@@ -90,6 +84,8 @@ DataPack FullAntennaSimReader::operator()()
     dp.getTruthRef().vertex.posz = *posz * mm;
     dp.getTruthRef().vertex.kineticenergy = *kine * keV;
     dp.getTruthRef().vertex.pitchangle = *pangle * rad;
+    dp.getTruthRef().vertex.vertex_omega = omvec->front() * Hz; // first entry    
+    dp.getTruthRef().vertex.vertex_bfield = e2b(*kine*keV, omvec->front()*Hz); // calculate
     std::cout << "reader1 Next() done, evt:  " << evcounter << std::endl;
 
     // check on hits, separately from trajectory reader
@@ -127,6 +123,13 @@ DataPack FullAntennaSimReader::operator()()
       dp.getTruthRef().tooShort = true; // empty Wfm is too short
     }
     dp.getTruthRef().nantenna = nantenna; // store input truth
-    dp.getTruthRef().bfield = Bfield; // store input truth
     return dp;
+}
+
+
+quantity<T> FullAntennaSimReader::e2b(quantity<keV> en, quantity<Hz> om)
+{
+  double gam = 1.0+(en.in(J) / (me_SI*c_SI*c_SI)); // all in SI units
+  quantity<T> B0 = (me_SI * gam * om.in(Hz) / qe_SI) * T;
+  return B0;
 }
