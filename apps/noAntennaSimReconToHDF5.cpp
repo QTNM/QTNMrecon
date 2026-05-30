@@ -31,7 +31,6 @@ using namespace ROOT::Math;
 #include "modules/AntennaResponse.hh"
 #include "receiver/HalfWaveDipole.hh"
 #include "modules/WaveformSampling.hh"
-#include "modules/OmegaBeatToTruth.hh"
 #include "modules/AddNoise.hh"
 #include "modules/Amplifier.hh"
 #include "modules/Mixer.hh"
@@ -47,7 +46,6 @@ int main(int argc, char** argv)
       // command line interface
   CLI::App app{"Example Recon Pipeline"};
   int nevents = -1;
-  quantity<T> bfield = 0.7 * T; // constant sim b-field value [T]
   quantity<ns> minduration = 100.0 * ns;
   std::string fname = "qtnm.root";
   std::string outfname = "recon.hdf5";
@@ -75,7 +73,6 @@ int main(int argc, char** argv)
   TTreeReader re2("ntuple/Score", &ff);
   auto source = FullKinematicsSimReader(re1, re2, origin);
   source.setMaxEventNumber(nevents); // default = all events in file
-  source.setSimConstantBField(bfield); // MUST be set
   source.setMinWfmDuration(minduration);
 
   // add truth
@@ -100,9 +97,6 @@ int main(int argc, char** argv)
   auto interpolator = WaveformSampling(origin,resp,samp);
   quantity<ns> stime = 0.008 * ns;
   interpolator.setSampleTime(stime);
-
-  // add truth, 'omout' is just for checking
-  auto addbeat = OmegaBeatToTruth(samp,"omout");
 
   // add noise, step (3), fill more truth with units
   auto noiseAdder = AddNoise(samp, noisy, l2noise);
@@ -136,7 +130,7 @@ int main(int argc, char** argv)
   HighFive::Group group = file.createGroup("sim");
   auto sink = WriterHitDigiToHDF5(group);
   
-  auto pl = yap::Pipeline{} | source | addchirp |antresponse | interpolator | addbeat |
+  auto pl = yap::Pipeline{} | source | addchirp |antresponse | interpolator |
     noiseAdder | amplifier | mixer | digitizer | sink;
   
   pl.consume();
