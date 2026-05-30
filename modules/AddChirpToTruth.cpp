@@ -49,7 +49,7 @@ DataPack AddChirpToTruth::operator()(DataPack dp)
         double tinter = lft->GetParameter(0); // fit result for intercept [keV]
 	quantity<keV> i0 = tinter * keV; // manual unit
 	quantity<keV> i1 = i0 + tslope * 1.e3 * keV; // KE after 1 mus
-        std::cout << "loss/mus: " << (i1-i0).in(eV) << " from " << i0 << std::endl;
+        std::cout << "loss/mus: " << (i1-i0).numerical_value_in(eV) << " from " << i0 << std::endl;
 
 	quantity<Hz> fslope = e2f(i1, dp.getTruthRef().vertex.vertex_bfield)
 	  - e2f(i0, dp.getTruthRef().vertex.vertex_bfield);
@@ -67,7 +67,7 @@ DataPack AddChirpToTruth::operator()(DataPack dp)
 
 quantity<Hz> AddChirpToTruth::e2f(quantity<keV> en, quantity<T> bf)
 {
-  double gam = 1.0 + en.in(J)/(me_SI*c_SI*c_SI); // SI units
-  quantity<Hz> f0 = bf.in(T) * qe_SI / (2.0*myPi) / (gam * me_SI) * Hz;
+  double gam = 1.0 + en.numerical_value_in(J)/(me_SI*c_SI*c_SI); // SI units
+  quantity<Hz> f0 = bf.numerical_value_in(T) * qe_SI / (2.0*myPi) / (gam * me_SI) * Hz;
   return f0;
 }

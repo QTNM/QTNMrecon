@@ -137,7 +137,7 @@ DataPack FullKinematicsSimReader::operator()()
 
 quantity<T> FullKinematicsSimReader::e2b(quantity<keV> en, quantity<Hz> om)
 {
-  double gam = 1.0 + en.in(J) / (me_SI*c_SI*c_SI); // all in SI units
-  quantity<T> B0 = (me_SI * gam * om.in(Hz) / qe_SI) * T;
+  double gam = 1.0 + en.numerical_value_in(J) / (me_SI*c_SI*c_SI); // all in SI units
+  quantity<T> B0 = (me_SI * gam * om.numerical_value_in(Hz) / qe_SI) * T;
   return B0;
 }

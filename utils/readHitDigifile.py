@@ -10,8 +10,6 @@ class truth_t:
     nantenna: int = 0
     snr: float = 0.0
     sampling_time_s: float = 0.0
-    average_omega_Hz : float = 0.0
-    beat_frequency_Hz: float = 0.0
     chirp_rate_Hz: float = 0.0
 
 
@@ -25,6 +23,8 @@ class vertex_t:
     posz_m: float = 0.0
     kinetic_energy_keV: float = 0.0
     pitch_angle_deg: float = 0.0
+    vertex_omega_Hz : float = 0.0
+    vertex_bfield_T : float = 0.0
 
 
 @dataclass
@@ -60,8 +60,6 @@ def convert_to_data_dict(event):
     truth.nantenna = event.truth_nantenna
     truth.snr = event.truth_snratio
     truth.sampling_time_s = event.truth_samplingtime_s
-    truth.average_omega_Hz = event.truth_avomega_Hz
-    truth.beat_frequency_Hz = event.truth_beatf_Hz
     truth.chirp_rate_Hz = event.truth_chirp_Hz_s
     vertex.event_ID = event.vertex_evID
     vertex.track_ID = event.vertex_trackID
@@ -70,6 +68,8 @@ def convert_to_data_dict(event):
     vertex.posz_m = event.vertex_posz_m
     vertex.kinetic_energy_keV = event.vertex_kinenergy_eV
     vertex.pitch_angle_deg = event.vertex_pitchangle_deg
+    vertex.vertex_omega_Hz = event.vertex_omega_Hz
+    vertex.vertex_bfield_T = event.vertex_bfield_T
     measured.gain = event.digi_gain
     measured.sampling_rate_Hz = event.digi_samplingrate_Hz
     measured.target_frequency_Hz = event.digi_tfrequency_Hz
