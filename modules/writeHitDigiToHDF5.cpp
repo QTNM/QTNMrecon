@@ -36,7 +36,6 @@ void WriterHitDigiToHDF5::operator()(DataPack dp)
 
   // global attributes
   if (bnew_sim) {
-    simgroup.createAttribute("truth_bfield_T", dp.getTruthRef().bfield.numerical_value_in(T));
     simgroup.createAttribute("truth_nantenna", nant);
     simgroup.createAttribute("truth_snratio", dp.getTruthRef().snratio);
     simgroup.createAttribute("truth_samplingtime_s", dp.getTruthRef().sampling_time.numerical_value_in(s));
@@ -73,8 +72,8 @@ void WriterHitDigiToHDF5::operator()(DataPack dp)
   recordgr.createAttribute("vertex_posz_m", dp.getTruthRef().vertex.posz.numerical_value_in(m));
   recordgr.createAttribute("vertex_kinenergy_eV", dp.getTruthRef().vertex.kineticenergy.numerical_value_in(eV));
   recordgr.createAttribute("vertex_pitchangle_deg", dp.getTruthRef().vertex.pitchangle.numerical_value_in(deg));
-  recordgr.createAttribute("truth_avomega_Hz", dp.getTruthRef().average_omega.numerical_value_in(Hz));
-  recordgr.createAttribute("truth_beatf_Hz", dp.getTruthRef().beat_frequency.numerical_value_in(Hz));
+  recordgr.createAttribute("vertex_omega_Hz", dp.getTruthRef().vertex.vertex_omega.numerical_value_in(Hz));
+  recordgr.createAttribute("vertex_bfield_T", dp.getTruthRef().vertex.vertex_bfield.numerical_value_in(T));
   recordgr.createAttribute("truth_chirp_Hz_s", dp.getTruthRef().chirp_rate.numerical_value_in(Hz/s));
   recordgr.createAttribute("truth_starttime_s", dp.getTruthRef().start_time.numerical_value_in(s));
 

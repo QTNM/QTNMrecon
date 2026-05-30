@@ -29,10 +29,9 @@ WfmReader::WfmReader(TTreeReader& re, std::string out) :
   pangle(reader, "vertex_pitchangle_deg"),
   samplingtime(reader, "truth_samplingtime_s"),
   starttime(reader, "truth_starttime_s"),
-  avomega(reader, "truth_avomega_Hz"),
-  beatf(reader, "truth_beatf_Hz"),
+  vomega(reader, "vertex_omega_Hz"),
   chirprate(reader, "truth_chirp_Hz_s"),
-  bfield(reader, "truth_bfield_T"),
+  vbfield(reader, "vertex_bfield_T"),
   trackHistory(reader, "vertex_trackHistory"),
   wfmarray(reader, "sampled_V")
 {
@@ -71,6 +70,8 @@ DataPack WfmReader::operator()()
     dp.getTruthRef().vertex.posz = *posz * m;
     dp.getTruthRef().vertex.kineticenergy = *kEnergy * eV;
     dp.getTruthRef().vertex.pitchangle = *pangle * deg;
+    dp.getTruthRef().vertex.vertex_bfield = *vbfield * T;
+    dp.getTruthRef().vertex.vertex_omega = *vomega * Hz;
 
     // check on hits, separately from trajectory reader
     // the hit reader may or may not hold data.
@@ -92,11 +93,8 @@ DataPack WfmReader::operator()()
     dp.getTruthRef().tooShort = emptyFlag; // store input truth
     dp.getTruthRef().nantenna = *nantenna; // store input truth
     dp.getTruthRef().chirp_rate = *chirprate * Hz/s; // store input truth
-    dp.getTruthRef().beat_frequency = *beatf * Hz; // store input truth
-    dp.getTruthRef().average_omega = *avomega * Hz; // store input truth
     dp.getTruthRef().sampling_time = *samplingtime * s; // store input truth
     dp.getTruthRef().start_time = *starttime * s; // store input truth
-    dp.getTruthRef().bfield = *bfield * T; // store input truth
     if (trackHistory.GetSetupStatus()>=0) // branch exists
       dp.getTruthRef().vertex.trackHistory = *trackHistory; // vector<int>
     return dp;

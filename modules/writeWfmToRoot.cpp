@@ -25,10 +25,7 @@ WriterWfmToRoot::WriterWfmToRoot(std::string inkey, TTree* tr) :
   mytree->Branch("truth_nantenna",&nantenna,"truth_nantenna/I");
   mytree->Branch("truth_samplingtime_s",&samplingtime,"truth_samplingtime/D");
   mytree->Branch("truth_starttime_s",&starttime,"truth_starttime/D");
-  mytree->Branch("truth_avomega_Hz",&avomega,"truth_avomega/D");
-  mytree->Branch("truth_beatf_Hz",&beatf,"truth_beatf/D");
   mytree->Branch("truth_chirp_Hz_s",&chirprate,"truth_chirp_rate/D");
-  mytree->Branch("truth_bfield_T",&bfield,"truth_bfield/D");
   mytree->Branch("vertex_evID",&evID,"vertex_evID/I");
   mytree->Branch("vertex_trackID",&trID,"vertex_trackID/I");
   mytree->Branch("vertex_posx_m",&posx,"vertex_posx/D");
@@ -36,7 +33,9 @@ WriterWfmToRoot::WriterWfmToRoot(std::string inkey, TTree* tr) :
   mytree->Branch("vertex_posz_m",&posz,"vertex_posz/D");
   mytree->Branch("vertex_kinenergy_eV",&kEnergy,"vertex_kinenergy/D");
   mytree->Branch("vertex_pitchangle_deg",&pangle,"vertex_pitchangle/D");
-
+  mytree->Branch("vertex_omega_Hz",&vomega,"vertex_omega/D");
+  mytree->Branch("vertex_bfield_T",&vbfield,"vertex_bfield/D");
+  
   mytree->Branch("sampled_V", &purewave); // vec<vec>* dummy address
   // hit data
   mytree->Branch("hit_eventID", &hitevID); // point to vec<int>* dummy address
@@ -64,14 +63,8 @@ void WriterWfmToRoot::operator()(DataPack dp)
   mytree->SetBranchAddress("truth_samplingtime_s",&samplingtime);
   starttime = dp.getTruthRef().start_time.numerical_value_in(s); // from quantity<ns> no unit for output
   mytree->SetBranchAddress("truth_starttime_s",&starttime);
-  avomega      = dp.getTruthRef().average_omega.numerical_value_in(Hz); // quantity<Hz>
-  mytree->SetBranchAddress("truth_avomega_Hz",&avomega);
-  beatf        = dp.getTruthRef().beat_frequency.numerical_value_in(Hz); // quantity<Hz>
-  mytree->SetBranchAddress("truth_beatf_Hz",&beatf);
   chirprate    = dp.getTruthRef().chirp_rate.numerical_value_in(Hz/s); // quantity<Hz>
   mytree->SetBranchAddress("truth_chirp_Hz_s",&chirprate);
-  bfield       = dp.getTruthRef().bfield.numerical_value_in(T); // quantity<Hz>
-  mytree->SetBranchAddress("truth_bfield_T",&bfield);
   // vertex
   evID = dp.getTruthRef().vertex.eventID;
   mytree->SetBranchAddress("vertex_evID",&evID);
@@ -87,6 +80,10 @@ void WriterWfmToRoot::operator()(DataPack dp)
   mytree->SetBranchAddress("vertex_kinenergy_eV",&kEnergy);
   pangle  = dp.getTruthRef().vertex.pitchangle.numerical_value_in(deg); // quantity<deg>
   mytree->SetBranchAddress("vertex_pitchangle_deg",&pangle);
+  vomega  = dp.getTruthRef().vertex.vertex_omega.numerical_value_in(Hz); // quantity<Hz>
+  mytree->SetBranchAddress("vertex_omega_Hz",&vomega);
+  vbfield = dp.getTruthRef().vertex.vertex_bfield.numerical_value_in(T); // quantity<Hz>
+  mytree->SetBranchAddress("vertex_bfield_T",&vbfield);
 
   Event<std::any> indata = dp.getRef()[inkey];
   std::string brname;
