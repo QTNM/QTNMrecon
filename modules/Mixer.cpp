@@ -51,7 +51,7 @@ DataPack Mixer::operator()(DataPack dp)
         demod.setSamplingRate(1.0/stime.numerical_value_in(s) * Hz);
 	//	std::cout << "mixer module " << stime << " sampling time set" << std::endl;
 
-        quantity<Hz> avom = dp.getTruthRef().average_omega;
+        quantity<Hz> avom = dp.getTruthRef().vertex.vertex_omega; // initial omega
         quantity<Hz> losc = (avom/(2.0*myPi)) - targetFrequency;
 	//	std::cout << "mixer module " << losc << " losc freq set" << std::endl;
         demod.setLOfrequency(losc); // mixer fully configured
