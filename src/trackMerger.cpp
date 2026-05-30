@@ -41,12 +41,11 @@ trackMerger::trackMerger(TTreeReader& re, TTree* tr) :
   posz(reader, "vertex_posz_m"),
   kEnergy(reader, "vertex_kinenergy_eV"),
   pangle(reader, "vertex_pitchangle_deg"),
+  vomega(reader, "vertex_omega_Hz"),
+  vbfield(reader, "vertex_bfield_T"),
   samplingtime(reader, "truth_samplingtime_s"),
   starttime(reader, "truth_starttime_s"),
-  avomega(reader, "truth_avomega_Hz"),
-  beatf(reader, "truth_beatf_Hz"),
   chirprate(reader, "truth_chirp_Hz_s"),
-  bfield(reader, "truth_bfield_T"),
   wfmarray(reader, "sampled_V")
 {
 
@@ -56,10 +55,7 @@ trackMerger::trackMerger(TTreeReader& re, TTree* tr) :
   mytree->Branch("truth_nantenna",&nant,"truth_nantenna/I");
   mytree->Branch("truth_samplingtime_s",&samplingtimeOut,"truth_samplingtime/D");
   mytree->Branch("truth_starttime_s",&starttimeOut,"truth_starttime/D");
-  mytree->Branch("truth_avomega_Hz",&avomegaOut,"truth_avomega/D");
-  mytree->Branch("truth_beatf_Hz",&beatfOut,"truth_beatf/D");
   mytree->Branch("truth_chirp_Hz_s",&chirprateOut,"truth_chirp_rate/D");
-  mytree->Branch("truth_bfield_T",&bfieldOut,"truth_bfield/D");
   mytree->Branch("vertex_evID",&evID,"vertex_evID/I");
   mytree->Branch("vertex_trackID",&trID,"vertex_trackID/I");
   mytree->Branch("vertex_posx_m",&posxOut,"vertex_posx/D");
@@ -67,6 +63,8 @@ trackMerger::trackMerger(TTreeReader& re, TTree* tr) :
   mytree->Branch("vertex_posz_m",&poszOut,"vertex_posz/D");
   mytree->Branch("vertex_kinenergy_eV",&kEnergyOut,"vertex_kinenergy/D");
   mytree->Branch("vertex_pitchangle_deg",&pangleOut,"vertex_pitchangle/D");
+  mytree->Branch("vertex_omega_Hz",&vomegaOut,"vertex_omega/D");
+  mytree->Branch("vertex_bfield_T",&vbfieldOut,"vertex_bfield/D");
   mytree->Branch("vertex_trackHistory",&trackHistory); // made in Merger
 
   mytree->Branch("sampled_V", &purewave); // point to vec<vec>* dummy address
@@ -127,16 +125,15 @@ void trackMerger::Loop()
 	vec_t wfm(wfmarray.At(i).begin(), wfmarray.At(i).end()); // wfmarray is ttreereaderarray
 	localWfm.push_back(wfm); // local copy for potential merging
       }
-      mergedDP.getTruthRef().average_omega = dp.getTruthRef().average_omega; // initial copy
       mergedDP.getTruthRef().sampling_time = dp.getTruthRef().sampling_time; // initial copy
-      mergedDP.getTruthRef().bfield = dp.getTruthRef().bfield; // initial copy
-      mergedDP.getTruthRef().beat_frequency = dp.getTruthRef().beat_frequency; // initial copy
       mergedDP.getTruthRef().chirp_rate = dp.getTruthRef().chirp_rate; // initial copy
       mergedDP.getTruthRef().vertex.posx = dp.getTruthRef().vertex.posx; // initial copy
       mergedDP.getTruthRef().vertex.posy = dp.getTruthRef().vertex.posy; // initial copy
       mergedDP.getTruthRef().vertex.posz = dp.getTruthRef().vertex.posz; // initial copy
       mergedDP.getTruthRef().vertex.kineticenergy = dp.getTruthRef().vertex.kineticenergy; // initial copy
       mergedDP.getTruthRef().vertex.pitchangle = dp.getTruthRef().vertex.pitchangle; // initial copy
+      mergedDP.getTruthRef().vertex.vertex_omega = dp.getTruthRef().vertex.vertex_omega; // initial copy
+      mergedDP.getTruthRef().vertex.vertex_bfield = dp.getTruthRef().vertex.vertex_bfield; // initial copy
       
       writeRow(dp); // write out as is, nothing else to do
     }
@@ -201,6 +198,8 @@ DataPack trackMerger::readRow()
   dp.getTruthRef().vertex.posz = *posz * m;
   dp.getTruthRef().vertex.kineticenergy = *kEnergy * eV;
   dp.getTruthRef().vertex.pitchangle = *pangle * deg;
+  dp.getTruthRef().vertex.vertex_omega = *vomega * Hz; // store input truth
+  dp.getTruthRef().vertex.vertex_bfield = *vbfield * T; // store input truth
   
   // check on hits, separately from trajectory reader
   // the hit reader may or may not hold data.
@@ -221,11 +220,8 @@ DataPack trackMerger::readRow()
   }
   dp.getTruthRef().nantenna = *nantenna; // store input truth
   dp.getTruthRef().chirp_rate = *chirprate * Hz/s; // store input truth
-  dp.getTruthRef().beat_frequency = *beatf * Hz; // store input truth
-  dp.getTruthRef().average_omega = *avomega * Hz; // store input truth
   dp.getTruthRef().sampling_time = *samplingtime * s; // store input truth
   dp.getTruthRef().start_time = *starttime * s; // store input truth
-  dp.getTruthRef().bfield = *bfield * T; // store input truth
   return dp;
 }
 
@@ -239,14 +235,8 @@ void trackMerger::writeRow(DataPack& dp)
   mytree->SetBranchAddress("truth_samplingtime_s",&samplingtimeOut);
   starttimeOut = dp.getTruthRef().start_time.numerical_value_in(s); // from quantity<ns> no unit for output
   mytree->SetBranchAddress("truth_starttime_s",&starttimeOut);
-  avomegaOut      = dp.getTruthRef().average_omega.numerical_value_in(Hz); // quantity<Hz>
-  mytree->SetBranchAddress("truth_avomega_Hz",&avomegaOut);
-  beatfOut        = dp.getTruthRef().beat_frequency.numerical_value_in(Hz); // quantity<Hz>
-  mytree->SetBranchAddress("truth_beatf_Hz",&beatfOut);
   chirprateOut    = dp.getTruthRef().chirp_rate.numerical_value_in(Hz/s); // quantity<Hz>
   mytree->SetBranchAddress("truth_chirp_Hz_s",&chirprateOut);
-  bfieldOut       = dp.getTruthRef().bfield.numerical_value_in(T); // quantity<Hz>
-  mytree->SetBranchAddress("truth_bfield_T",&bfieldOut);
   // vertex
   evID = dp.getTruthRef().vertex.eventID;
   mytree->SetBranchAddress("vertex_evID",&evID);
@@ -262,6 +252,10 @@ void trackMerger::writeRow(DataPack& dp)
   mytree->SetBranchAddress("vertex_kinenergy_eV",&kEnergyOut);
   pangleOut  = dp.getTruthRef().vertex.pitchangle.numerical_value_in(deg); // quantity<deg>
   mytree->SetBranchAddress("vertex_pitchangle_deg",&pangleOut);
+  vomegaOut  = dp.getTruthRef().vertex.vertex_omega.numerical_value_in(Hz); // quantity<Hz>
+  mytree->SetBranchAddress("vertex_omega_Hz",&vomegaOut);
+  vbfieldOut = dp.getTruthRef().vertex.vertex_bfield.numerical_value_in(T); // quantity<Hz>
+  mytree->SetBranchAddress("vertex_bfield_T",&vbfieldOut);
   trackHistory  = &dp.getTruthRef().vertex.trackHistory; // vector<int>*
   mytree->SetBranchAddress("vertex_trackHistory",&trackHistory);
 
