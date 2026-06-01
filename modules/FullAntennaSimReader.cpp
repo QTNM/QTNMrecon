@@ -123,12 +123,15 @@ DataPack FullAntennaSimReader::operator()()
       dp.getTruthRef().tooShort = true; // empty Wfm is too short
     }
     dp.getTruthRef().nantenna = nantenna; // store input truth
-    std::vector<double>::iterator it = std::min_element(omvec->begin(),omvec->begin()+20000);
-    int pos = it - omvec->begin();
-    dp.getTruthRef().base_omega = *it * Hz;
-    dp.getTruthRef().base_bfield = e2b(kevec->at(pos)*keV, *it * Hz); // calculate
-    double sum = std::accumulate(omvec->begin(),omvec->begin()+20000, 0.0) / 20000; // average
-    dp.getTruthRef().base_omega = sum * Hz;
+    if (omvec->size()>30000) {
+      double sum = std::accumulate(omvec->begin(),omvec->begin()+30000, 0.0) / 30000; // average
+      dp.getTruthRef().base_omega = sum * Hz;
+      dp.getTruthRef().base_bfield = e2b(*kine*keV, sum*Hz); // calculate
+    }
+    else {
+      dp.getTruthRef().base_omega = 0.0 * Hz;
+      dp.getTruthRef().base_bfield = 0.0 * T;
+    }
     return dp;
 }
 
