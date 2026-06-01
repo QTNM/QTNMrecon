@@ -31,6 +31,8 @@ private:
   TTreeReaderValue<double> samplingtime;
   TTreeReaderValue<double> starttime;
   TTreeReaderValue<double> chirprate;
+  TTreeReaderValue<double> bomega;
+  TTreeReaderValue<double> bbfield;
   // vertex
   TTreeReaderValue<double> posx;
   TTreeReaderValue<double> posy;

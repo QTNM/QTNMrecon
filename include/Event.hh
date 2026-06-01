@@ -37,7 +37,8 @@ struct truth_t {
   bool tooShort;
   quantity<ns> sampling_time; // from sampling
   quantity<ns> start_time;    // from time vector for each trackID
-  quantity<Hz> beat_frequency; // from omega vector
+  quantity<Hz> base_omega; // from omega vector
+  quantity<T> base_bfield; // at base omega point
   quantity<Hz/s> chirp_rate;
   std::vector<vec_t> pure; // sampled signal, no noise, one per antenna
   

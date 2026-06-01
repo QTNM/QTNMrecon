@@ -28,6 +28,8 @@ WriterHitDigiToRoot::WriterHitDigiToRoot(TTree* tr) :
   mytree->Branch("truth_snratio",&snratio,"truth_snratio/D");
   mytree->Branch("truth_samplingtime_s",&samplingtime,"truth_samplingtime/D");
   mytree->Branch("truth_starttime_s",&starttime,"truth_starttime/D");
+  mytree->Branch("base_omega_Hz",&bomega,"base_omega/D");
+  mytree->Branch("base_bfield_T",&bbfield,"base_bfield/D");
   mytree->Branch("truth_chirp_Hz_s",&chirprate,"truth_chirp_rate/D");
   mytree->Branch("vertex_evID",&evID,"vertex_evID/I");
   mytree->Branch("vertex_trackID",&trID,"vertex_trackID/I");
@@ -70,6 +72,10 @@ void WriterHitDigiToRoot::operator()(DataPack dp)
   mytree->SetBranchAddress("truth_samplingtime_s",&samplingtime);
   starttime = dp.getTruthRef().start_time.numerical_value_in(s); // from quantity<ns> no unit for output
   mytree->SetBranchAddress("truth_starttime_s",&starttime);
+  bomega = dp.getTruthRef().base_omega.numerical_value_in(Hz); // from quantity<Hz> no unit for output
+  mytree->SetBranchAddress("base_omega_Hz",&bomega);
+  bbfield = dp.getTruthRef().base_bfield.numerical_value_in(T); // from quantity<T> no unit for output
+  mytree->SetBranchAddress("base_bfield_T",&bbfield);
   chirprate    = dp.getTruthRef().chirp_rate.numerical_value_in(Hz/s); // quantity<Hz>
   mytree->SetBranchAddress("truth_chirp_Hz_s",&chirprate);
   // vertex

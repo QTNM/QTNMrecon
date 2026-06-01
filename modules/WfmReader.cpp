@@ -32,6 +32,8 @@ WfmReader::WfmReader(TTreeReader& re, std::string out) :
   vomega(reader, "vertex_omega_Hz"),
   chirprate(reader, "truth_chirp_Hz_s"),
   vbfield(reader, "vertex_bfield_T"),
+  bomega(reader, "base_omega_Hz"),
+  bbfield(reader, "base_bfield_T"),
   trackHistory(reader, "vertex_trackHistory"),
   wfmarray(reader, "sampled_V")
 {
@@ -95,6 +97,8 @@ DataPack WfmReader::operator()()
     dp.getTruthRef().chirp_rate = *chirprate * Hz/s; // store input truth
     dp.getTruthRef().sampling_time = *samplingtime * s; // store input truth
     dp.getTruthRef().start_time = *starttime * s; // store input truth
+    dp.getTruthRef().base_omega = *bomega * Hz; // store input truth
+    dp.getTruthRef().base_bfield = *bbfield * T; // store input truth
     if (trackHistory.GetSetupStatus()>=0) // branch exists
       dp.getTruthRef().vertex.trackHistory = *trackHistory; // vector<int>
     return dp;

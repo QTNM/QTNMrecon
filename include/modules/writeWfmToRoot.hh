@@ -49,6 +49,8 @@ class WriterWfmToRoot
       double pangle; // quantity<deg>
       double vomega; // quantity<Hz>
       double vbfield; // quantity<T>
+      double bomega; // quantity<Hz>
+      double bbfield; // quantity<T>
 
       // hit data
       std::vector<int>* hitevID;

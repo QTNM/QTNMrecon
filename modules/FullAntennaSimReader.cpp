@@ -123,6 +123,10 @@ DataPack FullAntennaSimReader::operator()()
       dp.getTruthRef().tooShort = true; // empty Wfm is too short
     }
     dp.getTruthRef().nantenna = nantenna; // store input truth
+    std::vector<double>::iterator it = std::min_element(omvec.begin(),omvec.begin()+20000);
+    int pos = it - omvec.begin();
+    dp.getTruthRef().base_omega = *it * Hz;
+    dp.getTruthRef().base_bfield = e2b(kevec->at(pos)*keV, *it * Hz); // calculate
     return dp;
 }
 

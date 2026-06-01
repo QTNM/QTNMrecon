@@ -41,6 +41,8 @@ class WriterHitDigiToRoot
       double samplingtime; // from quantity<ns>
       double starttime; // from quantity<ns>
       double chirprate; // quantity<Hz/s>
+      double bomega; // quantity<Hz>
+      double bbfield; // quantity<T>
       // vertex
       double posx; // quantity<m>
       double posy; // quantity<m>

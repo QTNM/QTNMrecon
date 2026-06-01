@@ -76,6 +76,8 @@ void WriterHitDigiToHDF5::operator()(DataPack dp)
   recordgr.createAttribute("vertex_bfield_T", dp.getTruthRef().vertex.vertex_bfield.numerical_value_in(T));
   recordgr.createAttribute("truth_chirp_Hz_s", dp.getTruthRef().chirp_rate.numerical_value_in(Hz/s));
   recordgr.createAttribute("truth_starttime_s", dp.getTruthRef().start_time.numerical_value_in(s));
+  recordgr.createAttribute("base_omega_Hz", dp.getTruthRef().base_omega.numerical_value_in(Hz));
+  recordgr.createAttribute("base_bfield_T", dp.getTruthRef().base_bfield.numerical_value_in(T));
 
   if (! dp.getTruthRef().vertex.trackHistory.empty())
     for (int val : dp.getTruthRef().vertex.trackHistory) trackHistory.push_back(val);
