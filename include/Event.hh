@@ -102,7 +102,8 @@ private:
     truthPack.tooShort = false; // Wfm flag default
     truthPack.sampling_time = 0.0 * ns;
     truthPack.start_time = 0.0 * ns;
-    truthPack.beat_frequency = 0.0 * Hz;
+    truthPack.base_omega = 0.0 * Hz;
+    truthPack.base_bfield = 0.0 * T;
     truthPack.chirp_rate = 0.0 * Hz/s;
     truthPack.vertex.posx = 0.0 * m;
     truthPack.vertex.posy = 0.0 * m;
