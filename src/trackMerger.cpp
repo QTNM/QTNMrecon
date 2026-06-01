@@ -43,6 +43,8 @@ trackMerger::trackMerger(TTreeReader& re, TTree* tr) :
   pangle(reader, "vertex_pitchangle_deg"),
   vomega(reader, "vertex_omega_Hz"),
   vbfield(reader, "vertex_bfield_T"),
+  bomega(reader, "base_omega_Hz"),
+  bbfield(reader, "base_bfield_T"),
   samplingtime(reader, "truth_samplingtime_s"),
   starttime(reader, "truth_starttime_s"),
   chirprate(reader, "truth_chirp_Hz_s"),
@@ -55,6 +57,8 @@ trackMerger::trackMerger(TTreeReader& re, TTree* tr) :
   mytree->Branch("truth_nantenna",&nant,"truth_nantenna/I");
   mytree->Branch("truth_samplingtime_s",&samplingtimeOut,"truth_samplingtime/D");
   mytree->Branch("truth_starttime_s",&starttimeOut,"truth_starttime/D");
+  mytree->Branch("base_omega_Hz",&bomegaOut,"base_omega/D");
+  mytree->Branch("base_bfield_T",&bbfieldOut,"base_bfield/D");
   mytree->Branch("truth_chirp_Hz_s",&chirprateOut,"truth_chirp_rate/D");
   mytree->Branch("vertex_evID",&evID,"vertex_evID/I");
   mytree->Branch("vertex_trackID",&trID,"vertex_trackID/I");
@@ -222,6 +226,8 @@ DataPack trackMerger::readRow()
   dp.getTruthRef().chirp_rate = *chirprate * Hz/s; // store input truth
   dp.getTruthRef().sampling_time = *samplingtime * s; // store input truth
   dp.getTruthRef().start_time = *starttime * s; // store input truth
+  dp.getTruthRef().base_omega = *bomega * Hz; // store input truth
+  dp.getTruthRef().base_bfield = *bbfield * T; // store input truth
   return dp;
 }
 
@@ -235,6 +241,10 @@ void trackMerger::writeRow(DataPack& dp)
   mytree->SetBranchAddress("truth_samplingtime_s",&samplingtimeOut);
   starttimeOut = dp.getTruthRef().start_time.numerical_value_in(s); // from quantity<ns> no unit for output
   mytree->SetBranchAddress("truth_starttime_s",&starttimeOut);
+  bomegaOut  = dp.getTruthRef().base_omega.numerical_value_in(Hz); // quantity<Hz>
+  mytree->SetBranchAddress("base_omega_Hz",&bomegaOut);
+  bbfieldOut = dp.getTruthRef().base_bfield.numerical_value_in(T); // quantity<T>
+  mytree->SetBranchAddress("base_bfield_T",&bbfieldOut);
   chirprateOut    = dp.getTruthRef().chirp_rate.numerical_value_in(Hz/s); // quantity<Hz>
   mytree->SetBranchAddress("truth_chirp_Hz_s",&chirprateOut);
   // vertex

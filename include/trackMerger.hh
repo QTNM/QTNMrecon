@@ -52,6 +52,8 @@ private:
   TTreeReaderValue<double> vomega;
   TTreeReaderValue<double> chirprate;
   TTreeReaderValue<double> vbfield;
+  TTreeReaderValue<double> bomega;
+  TTreeReaderValue<double> bbfield;
   // vertex
   TTreeReaderValue<double> posx;
   TTreeReaderValue<double> posy;
@@ -81,6 +83,8 @@ private:
   double vomegaOut; // quantity<Hz>
   double chirprateOut; // quantity<Hz/s>
   double vbfieldOut; // quantity<T>
+  double bomegaOut; // quantity<Hz>
+  double bbfieldOut; // quantity<T>
   // vertex
   double posxOut; // quantity<m>
   double posyOut; // quantity<m>

@@ -39,7 +39,7 @@ DataPack Amplifier::operator()(DataPack dp)
   Event<std::any> outdata; // to hold all the data items
 
   // filter set up
-  quantity<Hz> avom = dp.getTruthRef().vertex.vertex_omega;
+  quantity<Hz> avom = dp.getTruthRef().base_omega;
   quantity<Hz> centre = avom/(2.0*myPi);
   quantity<ns> stime = dp.getTruthRef().sampling_time;
   bw.setSamplingRate(1.0 / stime.numerical_value_in(s) * Hz);
