@@ -127,6 +127,8 @@ DataPack FullAntennaSimReader::operator()()
     int pos = it - omvec->begin();
     dp.getTruthRef().base_omega = *it * Hz;
     dp.getTruthRef().base_bfield = e2b(kevec->at(pos)*keV, *it * Hz); // calculate
+    double sum = std::accumulate(omvec->begin(),omvec->begin()+20000, 0.0) / 20000; // average
+    dp.getTruthRef().base_omega = sum * Hz;
     return dp;
 }
 
