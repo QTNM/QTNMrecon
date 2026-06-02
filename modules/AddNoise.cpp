@@ -51,8 +51,10 @@ DataPack AddNoise::operator()(DataPack dp)
           // set up the noise generator
 	  double maxel, minel;
 	  if (pure.size()>=50) { // expected signals are much longer, tests maybe not
-	    maxel = *std::max_element(pure.begin(),pure.begin()+50); // max from initial few oscillations
-	    minel = *std::min_element(pure.begin(),pure.begin()+50); // min
+	    auto itt = pure.begin();
+	    std::advance(itt, 50); // range end
+	    maxel = *std::max_element(pure.begin(),itt); // max from initial few oscillations
+	    minel = *std::min_element(pure.begin(),itt); // min
 	  }
 	  else {
 	    maxel = *std::max_element(pure.begin(),pure.end()); // max

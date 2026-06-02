@@ -330,6 +330,7 @@ void trackMerger::add(vec_t& other, int whichAntenna)
   int diff = final_other - final_idx;
   if (diff > 0) localWfm.at(whichAntenna).resize(final_idx+diff+1);
   // action
-  std::transform(other.begin(), other.end(), localWfm.at(whichAntenna).begin()+idx_start,
-		 localWfm.at(whichAntenna).begin()+idx_start, std::plus<double>()); // in-place addition
+  auto itt = localWfm.at(whichAntenna).begin();
+  std::advance(itt, idx_start); // range end
+  std::transform(other.begin(), other.end(), itt, itt, std::plus<double>()); // in-place addition
 }

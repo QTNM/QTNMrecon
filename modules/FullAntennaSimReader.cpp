@@ -124,7 +124,9 @@ DataPack FullAntennaSimReader::operator()()
     }
     dp.getTruthRef().nantenna = nantenna; // store input truth
     if (omvec->size()>30000) {
-      double sum = std::accumulate(omvec->begin(),omvec->begin()+30000, 0.0) / 30000; // average
+      auto itt = omvec->begin();
+      std::advance(itt, 30000); // range end
+      double sum = std::accumulate(omvec->begin(),itt, 0.0) / 30000; // average
       dp.getTruthRef().base_omega = sum * Hz;
       dp.getTruthRef().base_bfield = e2b(*kine*keV, sum*Hz); // calculate
     }
