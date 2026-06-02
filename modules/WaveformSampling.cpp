@@ -27,7 +27,7 @@ DataPack WaveformSampling::operator()(DataPack dp)
     std::cout << "origin key not in dictionary! Waveform Sampling" << std::endl;
     return dp;
   }
-  std::cout << "interpolator called" << std::endl;
+  //  std::cout << "interpolator called" << std::endl;
 
   // block Wfms too short for processing
   if (dp.getTruthRef().tooShort) {
@@ -114,7 +114,7 @@ DataPack WaveformSampling::operator()(DataPack dp)
     dp.getRef()[originkey].erase("SourceTime");
     dp.getRef()[originkey].erase("OmVec");
   }
-  std::cout << "interpolator finish." << std::endl;
+  //  std::cout << "interpolator finish." << std::endl;
   
   return dp;
 }

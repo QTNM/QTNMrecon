@@ -86,7 +86,7 @@ DataPack FullAntennaSimReader::operator()()
     dp.getTruthRef().vertex.pitchangle = *pangle * rad;
     dp.getTruthRef().vertex.vertex_omega = omvec->front() * Hz; // first entry    
     dp.getTruthRef().vertex.vertex_bfield = e2b(*kine*keV, omvec->front()*Hz); // calculate
-    std::cout << "reader1 Next() done, evt:  " << evcounter << std::endl;
+    //    std::cout << "reader1 Next() done, evt:  " << evcounter << std::endl;
 
     // check on hits, separately from trajectory reader
     // the hit reader may or may not hold data.
@@ -108,6 +108,7 @@ DataPack FullAntennaSimReader::operator()()
 	  // store the filled hit_t
 	  dp.hitsRef().push_back(myhit);
 	  std::cout << "found hit evt/track:  " << myhit.eventID << ", " << myhit.trackID << std::endl;
+	  std::cout << "found hit track at time:  " << myhit.trackID << ", " << myhit.timestamp << std::endl;
 	}
       }
       reader2.Restart(); // for each trajectory, have to loop over hits, then reset hits reader.

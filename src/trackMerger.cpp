@@ -82,7 +82,7 @@ trackMerger::trackMerger(TTreeReader& re, TTree* tr) :
   mytree->Branch("hit_edep_eV", &hitedepOut); // point to vec<double>* dummy address
   mytree->Branch("hit_posttheta_deg", &hitpostthetaOut); // point to vec<double>* dummy address
 
-  std::cout << "in merger, TTree set up." << std::endl;
+  //  std::cout << "in merger, TTree set up." << std::endl;
 }
 
 
@@ -164,7 +164,7 @@ void trackMerger::Loop()
       mergedDP.getTruthRef().nantenna = dp.getTruthRef().nantenna; // copy
     }
   }
-  std::cout << "Loop finished." << std::endl;
+  //  std::cout << "Loop finished." << std::endl;
 }
 
 

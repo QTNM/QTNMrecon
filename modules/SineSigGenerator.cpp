@@ -26,7 +26,7 @@ SineSigGenerator::SineSigGenerator(std::string out, quantity<V> amp, quantity<Hz
     counter(0),
     maxEventNumber(0)
 {
-  std::cout << "SineSig constructor called." << std::endl;
+  //  std::cout << "SineSig constructor called." << std::endl;
   sig.setAmplitude(amplitude);
   sig.setFrequency(frequency);
   sig.setSampling_rate(sampling_rate);
@@ -53,7 +53,7 @@ DataPack SineSigGenerator::operator()()
   outdata["sampling_Hz_0"] = std::make_any<quantity<Hz>>(sampling_rate);
   outdata["duration_s_0"] = std::make_any<quantity<s>>(duration);
   outdata["phase_rad_0"] = std::make_any<quantity<rad>>(phase);
-  std::cout << "sine gen: counter " << counter << ", in key " << outkey << std::endl;
+  //  std::cout << "sine gen: counter " << counter << ", in key " << outkey << std::endl;
   eventmap[outkey] = outdata;
   DataPack dp(eventmap);
   dp.getTruthRef().nantenna = 1; // required for outputs

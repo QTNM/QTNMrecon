@@ -16,7 +16,7 @@ WriterHitDigiToHDF5::WriterHitDigiToHDF5(HighFive::Group& gr) :
   bnew_event = true;
   evID = -1;
   trID = -1;
-  std::cout << "in HDF5 writer constructor." << std::endl;
+  //  std::cout << "in HDF5 writer constructor." << std::endl;
 }
 
 
@@ -46,7 +46,7 @@ void WriterHitDigiToHDF5::operator()(DataPack dp)
   
   if (bnew_event)
     eventgr = simgroup.createGroup("event_"+std::to_string(evID));
-  std::cout << "in HDF5 writer: made group with evID " << evID << std::endl;
+  //  std::cout << "in HDF5 writer: made group with evID " << evID << std::endl;
 
   // enable compression
   vec_t empty;

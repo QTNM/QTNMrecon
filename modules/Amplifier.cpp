@@ -72,7 +72,7 @@ DataPack Amplifier::operator()(DataPack dp)
 	std::string ikey = l2in + std::to_string(i);
 	auto wfm = std::any_cast<waveform_t>(indata[ikey]);
 	waveform_t filtsig = bw.BPassFilter(wfm); // use band-pass filter
-	std::cout << "filtered wfm size " << filtsig.size() << std::endl;
+	//	std::cout << "filtered wfm size " << filtsig.size() << std::endl;
 	std::transform(filtsig.begin(),filtsig.end(),
 		       filtsig.begin(),[this](waveform_value x){return x*gainfactor;}); // in-place
 	

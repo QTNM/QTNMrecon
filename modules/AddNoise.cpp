@@ -81,7 +81,7 @@ DataPack AddNoise::operator()(DataPack dp)
 
           waveform_t noisy = noisegen.add(res,onset); // use the noise generator
           std::string okey = l2out + std::to_string(i);
-	  std::cout << "store key " << okey << " waveform of size " << noisy.size() << std::endl;
+	  //	  std::cout << "store key " << okey << " waveform of size " << noisy.size() << std::endl;
           outdata[okey] = std::make_any<waveform_t>(noisy);
           dp.getRef()[inkey].erase(ikey); // obsolete, have copy with unit
         }

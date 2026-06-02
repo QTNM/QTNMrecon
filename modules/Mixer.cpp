@@ -63,7 +63,7 @@ DataPack Mixer::operator()(DataPack dp)
             // sine wave gen with losc; multiply with pure, LPassFilter, new time interval
             // sample_time_[ns] in event.
             waveform_t mixedsig = demod.mix(pure); // use down converter.
-	    std::cout << "mixed wfm size " << mixedsig.size() << std::endl;
+	    //	    std::cout << "mixed wfm size " << mixedsig.size() << std::endl;
 
             std::string okey = l2out + std::to_string(i);
             outdata[okey] = std::make_any<waveform_t>(mixedsig);

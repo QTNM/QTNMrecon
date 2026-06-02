@@ -49,14 +49,14 @@ WriterWfmToRoot::WriterWfmToRoot(std::string inkey, TTree* tr) :
   mytree->Branch("hit_edep_eV", &hitedep); // point to vec<double>* dummy address
   mytree->Branch("hit_posttheta_deg", &hitposttheta); // point to vec<double>* dummy address
 
-  std::cout << "Wfm writer constructed" << std::endl;
+  //  std::cout << "Wfm writer constructed" << std::endl;
 
 }
 
 
 void WriterWfmToRoot::operator()(DataPack dp)
 {
-  std::cout << "Wfm writer called." << std::endl;
+  //  std::cout << "Wfm writer called." << std::endl;
   
   // extract from datapack and assign to output branch variables with the correct address
   nantenna = dp.getTruthRef().nantenna;

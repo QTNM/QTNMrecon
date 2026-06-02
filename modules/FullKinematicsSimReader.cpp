@@ -94,7 +94,7 @@ DataPack FullKinematicsSimReader::operator()()
     dp.getTruthRef().vertex.pitchangle = *pangle * rad;
     dp.getTruthRef().vertex.vertex_omega = omvec->front() * Hz; // first entry    
     dp.getTruthRef().vertex.vertex_bfield = e2b(*kine*keV, omvec->front()*Hz); // calculate
-    std::cout << "reader Next() done, evt:  " << evcounter << std::endl;
+    //    std::cout << "reader Next() done, evt:  " << evcounter << std::endl;
 
     // check on hits, separately from trajectory reader
     // the hit reader may or may not hold data.
