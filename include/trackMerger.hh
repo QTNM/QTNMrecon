@@ -49,10 +49,11 @@ private:
   TTreeReaderValue<int> trackID;
   TTreeReaderValue<double> samplingtime;
   TTreeReaderValue<double> starttime;
-  TTreeReaderValue<double> avomega;
-  TTreeReaderValue<double> beatf;
+  TTreeReaderValue<double> vomega;
   TTreeReaderValue<double> chirprate;
-  TTreeReaderValue<double> bfield;
+  TTreeReaderValue<double> vbfield;
+  TTreeReaderValue<double> bomega;
+  TTreeReaderValue<double> bbfield;
   // vertex
   TTreeReaderValue<double> posx;
   TTreeReaderValue<double> posy;
@@ -79,10 +80,11 @@ private:
   int nant; // set by DataPack
   double samplingtimeOut; // from quantity<ns>
   double starttimeOut; // from quantity<ns>
-  double avomegaOut; // quantity<Hz>
-  double beatfOut; // quantity<Hz>
+  double vomegaOut; // quantity<Hz>
   double chirprateOut; // quantity<Hz/s>
-  double bfieldOut; // quantity<T>
+  double vbfieldOut; // quantity<T>
+  double bomegaOut; // quantity<Hz>
+  double bbfieldOut; // quantity<T>
   // vertex
   double posxOut; // quantity<m>
   double posyOut; // quantity<m>

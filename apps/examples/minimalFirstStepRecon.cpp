@@ -22,7 +22,6 @@
 #include "modules/FullAntennaSimReader.hh"
 #include "modules/AddChirpToTruth.hh"
 #include "modules/WaveformSampling.hh"
-#include "modules/OmegaBeatToTruth.hh"
 #include "modules/writeWfmToRoot.hh"
 
 #include "CLI11.hpp"
@@ -34,7 +33,6 @@ int main(int argc, char** argv)
       // command line interface
   CLI::App app{"Minimal First Step Recon Pipeline"};
   int nevents = -1;
-  quantity<T> bfield = 0.7 * T; // constant sim b-field value [T]
   quantity<ns> minduration = 100.0 * ns;
   std::string fname = "qtnm.root";
   std::string outfname = "sampled.root";
@@ -56,7 +54,6 @@ int main(int argc, char** argv)
   TTreeReader re2("ntuple/Score", &ff);
   auto source = FullAntennaSimReader(re1, re2, origin);
   source.setMaxEventNumber(nevents); // default = all events in file
-  source.setSimConstantBField(bfield); // MUST be set
   source.setAntennaN(nant);
   source.setMinWfmDuration(minduration);
 
@@ -68,9 +65,6 @@ int main(int argc, char** argv)
   quantity<ns> stime = 0.008 * ns;
   interpolator.setSampleTime(stime);
 
-  // add truth, 'omout' is just for checking
-  auto addbeat = OmegaBeatToTruth(samp,"omout");
-
   // data sink: write to Root, take from key
   TFile* outfile = new TFile(outfname.data(), "RECREATE");
   TTree* tr = new TTree("sampled","sampled data");
@@ -78,7 +72,7 @@ int main(int argc, char** argv)
 
   auto sink = WriterWfmToRoot(samp, tr);
   
-  auto pl = yap::Pipeline{} | source | addchirp | interpolator | addbeat | sink;
+  auto pl = yap::Pipeline{} | source | addchirp | interpolator | sink;
   
   pl.consume();
   

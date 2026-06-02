@@ -40,16 +40,17 @@ class WriterHitDigiToRoot
       double snratio;
       double samplingtime; // from quantity<ns>
       double starttime; // from quantity<ns>
-      double avomega; // quantity<Hz>
-      double beatf; // quantity<Hz>
       double chirprate; // quantity<Hz/s>
-      double bfield; // quantity<T>
+      double bomega; // quantity<Hz>
+      double bbfield; // quantity<T>
       // vertex
       double posx; // quantity<m>
       double posy; // quantity<m>
       double posz; // quantity<m>
       double kEnergy; // quantity<eV>
       double pangle; // quantity<deg>
+      double vomega; // quantity<Hz>
+      double vbfield; // quantity<T>
       std::vector<int>* trackHistory;
       // experiment
       double gain;

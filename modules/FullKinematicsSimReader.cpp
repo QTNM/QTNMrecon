@@ -12,7 +12,6 @@ FullKinematicsSimReader::FullKinematicsSimReader(TTreeReader& re1, TTreeReader& 
     outkey(std::move(out)),
     maxEventNumber(-1), // default -1 for a all events
     evcounter(0),
-    Bfield(-1.0 * T),
     minDuration(10.0 * ns), // default minimum Wfm duration
     reader1(re1),
     reader2(re2),
@@ -60,11 +59,6 @@ DataPack FullKinematicsSimReader::operator()()
         throw yap::GeneratorExit{};
     evcounter++;
 
-    if (Bfield < 0 * T) {
-        std::cout << "WARNING: Bfield is required input to pipeline. Exit" << std::endl;
-        throw yap::GeneratorExit{};
-    }
-
     Event_map<std::any> eventmap; // data item for delivery
     Event<std::any> outdata; // to hold all the data items from file
 
@@ -98,7 +92,9 @@ DataPack FullKinematicsSimReader::operator()()
     dp.getTruthRef().vertex.posz = *posz * mm;
     dp.getTruthRef().vertex.kineticenergy = *kine * keV;
     dp.getTruthRef().vertex.pitchangle = *pangle * rad;
-    std::cout << "reader Next() done, evt:  " << evcounter << std::endl;
+    dp.getTruthRef().vertex.vertex_omega = omvec->front() * Hz; // first entry    
+    dp.getTruthRef().vertex.vertex_bfield = e2b(*kine*keV, omvec->front()*Hz); // calculate
+    //    std::cout << "reader Next() done, evt:  " << evcounter << std::endl;
 
     // check on hits, separately from trajectory reader
     // the hit reader may or may not hold data.
@@ -128,14 +124,34 @@ DataPack FullKinematicsSimReader::operator()()
     if (!tvec->empty()) { // book truth from trajectory
       dp.getTruthRef().start_time = tvec->front() * ns;
       quantity<ns> endtime = tvec->back() * ns; // check on config Wfm duration
-      if ((endtime-dp.getTruthRef().start_time) <= minDuration)
+      if ((endtime-dp.getTruthRef().start_time) <= minDuration) {
 	dp.getTruthRef().tooShort = true; // Wfm too short for work
+	std::cout << "*** too short " << *eventID << ", " << *trackID << std::endl;
+      }
     }
     else {
       dp.getTruthRef().start_time = -1.0 * ns;
       dp.getTruthRef().tooShort = true; // empty Wfm is too short
+      std::cout << "*** too short " << *eventID << ", " << *trackID << std::endl;
     }
     dp.getTruthRef().nantenna = 1; // fine here; overwritten by AntennaResponse
-    dp.getTruthRef().bfield = Bfield; // store input truth
+    if (omvec->size()>30000) {
+      auto itt = omvec->begin();
+      std::advance(itt, 30000); // range end
+      double sum = std::accumulate(omvec->begin(),itt, 0.0) / 30000; // average
+      dp.getTruthRef().base_omega = sum * Hz;
+      dp.getTruthRef().base_bfield = e2b(*kine*keV, sum*Hz); // calculate
+    }
+    else {
+      dp.getTruthRef().base_omega = 0.0 * Hz;
+      dp.getTruthRef().base_bfield = 0.0 * T;
+    }
     return dp;
+}
+
+quantity<T> FullKinematicsSimReader::e2b(quantity<keV> en, quantity<Hz> om)
+{
+  double gam = 1.0 + en.numerical_value_in(J) / (me_SI*c_SI*c_SI); // all in SI units
+  quantity<T> B0 = (me_SI * gam * om.numerical_value_in(Hz) / qe_SI) * T;
+  return B0;
 }

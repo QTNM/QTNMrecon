@@ -14,22 +14,24 @@
 #include "CLI11.hpp"
 
 struct truth_t {
-    int nantenna;
-    double snr;
-    double sampling_time_s;
-    double average_omega_Hz;
-    double beat_frequency_Hz;
-    double chirp_rate_Hz;
+  int nantenna;
+  double snr;
+  double sampling_time_s;
+  double chirp_rate_Hz;
+  double base_omega_Hz;
+  double base_bfield_T;
 };
 
 struct vertex_t {
-    int event_ID;
-    int track_ID;
-    double posx_m;
-    double posy_m;
-    double posz_m;
-    double kinetic_energy_keV;
-    double pitch_angle_deg;
+  int event_ID;
+  int track_ID;
+  double posx_m;
+  double posy_m;
+  double posz_m;
+  double kinetic_energy_keV;
+  double pitch_angle_deg;
+  double vertex_omega_Hz;
+  double vertex_bfield_T;
 };
 
 struct hit_t {
@@ -53,11 +55,9 @@ int main(int argc, char** argv)
 {
     // command line interface
     CLI::App app{"Example Recon Pipeline"};
-    int nantenna = 2; // must be known to set up the reader before reading
     std::string fname = "recon.root";
 
     app.add_option("-i,--input", fname, "<input file name> Default: recon.root");
-    app.add_option("-n,--nantenna", nantenna, "<int number of antenna on file> Default: 2");
 
     CLI11_PARSE(app, argc, argv);
 
@@ -74,9 +74,9 @@ int main(int argc, char** argv)
     TTreeReaderValue<int> tnan(reader, "truth_nantenna");
     TTreeReaderValue<double> tsnr(reader, "truth_snratio");
     TTreeReaderValue<double> tsam(reader, "truth_samplingtime_s");
-    TTreeReaderValue<double> tom(reader, "truth_avomega_Hz");
-    TTreeReaderValue<double> tb(reader, "truth_beatf_Hz");
     TTreeReaderValue<double> tch(reader, "truth_chirp_Hz_s");
+    TTreeReaderValue<double> bom(reader, "base_omega_Hz");
+    TTreeReaderValue<double> bbf(reader, "base_bfield_T");
     // vertex
     TTreeReaderValue<int> vev(reader, "vertex_evID");
     TTreeReaderValue<int> vtr(reader, "vertex_trackID");
@@ -85,6 +85,8 @@ int main(int argc, char** argv)
     TTreeReaderValue<double> vz(reader, "vertex_posz_m");
     TTreeReaderValue<double> vk(reader, "vertex_kinenergy_eV");
     TTreeReaderValue<double> vp(reader, "vertex_pitchangle_deg");
+    TTreeReaderValue<double> tom(reader, "vertex_omega_Hz");
+    TTreeReaderValue<double> tbf(reader, "vertex_bfield_T");
     // digi data
     TTreeReaderValue<double> dg(reader, "digi_gain");
     TTreeReaderValue<double> ds(reader, "digi_samplingrate_Hz");
@@ -110,9 +112,9 @@ int main(int argc, char** argv)
       truth.nantenna = *tnan;
       truth.snr = *tsnr;
       truth.sampling_time_s = *tsam;
-      truth.average_omega_Hz = *tom;
-      truth.beat_frequency_Hz = *tb;
       truth.chirp_rate_Hz = *tch;
+      truth.base_omega_Hz = *bom;
+      truth.base_bfield_T = *bbf;
       vertex.event_ID = *vev;
       vertex.track_ID = *vtr;
       vertex.posx_m = *vx;
@@ -120,6 +122,8 @@ int main(int argc, char** argv)
       vertex.posz_m = *vz;
       vertex.kinetic_energy_keV = *vk;
       vertex.pitch_angle_deg = *vp;
+      vertex.vertex_omega_Hz = *tom;
+      vertex.vertex_bfield_T = *tbf;
       measured.gain = *dg;
       measured.sampling_rate_Hz = *ds;
       measured.target_frequency_Hz = *dt;
@@ -137,24 +141,27 @@ int main(int argc, char** argv)
 	hit.post_theta_deg = hitposttheta->at(j);
 	hits.push_back(hit);
       }
-        // got all data, can analyse
-        // trial prints to check reading
-	// NOTE: scopedata is a TTreeReaderArray
-	std::cout << "got TTreeReaderArray from antenna 0 of length " << scopedata.At(0).size() << std::endl;
-	std::cout << "got TTreeReaderArray from antenna 1 of length " << scopedata.At(1).size() << std::endl;
+      // got all data, can analyse
+      // trial prints to check reading
+      // NOTE: scopedata is a TTreeReaderArray
+      std::cout << ">>> Event ID: " << vertex.event_ID << " Track ID: " << vertex.track_ID << std::endl;
+      for (int i=0;i<truth.nantenna;++i) {
+	std::cout << "got TTreeReaderArray from antenna " << i << " of length " << scopedata.At(i).size() << std::endl;
 	// signal in vector<double> instead, convert:
-	std::vector<double> signal(scopedata.At(0).begin(),scopedata.At(0).end());
-	std::cout << "got signal from antenna 0 in vector " << signal.size() << std::endl;
-	
-        std::cout << "also n hits " << hits.size() << std::endl;
-        // truth data read in
-        std::cout << "truth struct:" << std::endl;
-        std::cout << "nantenna: " << truth.nantenna << std::endl;
-        std::cout << "snr: " << truth.snr << std::endl;
-        std::cout << "sampling time [s]: " << truth.sampling_time_s << std::endl;
-        std::cout << "av omega [Hz]: " << truth.average_omega_Hz << std::endl;
-        std::cout << "beat freq [Hz]: " << truth.beat_frequency_Hz << std::endl;
-        std::cout << "chirp rate [Hz]: " << truth.chirp_rate_Hz << std::endl;
+	std::vector<double> signal(scopedata.At(i).begin(),scopedata.At(i).end());
+	std::cout << "got signal from antenna " << i << " in vector " << signal.size() << std::endl;
+      }
+      std::cout << "also n hits " << hits.size() << std::endl;
+      // truth data read in
+      std::cout << "truth struct:" << std::endl;
+      std::cout << "nantenna: " << truth.nantenna << std::endl;
+      std::cout << "snr: " << truth.snr << std::endl;
+      std::cout << "sampling time [s]: " << truth.sampling_time_s << std::endl;
+      std::cout << "v omega [Hz]: " << vertex.vertex_omega_Hz << std::endl;
+      std::cout << "v bfield [T]: " << vertex.vertex_bfield_T << std::endl;
+      std::cout << "base omega [Hz]: " << truth.base_omega_Hz << std::endl;
+      std::cout << "base bfield [T]: " << truth.base_bfield_T << std::endl;
+      std::cout << "chirp rate [Hz]: " << truth.chirp_rate_Hz << std::endl;
     }
     ff->Close();
     return 0;

@@ -51,7 +51,7 @@ DataPack Mixer::operator()(DataPack dp)
         demod.setSamplingRate(1.0/stime.numerical_value_in(s) * Hz);
 	//	std::cout << "mixer module " << stime << " sampling time set" << std::endl;
 
-        quantity<Hz> avom = dp.getTruthRef().average_omega;
+        quantity<Hz> avom = dp.getTruthRef().base_omega; // main omega
         quantity<Hz> losc = (avom/(2.0*myPi)) - targetFrequency;
 	//	std::cout << "mixer module " << losc << " losc freq set" << std::endl;
         demod.setLOfrequency(losc); // mixer fully configured
@@ -63,7 +63,7 @@ DataPack Mixer::operator()(DataPack dp)
             // sine wave gen with losc; multiply with pure, LPassFilter, new time interval
             // sample_time_[ns] in event.
             waveform_t mixedsig = demod.mix(pure); // use down converter.
-	    std::cout << "mixed wfm size " << mixedsig.size() << std::endl;
+	    //	    std::cout << "mixed wfm size " << mixedsig.size() << std::endl;
 
             std::string okey = l2out + std::to_string(i);
             outdata[okey] = std::make_any<waveform_t>(mixedsig);

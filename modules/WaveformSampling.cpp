@@ -27,7 +27,7 @@ DataPack WaveformSampling::operator()(DataPack dp)
     std::cout << "origin key not in dictionary! Waveform Sampling" << std::endl;
     return dp;
   }
-  std::cout << "interpolator called" << std::endl;
+  //  std::cout << "interpolator called" << std::endl;
 
   // block Wfms too short for processing
   if (dp.getTruthRef().tooShort) {
@@ -65,17 +65,6 @@ DataPack WaveformSampling::operator()(DataPack dp)
 	  std::string tkey = "sampled_" + std::to_string(i) + "_V";
 	  outdata[tkey] = std::make_any<vec_t>(resampled);
 	}
-	// cast the containers from reader and inkey from processing
-	vec_t ts = std::any_cast<std::vector<double>>(origindata["SourceTime"]);
-	// also sample the omega vector for reconstruction
-	vec_t omvec = std::any_cast<std::vector<double>>(origindata["OmVec"]);
-	if (omvec.size()>1) { // test case has single entry
-	  vec_t omresampled = interpolate(ts, omvec);
-	  outdata["omega"] = std::make_any<vec_t>(omresampled); // for the beat freq
-	}
-	quantity<Hz> avo = average_omega(omvec);
-	if (avo>0.0*Hz) // test sets this earlier, otherwise there is an omvec
-	  dp.getTruthRef().average_omega = avo; // overwrite
       }
     catch(const std::bad_any_cast& e)
       {
@@ -112,23 +101,12 @@ DataPack WaveformSampling::operator()(DataPack dp)
 	  dp.getRef()[inkey].erase(ikey); // used; not needed anymore
 	  dp.getRef()[inkey].erase(ikey2); // used; not needed anymore
 	}
-	// cast the containers from reader and inkey from processing
-	auto ts = std::any_cast<std::vector<double>>(origindata["SourceTime"]);
-	// also sample the omega vector for reconstruction
-	auto omvec = std::any_cast<std::vector<double>>(origindata["OmVec"]);
-	if (omvec.size()>1) { // test case has single entry
-	  vec_t omresampled = interpolate(ts, omvec);
-	  outdata["omega"] = std::make_any<vec_t>(omresampled); // for the beat freq
-	}
-	quantity<Hz> avo = average_omega(omvec);
-	if (avo>0.0*Hz)
-	  dp.getTruthRef().average_omega = avo;
       }
     catch(const std::bad_any_cast& e)
       {
 	std::cerr << e.what() << '\n';
       }
-
+    
     dp.getTruthRef().sampling_time = sampletime;
     dp.getRef()[outkey] = outdata;
     
@@ -136,22 +114,9 @@ DataPack WaveformSampling::operator()(DataPack dp)
     dp.getRef()[originkey].erase("SourceTime");
     dp.getRef()[originkey].erase("OmVec");
   }
-  std::cout << "interpolator finish." << std::endl;
+  //  std::cout << "interpolator finish." << std::endl;
   
   return dp;
-}
-
-
-quantity<Hz> WaveformSampling::average_omega(const vec_t& omvec)
-{
-  if (omvec.size()>1) { // test case has single entry
-    double omsum = 0.0;
-    for (auto entry : omvec) omsum += entry;
-    quantity<Hz> res = omsum/omvec.size() * Hz;
-    return res;
-  }
-  else if (omvec.size()==1) return omvec.front() * Hz;
-  else return 0.0*Hz;
 }
 
 

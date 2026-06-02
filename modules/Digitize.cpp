@@ -57,7 +57,7 @@ DataPack Digitize::operator()(DataPack dp)
 	    //	    std::cout << "digi interpolate gives " << resampled.size() << " resampled size." << std::endl;
             // digitize
             waveform_t dsig = adc.digitize(resampled); // use the digitizer
-	    std::cout << "digitize gives " << dsig.size() << " dsig size." << std::endl;
+	    //	    std::cout << "digitize gives " << dsig.size() << " dsig size." << std::endl;
 	    vec_t nounit(dsig.size());
 	    std::transform(dsig.begin(),dsig.end(),nounit.begin(),[](waveform_value x){return x.numerical_value_in(V);});
             dp.getExperimentRef().signals.push_back(nounit); // copy to experiment_t for storage

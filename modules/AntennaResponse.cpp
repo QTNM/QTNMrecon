@@ -23,6 +23,7 @@ DataPack AntennaResponse::operator()(DataPack dp)
     // block Wfms too short for processing
     if (dp.getTruthRef().tooShort) {
       std::cout << "Waveform too short to process: Antenna Response." << std::endl;
+      dp.getTruthRef().nantenna = receiver.size(); // overwrite for kinematic input stream
       return dp;
     }
     

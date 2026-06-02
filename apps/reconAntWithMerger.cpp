@@ -23,7 +23,6 @@
 #include "modules/FullAntennaSimReader.hh"
 #include "modules/AddChirpToTruth.hh"
 #include "modules/WaveformSampling.hh"
-#include "modules/OmegaBeatToTruth.hh"
 #include "modules/writeWfmToRoot.hh"
 #include "trackMerger.hh"
 #include "modules/WfmReader.hh"
@@ -42,7 +41,6 @@ int main(int argc, char** argv)
       // command line interface
   CLI::App app{"Recon Pipeline with track merger"};
   int nevents = -1;
-  quantity<T> bfield = 0.7 * T; // constant sim b-field value [T]
   quantity<ns> minduration = 100.0 * ns;
   std::string fname = "qtnm.root";
   std::string samfname = "sampled.root";
@@ -74,10 +72,7 @@ int main(int argc, char** argv)
   TTreeReader re1("ntuple/Signal", &ff);
   TTreeReader re2("ntuple/Score", &ff);
   auto source1 = FullAntennaSimReader(re1, re2, origin);
-  // TTreeReader re("test", &ff); // read test file
-  // auto source1 = QTNMSimAntennaReader(re, origin);
   source1.setMaxEventNumber(nevents); // default = all events in file
-  source1.setSimConstantBField(bfield); // MUST be set
   source1.setAntennaN(nant);
   source1.setMinWfmDuration(minduration);
 
@@ -89,9 +84,6 @@ int main(int argc, char** argv)
   quantity<ns> stime = 0.008 * ns;
   interpolator.setSampleTime(stime);
 
-  // add truth, 'omout' is just for checking
-  auto addbeat = OmegaBeatToTruth(samp,"");
-
   // data sink: write to Root, take from key
   TFile* out1file = new TFile(samfname.data(), "RECREATE");
   TTree* tr1 = new TTree("sampled","sampled data");
@@ -99,8 +91,7 @@ int main(int argc, char** argv)
 
   auto sink1 = WriterWfmToRoot(samp, tr1);
   
-  auto pl1 = yap::Pipeline{} | source1 | addchirp | interpolator | addbeat | sink1;
-  //  auto pl1 = yap::Pipeline{} | source1 | interpolator | sink1; // test only
+  auto pl1 = yap::Pipeline{} | source1 | addchirp | interpolator | sink1;
   
   pl1.consume();
   

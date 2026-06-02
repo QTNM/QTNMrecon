@@ -35,11 +35,10 @@ struct truth_t {
   int nantenna; // from sampling or antenna response
   double snratio; // from adding noise
   bool tooShort;
-  quantity<T> bfield;
   quantity<ns> sampling_time; // from sampling
   quantity<ns> start_time;    // from time vector for each trackID
-  quantity<Hz> average_omega; // from antenna
-  quantity<Hz> beat_frequency; // from omega vector
+  quantity<Hz> base_omega; // from omega vector
+  quantity<T> base_bfield; // at base omega point
   quantity<Hz/s> chirp_rate;
   std::vector<vec_t> pure; // sampled signal, no noise, one per antenna
   
@@ -50,6 +49,8 @@ struct truth_t {
     quantity<m> posx, posy,posz; // turn no unit numbers from file
     quantity<eV> kineticenergy;  // into quantities with unit.
     quantity<deg> pitchangle;
+    quantity<T> vertex_bfield; // at vertex
+    quantity<Hz> vertex_omega; // from OmVec
   } vertex;
 };
 
@@ -99,17 +100,18 @@ public:
 private:
   inline void init() { // define quantity<> at construction
     truthPack.tooShort = false; // Wfm flag default
-    truthPack.bfield = 0.0 * T;
     truthPack.sampling_time = 0.0 * ns;
     truthPack.start_time = 0.0 * ns;
-    truthPack.average_omega = 0.0 * Hz;
-    truthPack.beat_frequency = 0.0 * Hz;
+    truthPack.base_omega = 0.0 * Hz;
+    truthPack.base_bfield = 0.0 * T;
     truthPack.chirp_rate = 0.0 * Hz/s;
     truthPack.vertex.posx = 0.0 * m;
     truthPack.vertex.posy = 0.0 * m;
     truthPack.vertex.posz = 0.0 * m;
     truthPack.vertex.kineticenergy = 0.0 * eV;
     truthPack.vertex.pitchangle = 0.0 * deg;
+    truthPack.vertex.vertex_bfield = 0.0 * T;
+    truthPack.vertex.vertex_omega = 0.0 * Hz;
     expPack.target_frequency = 0.0 * Hz;
     expPack.digi_sampling_rate = 0.0 * Hz;
   }

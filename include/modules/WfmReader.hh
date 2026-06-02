@@ -30,16 +30,17 @@ private:
   TTreeReaderValue<int> trackID;
   TTreeReaderValue<double> samplingtime;
   TTreeReaderValue<double> starttime;
-  TTreeReaderValue<double> avomega;
-  TTreeReaderValue<double> beatf;
   TTreeReaderValue<double> chirprate;
-  TTreeReaderValue<double> bfield;
+  TTreeReaderValue<double> bomega;
+  TTreeReaderValue<double> bbfield;
   // vertex
   TTreeReaderValue<double> posx;
   TTreeReaderValue<double> posy;
   TTreeReaderValue<double> posz;
   TTreeReaderValue<double> kEnergy;
   TTreeReaderValue<double> pangle;
+  TTreeReaderValue<double> vomega;
+  TTreeReaderValue<double> vbfield;
   TTreeReaderValue<std::vector<int>> trackHistory;
   // hit data
   TTreeReaderValue<std::vector<int>> hitevID;

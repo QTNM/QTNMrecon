@@ -51,8 +51,10 @@ DataPack AddNoise::operator()(DataPack dp)
           // set up the noise generator
 	  double maxel, minel;
 	  if (pure.size()>=50) { // expected signals are much longer, tests maybe not
-	    maxel = *std::max_element(pure.begin(),pure.begin()+50); // max from initial few oscillations
-	    minel = *std::min_element(pure.begin(),pure.begin()+50); // min
+	    auto itt = pure.begin();
+	    std::advance(itt, 50); // range end
+	    maxel = *std::max_element(pure.begin(),itt); // max from initial few oscillations
+	    minel = *std::min_element(pure.begin(),itt); // min
 	  }
 	  else {
 	    maxel = *std::max_element(pure.begin(),pure.end()); // max
@@ -79,7 +81,7 @@ DataPack AddNoise::operator()(DataPack dp)
 
           waveform_t noisy = noisegen.add(res,onset); // use the noise generator
           std::string okey = l2out + std::to_string(i);
-	  std::cout << "store key " << okey << " waveform of size " << noisy.size() << std::endl;
+	  //	  std::cout << "store key " << okey << " waveform of size " << noisy.size() << std::endl;
           outdata[okey] = std::make_any<waveform_t>(noisy);
           dp.getRef()[inkey].erase(ikey); // obsolete, have copy with unit
         }
