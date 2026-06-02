@@ -124,12 +124,15 @@ DataPack FullKinematicsSimReader::operator()()
     if (!tvec->empty()) { // book truth from trajectory
       dp.getTruthRef().start_time = tvec->front() * ns;
       quantity<ns> endtime = tvec->back() * ns; // check on config Wfm duration
-      if ((endtime-dp.getTruthRef().start_time) <= minDuration)
+      if ((endtime-dp.getTruthRef().start_time) <= minDuration) {
 	dp.getTruthRef().tooShort = true; // Wfm too short for work
+	std::cout << "*** too short " << *eventID << ", " << *trackID << std::endl;
+      }
     }
     else {
       dp.getTruthRef().start_time = -1.0 * ns;
       dp.getTruthRef().tooShort = true; // empty Wfm is too short
+      std::cout << "*** too short " << *eventID << ", " << *trackID << std::endl;
     }
     dp.getTruthRef().nantenna = 1; // fine here; overwritten by AntennaResponse
     if (omvec->size()>30000) {
