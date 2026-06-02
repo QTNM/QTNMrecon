@@ -14,10 +14,12 @@
 #include "CLI11.hpp"
 
 struct truth_t {
-    int nantenna;
-    double snr;
-    double sampling_time_s;
-    double chirp_rate_Hz;
+  int nantenna;
+  double snr;
+  double sampling_time_s;
+  double chirp_rate_Hz;
+  double base_omega_Hz;
+  double base_bfield_T;
 };
 
 struct vertex_t {
@@ -53,11 +55,9 @@ int main(int argc, char** argv)
 {
     // command line interface
     CLI::App app{"Example Recon Pipeline"};
-    int nantenna = 2; // must be known to set up the reader before reading
     std::string fname = "recon.root";
 
     app.add_option("-i,--input", fname, "<input file name> Default: recon.root");
-    app.add_option("-n,--nantenna", nantenna, "<int number of antenna on file> Default: 2");
 
     CLI11_PARSE(app, argc, argv);
 
@@ -75,6 +75,8 @@ int main(int argc, char** argv)
     TTreeReaderValue<double> tsnr(reader, "truth_snratio");
     TTreeReaderValue<double> tsam(reader, "truth_samplingtime_s");
     TTreeReaderValue<double> tch(reader, "truth_chirp_Hz_s");
+    TTreeReaderValue<double> bom(reader, "base_omega_Hz");
+    TTreeReaderValue<double> bbf(reader, "base_bfield_T");
     // vertex
     TTreeReaderValue<int> vev(reader, "vertex_evID");
     TTreeReaderValue<int> vtr(reader, "vertex_trackID");
@@ -111,6 +113,8 @@ int main(int argc, char** argv)
       truth.snr = *tsnr;
       truth.sampling_time_s = *tsam;
       truth.chirp_rate_Hz = *tch;
+      truth.base_omega_Hz = *bom;
+      truth.base_bfield_T = *bbf;
       vertex.event_ID = *vev;
       vertex.track_ID = *vtr;
       vertex.posx_m = *vx;
@@ -137,24 +141,27 @@ int main(int argc, char** argv)
 	hit.post_theta_deg = hitposttheta->at(j);
 	hits.push_back(hit);
       }
-        // got all data, can analyse
-        // trial prints to check reading
-	// NOTE: scopedata is a TTreeReaderArray
-	std::cout << "got TTreeReaderArray from antenna 0 of length " << scopedata.At(0).size() << std::endl;
-	std::cout << "got TTreeReaderArray from antenna 1 of length " << scopedata.At(1).size() << std::endl;
+      // got all data, can analyse
+      // trial prints to check reading
+      // NOTE: scopedata is a TTreeReaderArray
+      std::cout << ">>> Event ID: " << vertex.event_ID << " Track ID: " << vertex.track_ID << std::endl;
+      for (int i=0;i<truth.nantenna;++i) {
+	std::cout << "got TTreeReaderArray from antenna " << i << " of length " << scopedata.At(i).size() << std::endl;
 	// signal in vector<double> instead, convert:
-	std::vector<double> signal(scopedata.At(0).begin(),scopedata.At(0).end());
-	std::cout << "got signal from antenna 0 in vector " << signal.size() << std::endl;
-	
-        std::cout << "also n hits " << hits.size() << std::endl;
-        // truth data read in
-        std::cout << "truth struct:" << std::endl;
-        std::cout << "nantenna: " << truth.nantenna << std::endl;
-        std::cout << "snr: " << truth.snr << std::endl;
-        std::cout << "sampling time [s]: " << truth.sampling_time_s << std::endl;
-        std::cout << "v omega [Hz]: " << vertex.vertex_omega_Hz << std::endl;
-        std::cout << "v bfield [T]: " << vertex.vertex_bfield_T << std::endl;
-        std::cout << "chirp rate [Hz]: " << truth.chirp_rate_Hz << std::endl;
+	std::vector<double> signal(scopedata.At(i).begin(),scopedata.At(i).end());
+	std::cout << "got signal from antenna " << i << " in vector " << signal.size() << std::endl;
+      }
+      std::cout << "also n hits " << hits.size() << std::endl;
+      // truth data read in
+      std::cout << "truth struct:" << std::endl;
+      std::cout << "nantenna: " << truth.nantenna << std::endl;
+      std::cout << "snr: " << truth.snr << std::endl;
+      std::cout << "sampling time [s]: " << truth.sampling_time_s << std::endl;
+      std::cout << "v omega [Hz]: " << vertex.vertex_omega_Hz << std::endl;
+      std::cout << "v bfield [T]: " << vertex.vertex_bfield_T << std::endl;
+      std::cout << "base omega [Hz]: " << truth.base_omega_Hz << std::endl;
+      std::cout << "base bfield [T]: " << truth.base_bfield_T << std::endl;
+      std::cout << "chirp rate [Hz]: " << truth.chirp_rate_Hz << std::endl;
     }
     ff->Close();
     return 0;

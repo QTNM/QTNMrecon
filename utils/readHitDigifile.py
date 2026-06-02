@@ -11,6 +11,8 @@ class truth_t:
     snr: float = 0.0
     sampling_time_s: float = 0.0
     chirp_rate_Hz: float = 0.0
+    base_omega_Hz : float = 0.0
+    base_bfield_T : float = 0.0
 
 
 @dataclass
@@ -70,6 +72,8 @@ def convert_to_data_dict(event):
     vertex.pitch_angle_deg = event.vertex_pitchangle_deg
     vertex.vertex_omega_Hz = event.vertex_omega_Hz
     vertex.vertex_bfield_T = event.vertex_bfield_T
+    truth.base_omega_Hz = event.base_omega_Hz
+    truth.base_bfield_T = event.base_bfield_T
     measured.gain = event.digi_gain
     measured.sampling_rate_Hz = event.digi_samplingrate_Hz
     measured.target_frequency_Hz = event.digi_tfrequency_Hz
