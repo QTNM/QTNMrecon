@@ -93,8 +93,10 @@ DataPack WaveformSampling::operator()(DataPack dp)
 	  auto tv = std::any_cast<vec_t>(indata[ikey]);
 	  std::string ikey2 = "TimeVec_" + std::to_string(i) + "_ns";
 	  auto tiv = std::any_cast<vec_t>(indata[ikey2]);
+
 	  // sample by interpolation
 	  vec_t resampled = interpolate(tiv, tv);
+
 	  // store result
 	  std::string okey = "sampled_" + std::to_string(i) + "_V";
 	  outdata[okey] = std::make_any<vec_t>(resampled); // for later transformation and deletion
@@ -104,7 +106,7 @@ DataPack WaveformSampling::operator()(DataPack dp)
       }
     catch(const std::bad_any_cast& e)
       {
-	std::cerr << e.what() << '\n';
+	std::cerr << "WaveformSampling: " << e.what() << '\n';
       }
     
     dp.getTruthRef().sampling_time = sampletime;
@@ -112,7 +114,6 @@ DataPack WaveformSampling::operator()(DataPack dp)
     
     // clear obsolete data in Event_map
     dp.getRef()[originkey].erase("SourceTime");
-    dp.getRef()[originkey].erase("OmVec");
   }
   //  std::cout << "interpolator finish." << std::endl;
   

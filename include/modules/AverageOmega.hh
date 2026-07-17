@@ -1,6 +1,6 @@
-// Simply add the chirp rate to truth data in module
-#ifndef addchirp_HH
-#define addchirp_HH 1
+// Add the beat frequency from omega to truth data in module
+#ifndef addbeat_HH
+#define addbeat_HH 1
 
 // std includes
 #include <string>
@@ -11,10 +11,10 @@
 // must have include for pipeline
 #include <Event.hh>
 
-class AddChirpToTruth
+class AverageOmega
 {
 public:
-  AddChirpToTruth(std::string inbox); // constructor; required
+  AverageOmega(std::string inbox); // constructor; required
   // Configures the module. Could have more config parameters
   // Minimum required are the key labels for input and output 
   // of Event Map data item. String Key inbox label and new Key outbox label.
@@ -25,9 +25,10 @@ public:
   // Only Readers should expect no input argument and return an event map
   // and Writers only receive an event map and return void as signature.
   
+  // getter/setter methods for configuration could live here.
   
 private:
-  quantity<Hz> e2f(quantity<keV>, quantity<T>); // convert keV to Hz for chirp
+  quantity<T> e2b(quantity<keV>, quantity<Hz>); // calculate B
 
   // include any configuration data members for internal use here.
   TLinearFitter* lft = nullptr;

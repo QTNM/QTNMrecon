@@ -65,7 +65,7 @@ vec_t VReceiver::antenna_time(Event<std::any>& event, XYZPoint& eval_point)
       auto pz = std::any_cast<std::vector<double>>(event["pzVec"]);
       auto ts = std::any_cast<std::vector<double>>(event["SourceTime"]); // source time in [ns]
       
-      for (size_t i=0; i<px.size();++i) { // check units
+      for (size_t i=0; i<px.size()-1;++i) { // check units
 	XYZPoint  pos(px[i],py[i],pz[i]);
 	double delay = (eval_point - pos).R() / c_m_per_ns;
 	local_time.push_back(ts[i] + delay);

@@ -3,6 +3,9 @@
 // std
 #include <iostream>
 
+// ROOT includes
+#include "TLinearFitter.h"
+
 // us
 #include "FullKinematicsSimReader.hh"
 #include "yap/pipeline.h"
@@ -135,17 +138,26 @@ DataPack FullKinematicsSimReader::operator()()
       std::cout << "*** too short " << *eventID << ", " << *trackID << std::endl;
     }
     dp.getTruthRef().nantenna = 1; // fine here; overwritten by AntennaResponse
-    if (omvec->size()>30000) {
-      auto itt = omvec->begin();
-      std::advance(itt, 30000); // range end
-      double sum = std::accumulate(omvec->begin(),itt, 0.0) / 30000; // average
-      dp.getTruthRef().base_omega = sum * Hz;
-      dp.getTruthRef().base_bfield = e2b(*kine*keV, sum*Hz); // calculate
-    }
-    else {
-      dp.getTruthRef().base_omega = 0.0 * Hz;
-      dp.getTruthRef().base_bfield = 0.0 * T;
-    }
+    dp.getTruthRef().base_omega = 0.0*Hz;
+    dp.getTruthRef().base_bfield = 0.0*T;
+
+    // use omvec data vector for fitting
+    // if (*trackID == 1) { // do this only once
+    //   TLinearFitter* lft = new TLinearFitter(1,"pol1",""); // line fit
+    //   lft->StoreData(false);
+    //   int npoints = (int)omvec->size()-2; // not final 2 points from MC
+    //   lft->AssignData(npoints, 1, tvec->data(), omvec->data());
+    //   lft->Eval(); // fit
+    //   double baseom = lft->GetParameter(0);  // intercept of line as average
+    //   dp.getTruthRef().base_omega = baseom * Hz;
+    //   dp.getTruthRef().base_bfield = e2b(*kine*keV, baseom*Hz); // calculate
+    //   lft->Clear();
+    //   delete lft;
+    // }
+    // else {
+    //   dp.getTruthRef().base_omega = 0.0*Hz;
+    //   dp.getTruthRef().base_bfield = 0.0*T;
+    // }
     return dp;
 }
 
