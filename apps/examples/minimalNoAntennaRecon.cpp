@@ -25,6 +25,7 @@ using namespace ROOT::Math;
 #include "yap/pipeline.h"
 #include "modules/FullKinematicsSimReader.hh"
 #include "modules/AddChirpToTruth.hh"
+#include "modules/AverageOmega.hh"
 #include "modules/AntennaResponse.hh"
 #include "receiver/HalfWaveDipole.hh"
 #include "modules/WaveformSampling.hh"
@@ -39,17 +40,21 @@ int main(int argc, char** argv)
       // command line interface
   CLI::App app{"Minimal First Step Recon Pipeline"};
   int nevents = -1;
-  quantity<ns> minduration = 100.0 * ns;
+  double md = 100.0;
+  double sd = 0.0;
   std::string fname = "qtnm.root";
   std::string outfname = "sampled.root";
 
   app.add_option("-n,--nevents", nevents, "<number of events> Default: -1");
   app.add_option("-i,--input", fname, "<input file name> Default: qtnm.root");
+  app.add_option("-s,--screen", sd, "screen distance [m]; Default: 0.0 m");
+  app.add_option("-d,--mindur", md, "min traj duration [ns]; Default: 100.0 ns");
   app.add_option("-o,--output", outfname, "<output file name> Default: sampled.root");
 
   CLI11_PARSE(app, argc, argv);
 
   // keys to set
+  quantity<ns> minduration = md * ns;
   std::string origin = "raw";
   std::string resp = "response";
   std::string samp = "sampled";
@@ -65,17 +70,20 @@ int main(int argc, char** argv)
   // add truth
   auto addchirp = AddChirpToTruth(origin); // default antenna number
 
+  // add truth
+  auto addavom = AverageOmega(origin);
+
   // transformer (1)
   auto antresponse = AntennaResponse(origin, resp);
   // configure antennae
   std::vector<VReceiver*> allantenna;
   XYZPoint  apos1(0.027, 0.0, 0.0); // fix from geometry, SI unit [m]
   XYZVector apol1(0.0, 1.0, 0.0); // unit vector
-  VReceiver* ant1 = new HalfWaveDipole(apos1, apol1); // insert as pointer
+  VReceiver* ant1 = new HalfWaveDipole(apos1, apol1, sd); // insert as pointer
   allantenna.push_back(ant1);
   XYZPoint  apos2(0.0, 0.027, 0.0); // fix from geometry
   XYZVector apol2(1.0, 0.0, 0.0); // unit vector
-  VReceiver* ant2 = new HalfWaveDipole(apos2, apol2); // insert as pointer
+  VReceiver* ant2 = new HalfWaveDipole(apos2, apol2, sd); // insert as pointer
   allantenna.push_back(ant2);
 
   antresponse.setAntennaCollection(allantenna); // finished antenna configuration
@@ -92,7 +100,7 @@ int main(int argc, char** argv)
 
   auto sink = WriterWfmToRoot(samp, tr);
   
-  auto pl = yap::Pipeline{} | source | addchirp | antresponse | interpolator |
+  auto pl = yap::Pipeline{} | source | addchirp | addavom | antresponse | interpolator |
     sink;
   
   pl.consume();

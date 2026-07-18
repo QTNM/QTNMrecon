@@ -29,14 +29,22 @@ DataPack AntennaResponse::operator()(DataPack dp)
     
     Event<std::any> indata = dp.getRef()[inkey];
     Event<std::any> outdata; // to hold all the data items
-    int counter = 0;
-    for (auto* antenna : receiver) {
-        std::string tkey = "VoltageVec_" + std::to_string(counter) + "_[V]";
-        outdata[tkey] = std::make_any<vec_t>(antenna->voltage_response(indata));
-        std::string tkey2 = "TimeVec_" + std::to_string(counter) + "_ns";
-        outdata[tkey2] = std::make_any<vec_t>(antenna->antenna_local_time(indata));
-        counter++;
-    }
+    try
+      {
+	int counter = 0;
+	for (auto* antenna : receiver) {
+	  std::string tkey = "VoltageVec_" + std::to_string(counter) + "_[V]";
+	  outdata[tkey] = std::make_any<vec_t>(antenna->voltage_response(indata));
+	  std::string tkey2 = "TimeVec_" + std::to_string(counter) + "_ns";
+	  outdata[tkey2] = std::make_any<vec_t>(antenna->antenna_local_time(indata));
+	  counter++;
+	}
+      }
+    catch(const std::bad_any_cast& e)
+      {
+	std::cerr << "Antenna Response: " << e.what() << '\n';
+      }
+    
     // clear obsolete data
     dp.getRef()[inkey].erase("pxVec"); // used hence remove from source
     dp.getRef()[inkey].erase("pyVec"); // used hence remove from source
@@ -47,6 +55,7 @@ DataPack AntennaResponse::operator()(DataPack dp)
     dp.getRef()[inkey].erase("axVec"); // used hence remove from source
     dp.getRef()[inkey].erase("ayVec"); // used hence remove from source
     dp.getRef()[inkey].erase("azVec"); // used hence remove from source
+    dp.getRef()[inkey].erase("OmVec"); // used hence remove from source
 
     dp.getRef()[outkey] = outdata;
     dp.getTruthRef().nantenna = receiver.size(); // overwrite for kinematic input stream

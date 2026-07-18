@@ -52,11 +52,12 @@ modules/FullKinematicsSimReader.cpp
 modules/FullAntennaSimReader.cpp
 modules/SineSigGenerator.cpp 
 modules/AddChirpToTruth.cpp
+modules/AverageOmega.cpp
 modules/AntennaResponse.cpp
 modules/WaveformSampling.cpp 
 modules/AddNoise.cpp
-modules/Amplifier.cpp
 modules/Mixer.cpp
+modules/Amplifier.cpp
 modules/Digitize.cpp
 modules/writeWfmToRoot.cpp
 modules/writeHitDigiToRoot.cpp
@@ -81,8 +82,6 @@ add_executable(minantrecon.exe apps/examples/minimalFirstStepRecon.cpp)
 target_link_libraries(minantrecon.exe PUBLIC ReconModules QTNMTools)
 add_executable(minnoantrecon.exe apps/examples/minimalNoAntennaRecon.cpp)
 target_link_libraries(minnoantrecon.exe PUBLIC ReconModules QTNMTools)
-add_executable(testReconMerged.exe apps/examples/test_writeFakeG4.cpp)
-target_link_libraries(testReconMerged.exe PUBLIC ReconModules QTNMTools)
 add_executable(testTrackMerge.exe apps/examples/test_trackMerger.cpp)
 target_link_libraries(testTrackMerge.exe PUBLIC ReconModules QTNMTools)
 

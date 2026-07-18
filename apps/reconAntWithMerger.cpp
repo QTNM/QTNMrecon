@@ -19,9 +19,9 @@
 
 // us
 #include "yap/pipeline.h"
-//#include "modules/QTNMSimAntennaReader.hh"
 #include "modules/FullAntennaSimReader.hh"
 #include "modules/AddChirpToTruth.hh"
+#include "modules/AverageOmega.hh"
 #include "modules/WaveformSampling.hh"
 #include "modules/writeWfmToRoot.hh"
 #include "trackMerger.hh"
@@ -41,7 +41,7 @@ int main(int argc, char** argv)
       // command line interface
   CLI::App app{"Recon Pipeline with track merger"};
   int nevents = -1;
-  quantity<ns> minduration = 100.0 * ns;
+  double md = 100.0;
   std::string fname = "qtnm.root";
   std::string samfname = "sampled.root";
   std::string merfname = "merged.root";
@@ -49,11 +49,13 @@ int main(int argc, char** argv)
 
   app.add_option("-n,--nevents", nevents, "<number of events> Default: -1");
   app.add_option("-i,--input", fname, "<input file name> Default: qtnm.root");
+  app.add_option("-d,--mindur", md, "min traj duration [ns]; Default: 100.0 ns");
   app.add_option("-o,--output", outfname, "<output file name> Default: recon.root");
 
   CLI11_PARSE(app, argc, argv);
 
   // keys to set
+  quantity<ns> minduration = md * ns;
   int nant = 2;
   std::string origin = "raw";
   std::string samp = "sampled";
@@ -79,6 +81,9 @@ int main(int argc, char** argv)
   // add truth
   auto addchirp = AddChirpToTruth(origin); // default antenna number
   
+  // add truth
+  auto addavom = AverageOmega(origin);
+
   // transformer (2)
   auto interpolator = WaveformSampling(origin,"",samp);
   quantity<ns> stime = 0.008 * ns;
@@ -91,7 +96,7 @@ int main(int argc, char** argv)
 
   auto sink1 = WriterWfmToRoot(samp, tr1);
   
-  auto pl1 = yap::Pipeline{} | source1 | addchirp | interpolator | sink1;
+  auto pl1 = yap::Pipeline{} | source1 | addchirp | addavom | interpolator | sink1;
   
   pl1.consume();
   

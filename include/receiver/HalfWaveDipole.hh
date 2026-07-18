@@ -17,7 +17,7 @@ using namespace ROOT::Math;
 class HalfWaveDipole : public VReceiver
 {
 public:
-  HalfWaveDipole(XYZPoint antennaPos, XYZVector antennaPlaneNormal); // constructor
+  HalfWaveDipole(XYZPoint antennaPos, XYZVector antennaPlaneNormal, double d); // constructor
   virtual ~HalfWaveDipole() = default;
   
   vec_t voltage_response(Event<std::any>& event) override;
@@ -31,6 +31,7 @@ public:
 private:
   XYZPoint  antPos;    // input geometry
   XYZVector antPol;    // input geometry
+  double screen_distance;
 };
 
 #endif
