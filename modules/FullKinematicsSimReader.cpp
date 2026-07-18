@@ -3,9 +3,6 @@
 // std
 #include <iostream>
 
-// ROOT includes
-#include "TLinearFitter.h"
-
 // us
 #include "FullKinematicsSimReader.hh"
 #include "yap/pipeline.h"
