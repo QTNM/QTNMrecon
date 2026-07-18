@@ -4,6 +4,9 @@
 #include <iostream>
 #include <algorithm>
 
+// ROOT includes
+#include "TLinearFitter.h"
+
 // us
 #include "AverageOmega.hh"
 
@@ -33,10 +36,10 @@ DataPack AverageOmega::operator()(DataPack dp)
     }
 
     // use omega data vector for fitting
-    lft = new TLinearFitter(); // line fit
-    lft->SetDim(1);
-    lft->SetFormula("pol1");
-    lft->StoreData(false);
+    TLinearFitter lft; // line fit
+    lft.SetDim(1);
+    lft.SetFormula("pol1");
+    lft.StoreData(false);
     try
       {
         // get hold of truth data from sim
@@ -44,9 +47,9 @@ DataPack AverageOmega::operator()(DataPack dp)
 	auto tvec = std::any_cast<vec_t>(indata["SourceTime"]);
 
 	int npoints = (int)omvec.size()-2; // not final 2 points from MC
-	lft->AssignData(npoints, 1, tvec.data(), omvec.data());
-	lft->Eval(); // fit
-	double baseom = lft->GetParameter(0);  // intercept of line as average
+	lft.AssignData(npoints, 1, tvec.data(), omvec.data());
+	lft.Eval(); // fit
+	double baseom = lft.GetParameter(0);  // intercept of line as average
         std::cout << "average omega [Hz]: " << baseom << std::endl;
 	dp.getTruthRef().base_omega = baseom * Hz;
 	dp.getTruthRef().base_bfield = e2b(dp.getTruthRef().vertex.kineticenergy, baseom*Hz); // calculate
@@ -55,7 +58,7 @@ DataPack AverageOmega::operator()(DataPack dp)
       {
 	std::cerr << "AverageOmega: " << e.what() << '\n';
       }
-    lft->Clear();
+    lft.Clear();
     return dp;
 }
 

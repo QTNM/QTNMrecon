@@ -141,23 +141,6 @@ DataPack FullKinematicsSimReader::operator()()
     dp.getTruthRef().base_omega = 0.0*Hz;
     dp.getTruthRef().base_bfield = 0.0*T;
 
-    // use omvec data vector for fitting
-    // if (*trackID == 1) { // do this only once
-    //   TLinearFitter* lft = new TLinearFitter(1,"pol1",""); // line fit
-    //   lft->StoreData(false);
-    //   int npoints = (int)omvec->size()-2; // not final 2 points from MC
-    //   lft->AssignData(npoints, 1, tvec->data(), omvec->data());
-    //   lft->Eval(); // fit
-    //   double baseom = lft->GetParameter(0);  // intercept of line as average
-    //   dp.getTruthRef().base_omega = baseom * Hz;
-    //   dp.getTruthRef().base_bfield = e2b(*kine*keV, baseom*Hz); // calculate
-    //   lft->Clear();
-    //   delete lft;
-    // }
-    // else {
-    //   dp.getTruthRef().base_omega = 0.0*Hz;
-    //   dp.getTruthRef().base_bfield = 0.0*T;
-    // }
     return dp;
 }
 

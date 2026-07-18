@@ -5,9 +5,6 @@
 // std includes
 #include <string>
 
-// ROOT includes
-#include "TLinearFitter.h"
-
 // must have include for pipeline
 #include <Event.hh>
 
@@ -30,9 +27,6 @@ public:
 private:
   quantity<T> e2b(quantity<keV>, quantity<Hz>); // calculate B
 
-  // include any configuration data members for internal use here.
-  TLinearFitter* lft = nullptr;
-  
   // these below serve as string keys to access (read/write) the Event map
   std::string inkey;
 };

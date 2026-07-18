@@ -28,6 +28,7 @@ using namespace ROOT::Math;
 #include "yap/pipeline.h"
 #include "modules/FullKinematicsSimReader.hh"
 #include "modules/AddChirpToTruth.hh"
+#include "modules/AverageOmega.hh"
 #include "modules/AntennaResponse.hh"
 #include "receiver/HalfWaveDipole.hh"
 #include "modules/WaveformSampling.hh"
@@ -46,17 +47,21 @@ int main(int argc, char** argv)
       // command line interface
   CLI::App app{"Example Recon Pipeline"};
   int nevents = -1;
-  quantity<ns> minduration = 100.0 * ns;
+  double md = 100.0;
+  double sd = 0.0;
   std::string fname = "qtnm.root";
   std::string outfname = "recon.hdf5";
 
   app.add_option("-n,--nevents", nevents, "<number of events> Default: -1");
   app.add_option("-i,--input", fname, "<input file name> Default: qtnm.root");
+  app.add_option("-s,--screen", sd, "screen distance [m]; Default: 0.0 m");
+  app.add_option("-d,--mindur", md, "min traj duration [ns]; Default: 100.0 ns");
   app.add_option("-o,--output", outfname, "<output file name> Default: recon.hdf5");
 
   CLI11_PARSE(app, argc, argv);
 
   // keys to set
+  quantity<ns> minduration = md * ns;
   std::string origin = "raw";
   std::string resp = "response";
   std::string samp = "sampled";
@@ -78,17 +83,20 @@ int main(int argc, char** argv)
   // add truth
   auto addchirp = AddChirpToTruth(origin); // default antenna number
 
+  // add truth
+  auto addavom = AverageOmega(origin);
+
   // transformer (1)
   auto antresponse = AntennaResponse(origin, resp);
   // configure antennae
   std::vector<VReceiver*> allantenna;
   XYZPoint  apos1(0.027, 0.0, 0.0); // fix from geometry, SI unit [m]
   XYZVector apol1(0.0, 1.0, 0.0); // unit vector
-  VReceiver* ant1 = new HalfWaveDipole(apos1, apol1); // insert as pointer
+  VReceiver* ant1 = new HalfWaveDipole(apos1, apol1, sd); // insert as pointer
   allantenna.push_back(ant1);
   XYZPoint  apos2(0.0, 0.027, 0.0); // fix from geometry
   XYZVector apol2(1.0, 0.0, 0.0); // unit vector
-  VReceiver* ant2 = new HalfWaveDipole(apos2, apol2); // insert as pointer
+  VReceiver* ant2 = new HalfWaveDipole(apos2, apol2, sd); // insert as pointer
   allantenna.push_back(ant2);
 
   antresponse.setAntennaCollection(allantenna); // finished antenna configuration
@@ -100,24 +108,24 @@ int main(int argc, char** argv)
 
   // add noise, step (3), fill more truth with units
   auto noiseAdder = AddNoise(samp, noisy, l2noise);
-  noiseAdder.setSignalToNoise(1.0);
+  noiseAdder.setSignalToNoise(10.0);
   noiseAdder.setOnsetPercent(10.0);
 
   // amplifier, step (4), waveform in from l2 key, out in l2 key
   auto amplifier = Amplifier(noisy, amped, l2noise, l2amp);
-  quantity<Hz> bwidth = 200.0 * MHz; // +-100MHz
+  quantity<Hz> bwidth = 1.5 * GHz; // +-
   amplifier.setBandPassWidthOnTruth(bwidth);
   amplifier.setGainFactor(1.0);
 
   // mixer, step (5), waveform in from l2 key, out in l2 key
   auto mixer = Mixer(amped, mixed, l2amp, l2mix);
-  quantity<Hz> tfreq = 100.0 * MHz;
+  quantity<Hz> tfreq = 1.0 * GHz;
   mixer.setTargetFrequency(tfreq);
-  mixer.setFilterCutFrequency(10*tfreq);
+  mixer.setFilterCutFrequency(5*tfreq);
 
   // digitizer, step (6), waveform from l2 key
   auto digitizer = Digitize(mixed, l2mix);
-  quantity<Hz> dsampling = 1.0 * GHz;
+  quantity<Hz> dsampling = 10.0 * GHz;
   quantity<V> vert = 1.0 * V;
   digitizer.setDigiSamplingRate(dsampling);
   digitizer.setVerticalRange(vert);
@@ -130,7 +138,7 @@ int main(int argc, char** argv)
   HighFive::Group group = file.createGroup("sim");
   auto sink = WriterHitDigiToHDF5(group);
   
-  auto pl = yap::Pipeline{} | source | addchirp |antresponse | interpolator |
+  auto pl = yap::Pipeline{} | source | addchirp | addavom | antresponse | interpolator |
     noiseAdder | amplifier | mixer | digitizer | sink;
   
   pl.consume();

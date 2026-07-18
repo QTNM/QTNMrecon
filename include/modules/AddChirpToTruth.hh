@@ -5,9 +5,6 @@
 // std includes
 #include <string>
 
-// ROOT includes
-#include "TLinearFitter.h"
-
 // must have include for pipeline
 #include <Event.hh>
 
@@ -29,9 +26,6 @@ public:
 private:
   quantity<Hz> e2f(quantity<keV>, quantity<T>); // convert keV to Hz for chirp
 
-  // include any configuration data members for internal use here.
-  TLinearFitter* lft = nullptr;
-  
   // these below serve as string keys to access (read/write) the Event map
   std::string inkey;
 };

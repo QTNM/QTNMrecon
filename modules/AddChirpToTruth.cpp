@@ -4,6 +4,9 @@
 #include <iostream>
 #include <algorithm>
 
+// ROOT includes
+#include "TLinearFitter.h"
+
 // us
 #include "AddChirpToTruth.hh"
 
@@ -34,10 +37,10 @@ DataPack AddChirpToTruth::operator()(DataPack dp)
     }
     
     // use KEvec data vector for fitting
-    lft = new TLinearFitter(); // line fit, intend to use robust version
-    lft->SetDim(1);
-    lft->SetFormula("pol1");
-    lft->StoreData(false);
+    TLinearFitter lft;
+    lft.SetDim(1);
+    lft.SetFormula("pol1");
+    lft.StoreData(false);
     try
     {
         // get hold of truth data from sim
@@ -46,10 +49,10 @@ DataPack AddChirpToTruth::operator()(DataPack dp)
 	// std::cout << "ST size: " << temptiv.size() << " KEV size: " << ov.size() << std::endl;
 
 	int npoints = std::min((int)ov.size(), 100000); // don't fit too many points for a line
-        lft->AssignData(npoints, 1, temptiv.data(), ov.data());
-        lft->EvalRobust(0.9); // allow 10% outlier data
-        double tslope = lft->GetParameter(1); // fit result for chirp rate [keV/ns]
-        double tinter = lft->GetParameter(0); // fit result for intercept [keV]
+        lft.AssignData(npoints, 1, temptiv.data(), ov.data());
+        lft.EvalRobust(0.9); // allow 10% outlier data
+        double tslope = lft.GetParameter(1); // fit result for chirp rate [keV/ns]
+        double tinter = lft.GetParameter(0); // fit result for intercept [keV]
 	quantity<keV> i0 = tinter * keV; // manual unit
 	quantity<keV> i1 = i0 + tslope * 1.e3 * keV; // KE after 1 mus
 	//        std::cout << "loss/mus: " << (i1-i0).numerical_value_in(eV) << " from " << i0 << std::endl;
@@ -63,7 +66,7 @@ DataPack AddChirpToTruth::operator()(DataPack dp)
     {
       std::cerr << "AddChirpTo Truth: " << e.what() << '\n';
     }
-    lft->Clear();
+    lft.Clear();
     dp.getRef()[inkey].erase("KEVec"); // used, obsolete
     return dp;
 }

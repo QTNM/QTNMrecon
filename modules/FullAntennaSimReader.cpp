@@ -127,17 +127,9 @@ DataPack FullAntennaSimReader::operator()()
       std::cout << "*** too short " << *eventID << ", " << *trackID << std::endl;
     }
     dp.getTruthRef().nantenna = nantenna; // store input truth
-    if (omvec->size()>30000) {
-      auto itt = omvec->begin();
-      std::advance(itt, 30000); // range end
-      double sum = std::accumulate(omvec->begin(),itt, 0.0) / 30000; // average
-      dp.getTruthRef().base_omega = sum * Hz;
-      dp.getTruthRef().base_bfield = e2b(*kine*keV, sum*Hz); // calculate
-    }
-    else {
-      dp.getTruthRef().base_omega = 0.0 * Hz;
-      dp.getTruthRef().base_bfield = 0.0 * T;
-    }
+    dp.getTruthRef().base_omega = 0.0*Hz;
+    dp.getTruthRef().base_bfield = 0.0*T;
+
     return dp;
 }
 
