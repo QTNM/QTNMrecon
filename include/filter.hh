@@ -1,12 +1,13 @@
 // Filter for QTNM tools
-#ifndef QT_FILTER_H
-#define QT_FILTER_H
 
 // std
 
 // us
 #include "types.hh"
 #include "dsp.hh"
+
+#ifndef QT_FILTER_H
+#define QT_FILTER_H
 
 
 class Butterworth
@@ -49,15 +50,21 @@ class MatchedFilter
     // while pure function container,
     // default constructor/destructor
     public:
-        waveform_t Filter(waveform_t &record); // operation function
+        MatchedFilter();
+        virtual  ~MatchedFilter() = default;
 
-        void setTemplate(vec_t templ);
+        waveform_t Filter(waveform_t &record); // operation function
+        std::vector<quantity<s>> getTimeLag(quantity<s>);
+        inline void setTemplate(vec_t* templ) {pattern = templ;}
 
     private:
         DSP dsp; // FFT internal, holds no data
         void padding(waveform_t&, int); // data padding
-        void padding(vec_t&, int); // pattern padding
-        vec_t pattern;
+        void padding(vec_t*, int); // pattern padding
+        vec_t* pattern;
+        int stitch;
+        int tzero;
+        int axis_size;
 };
 
 

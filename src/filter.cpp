@@ -12,38 +12,65 @@
 #include "filter.hh"
 
 
-// MatchedFilter: inline methods implementation
-void MatchedFilter::setTemplate(vec_t t)
-{
-    pattern = t;
-    std::reverse(pattern.begin(), pattern.end()); // preparation for cross-correlation
-}
+// MatchedFilter: methods implementation
+MatchedFilter::MatchedFilter() : 
+pattern(nullptr),
+stitch(0),
+tzero(0),
+axis_size(0)
+{}
 
 void MatchedFilter::padding(waveform_t& indata, int zeros)
 {
+    stitch = (int)indata.size()/2;
     int count = 0;
     while (count<zeros) {
-        indata.push_back(0.0 * V); // casts 0 to complex
+        indata.push_back(0.0 * V);
         count++;
     }
 }
 
-void MatchedFilter::padding(vec_t& indata, int zeros)
+// pattern padding
+void MatchedFilter::padding(vec_t* indata, int zeros)
 {
     int count = 0;
     while (count<zeros) {
-        indata.push_back(0.0); // casts 0 to complex
+        indata->push_back(0.0);
         count++;
     }
 }
+
+std::vector<quantity<s>> MatchedFilter::getTimeLag(quantity<s> tstep)
+{
+    std::vector<quantity<s>> taxis; // empty for now
+    if (axis_size == 0) {
+        std::cout << ">>> Matched Filter: Filter first, no time lag yet." << std::endl;
+        return taxis;
+    }
+    taxis.resize(axis_size);
+    for (int i=0;i<axis_size;++i)
+        taxis[i] = i * tstep - tzero * tstep;
+    return taxis;
+}
+
 
 waveform_t MatchedFilter::Filter(waveform_t &record)
 {
-    int zeros = record.size() - pattern.size();
+    waveform_t res; // empty for now
+    if (pattern == nullptr) {
+        std::cout << ">>> Matched Filter: empty pattern/template, empty return." << std::endl;
+        return res;
+    }
+    if (record.empty()) {
+        std::cout << ">>> Matched Filter: empty data record input, empty return." << std::endl;
+        return res;
+    }
+    stitch = (int)pattern->size()/2; // overwrite in padding if required
+    int zeros = record.size() - pattern->size();
     zeros>0 ? padding(pattern,zeros) : padding(record, abs(zeros));
 
-    pattern_arg pin(pattern.size()); // temporary
-    for (int i=0; i<pattern.size();++i) pin[i] = pattern[i]; // casting double->complex<double>
+    pattern_arg pin(pattern->size()); // temporary
+    for (int i=0; i<pattern->size();++i) pin[i] = pattern->at(i); // casting double->complex<double>
     pattern_arg tdat(record.size()); // temporary
     for (int i=0; i<record.size();++i) tdat[i] = record[i].numerical_value_in(record.front().unit); // unit removed
 
@@ -58,9 +85,19 @@ waveform_t MatchedFilter::Filter(waveform_t &record)
     std::transform(pin.begin(),pin.end(), fo.begin(), tdat.begin(), 
                     std::multiplies<std::complex<double>>()); // (hat(g))*f
 
+    // inverse FFT
     pattern_arg xinv = dsp.rfft1d(tdat, fft_dir::DIR_BWD);
-    waveform_t res;
-    for (auto entry : xinv) res.push_back(entry.real() * record.front().unit); // complex<double>->quantity<V>
+
+    // re-order output, same as scipy.signal.ifft needs re-order
+    // target order like in scipy.signal.correlate
+    res.resize(xinv.size());
+    // real part and imaginary part separately
+    pattern_arg left(xinv.end()-stitch,xinv.end()); // time lag negative
+    tzero = stitch; // for time-lag
+    axis_size = xinv.size();
+
+    for (int i=0;i<stitch;++i) res[i]=left[i].real() * record.front().unit; // complex<double>->quantity<V>
+    for (int i=stitch;i<xinv.size();++i) res[i]=xinv[i-stitch].real() * record.front().unit;
     return res;
 }
 
@@ -128,10 +165,8 @@ waveform_t Butterworth::LPassFilter(const waveform_t &record)
             }
             recalc = false; // coefficients calculated
         }
-        else {
-	  std::cout << "WARNING Filter: cut-off larger than Nyquist, return empty." << std::endl;
-	  return result;       // empty; no filtering
-	}
+        else 
+            return result;       // empty; no filtering
     }
     if (!record.empty()) {
         for (waveform_value xdata : record) {
